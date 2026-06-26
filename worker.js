@@ -454,21 +454,24 @@ export default {
                     if (!res.ok) throw new Error('API_ERR');
                     const data = await res.json();
                     
+                    let author = data.from_who || "";
+                    let work = data.from || "";
                     let source = "";
-                    if (data.from_who && data.from) {
-                        source = `—— ${data.from_who}《${data.from}》`;
-                    } else if (data.from) {
-                        source = `—— 《${data.from}》`;
-                    } else if (data.from_who) {
-                        source = `—— ${data.from_who}`;
+                    
+                    if (author && work && author !== work) {
+                        source = `—— ${author}《${work}》`;
+                    } else if (work) {
+                        source = `—— 《${work}》`;
+                    } else if (author) {
+                        source = `—— ${author}`;
+                    } else if (data.creator) {
+                        source = `—— @${data.creator}`;
+                    } else {
+                        source = `—— 佚名`;
                     }
                     
-                    if (source) {
-                        // 出处另起一行，字号略小，换用霞鹜文楷以产生排版视觉对比
-                        quoteEl.innerHTML = `「 ${data.hitokoto} 」<span style="display:block; font-size:13px; margin-top:10px; opacity:0.6; font-family:'LXGW WenKai TC', sans-serif; letter-spacing:1px; text-shadow:none;">${source}</span>`;
-                    } else {
-                        quoteEl.innerText = `「 ${data.hitokoto} 」`;
-                    }
+                    // 使用 <br> 强制换行，提升兼容性，字号调大至 14px 更清晰
+                    quoteEl.innerHTML = `「 ${data.hitokoto} 」<br><span style="display:inline-block; font-size:14px; margin-top:12px; color:#94a3b8; opacity:0.8; font-family:'LXGW WenKai TC', sans-serif; letter-spacing:1px; text-shadow:none;">${source}</span>`;
                 } catch (e) {
                     // 原生语录已彻底抹除，网络超时仅做极简提示
                     quoteEl.innerText = "「 灵气枯竭，未能连接到语录之源... 」";
@@ -635,6 +638,6 @@ export default {
     </html>
     `;
 
-    return new Response(html, { headers: { "content-type": "text/html;charset=UTF-8" } });
+    return new Response(html, { headers: { "content-type": "text/html;charset=UTF-8", "Cache-Control": "no-cache, no-store, must-revalidate" } });
   },
 };

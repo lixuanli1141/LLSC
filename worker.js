@@ -11,7 +11,13 @@ const DEFAULT_CONFIG = [
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    
+    // 后台系统的绝对入口密码
     const adminPwd = env.ADMIN_PWD || "lixuanli"; 
+
+    // 获取系统动态安全配置（口令与秘典密钥）
+    let sysConfigStr = await env.MY_KV.get("SYS_CONFIG");
+    let sysConfig = sysConfigStr ? JSON.parse(sysConfigStr) : { revealPwd: "5201314", memoPwd: "5201314" };
 
     // ==========================================
     // 1. 安全层：后台系统鉴权 (Admin)
@@ -30,9 +36,13 @@ export default {
       if (request.method === "POST") {
         const formData = await request.formData();
         const newJson = formData.get("configJson");
+        const newRevealPwd = formData.get("revealPwd") || "5201314";
+        const newMemoPwd = formData.get("memoPwd") || "5201314";
+        
         try {
           JSON.parse(newJson); 
           await env.MY_KV.put("NAV_CONFIG", newJson);
+          await env.MY_KV.put("SYS_CONFIG", JSON.stringify({ revealPwd: newRevealPwd, memoPwd: newMemoPwd }));
           return Response.redirect(url.origin + "/admin?msg=success", 302);
         } catch (e) {
           return new Response("数据编译错误，保存失败！", { status: 400 });
@@ -97,6 +107,24 @@ export default {
             <button type="button" class="btn btn-secondary" onclick="importJson()">📜 融合玉简 (Import)</button>
           </div>
           <form method="POST" id="adminForm">
+            
+            <!-- 核心安全配置区域 -->
+            <div class="edit-card" style="border-color: #f87171; box-shadow: 0 4px 6px -1px rgba(239,68,68,0.1);">
+                <div class="card-header">
+                    <span class="badge" style="background:#fef2f2;color:#ef4444;">🛡️ 核心动态密钥配置</span>
+                </div>
+                <div class="input-grid">
+                    <div class="form-group">
+                        <label>隐秘法阵口令 (右下角触发)</label>
+                        <input type="text" name="revealPwd" value="${sysConfig.revealPwd}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>秘典残卷密钥 (左下角触发)</label>
+                        <input type="text" name="memoPwd" value="${sysConfig.memoPwd}" required>
+                    </div>
+                </div>
+            </div>
+
             <input type="hidden" name="configJson" id="hidden-json">
             <div id="list-container"></div>
             <button type="button" class="btn btn-add" onclick="addItem()">+ 凝练新节点</button>
@@ -214,7 +242,7 @@ export default {
 
     if (url.pathname === '/api/memo' && request.method === 'POST') {
       const { pwd, text, action } = await request.json();
-      if (pwd !== adminPwd) return new Response("Unauthorized", { status: 401 });
+      if (pwd !== sysConfig.memoPwd) return new Response("Unauthorized", { status: 401 });
       
       if (action === 'save') {
         await env.MY_KV.put("CLOUD_MEMO", text);
@@ -227,7 +255,7 @@ export default {
 
     if (url.pathname === '/api/reveal' && request.method === 'POST') {
       const { pwd } = await request.json();
-      if (pwd === adminPwd) {
+      if (pwd === sysConfig.revealPwd) {
         // 返回未被彻底隐藏，且标记为私密的节点
         const privateItems = NAV_ITEMS
           .map((item, idx) => ({ ...item, originalIdx: idx }))
@@ -344,13 +372,11 @@ export default {
             .status-dot.online { background-color: #10b981; opacity: 1; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6), 0 0 12px rgba(16, 185, 129, 0.2); animation: dot-breathe 2.4s ease-in-out infinite; }
             .status-dot.offline { background-color: #ef4444; opacity: 1; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
 
-            .float-tools { position: fixed; top: 30px; right: 30px; display: flex; gap: 15px; z-index: 50; }
-            .tool-btn { background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); color: var(--text-secondary); width: 44px; height: 44px; border-radius: 12px; display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s; font-size: 18px; }
-            .tool-btn:hover { border-color: var(--primary-blue); color: var(--primary-blue); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.2); }
-            .tool-btn:active { transform: scale(0.92); }
-
-            /* 隐蔽口令触控区 (彻底防被发现) */
-            .stealth-trigger { position: fixed; bottom: 0; right: 0; width: 40px; height: 40px; cursor: pointer; z-index: 999; opacity: 0; -webkit-tap-highlight-color: transparent;}
+            /* ============================================================ */
+            /* 极简隐蔽触发器 (分别位于屏幕左下角和右下角死角，完全透明) */
+            /* ============================================================ */
+            .stealth-trigger-memo { position: fixed; bottom: 0; left: 0; width: 60px; height: 60px; cursor: pointer; z-index: 999; opacity: 0; -webkit-tap-highlight-color: transparent;}
+            .stealth-trigger-reveal { position: fixed; bottom: 0; right: 0; width: 60px; height: 60px; cursor: pointer; z-index: 999; opacity: 0; -webkit-tap-highlight-color: transparent;}
 
             .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
             .modal-overlay.active { display: flex; opacity: 1; }
@@ -388,7 +414,6 @@ export default {
                 .container { padding: 35px 20px; width: 92%; } 
                 .nav-grid { grid-template-columns: 1fr; } 
                 h1 { font-size: 44px; } 
-                .float-tools { top: max(20px, env(safe-area-inset-top)); right: 20px; } 
             }
         </style>
     </head>
@@ -396,12 +421,12 @@ export default {
         <div class="aurora-glow glow-1"></div>
         <div class="aurora-glow glow-2"></div>
         
-        <!-- 隐蔽的边缘触发器 -->
-        <div class="stealth-trigger" onclick="openModal('reveal')" title=" "></div>
-
-        <div class="float-tools">
-            <div class="tool-btn" onclick="openModal('memo')" title="秘典残卷 (云端便签)">📜</div>
-        </div>
+        <!-- ================================================== -->
+        <!-- 左下角隐蔽点击触发：秘典残卷 -->
+        <div class="stealth-trigger-memo" onclick="openModal('memo')" title=" "></div>
+        <!-- 右下角隐蔽点击触发：隐秘法阵 -->
+        <div class="stealth-trigger-reveal" onclick="openModal('reveal')" title=" "></div>
+        <!-- ================================================== -->
 
         <!-- 通用模态框 -->
         <div class="modal-overlay" id="app-modal">
@@ -416,8 +441,7 @@ export default {
                     <button class="auth-submit" onclick="verifyPwd()">破阵</button>
                 </div>
                 
-                <!-- Placeholder 中注入了你之前要求的免责声明，保障合规又不破坏 UI -->
-                <textarea class="memo-area" id="memo-area" placeholder="Personal self-built cloud disk · Non-commercial use · Stability not guaranteed.&#10;记录大千世界的灵光一闪... (自动保存)"></textarea>
+                <textarea class="memo-area" id="memo-area" placeholder="记录大千世界的灵光一闪... (自动保存)"></textarea>
                 <div class="save-status" id="save-status">阵纹已铭刻 ✓</div>
             </div>
         </div>
@@ -431,7 +455,8 @@ export default {
         </div>
         
         <div class="footer" id="footer-text">
-            © <span id="current-year"></span> 零落山川 All Rights Reserved.
+            © <span id="current-year"></span> 零落山川 All Rights Reserved.<br/>
+            Personal self-built cloud disk · Non-commercial use · Stability not guaranteed.
         </div>
 
         <script>
@@ -551,14 +576,14 @@ export default {
                 if (appType === 'reveal') {
                     document.getElementById('modal-title').innerText = '🔑 隐秘法阵';
                     document.getElementById('memo-area').style.display = 'none';
-                    document.getElementById('sys-pwd').placeholder = '请输入破除隐匿的口令...';
+                    document.getElementById('sys-pwd').placeholder = '请输入破除隐匿的全局口令...';
                     document.getElementById('sys-pwd').value = '';
                 } else if (appType === 'memo') {
                     document.getElementById('modal-title').innerText = '📜 秘典残卷';
                     document.getElementById('memo-area').style.display = 'none';
-                    document.getElementById('sys-pwd').placeholder = '请输入全局管理员密钥...';
+                    document.getElementById('sys-pwd').placeholder = '请输入便签专属密钥...';
                     
-                    const savedPwd = localStorage.getItem('LLSC_TOKEN');
+                    const savedPwd = localStorage.getItem('LLSC_MEMO_PWD');
                     if (savedPwd) {
                         document.getElementById('sys-pwd').value = savedPwd;
                         verifyPwd();
@@ -599,20 +624,20 @@ export default {
                         const res = await fetch('/api/memo', { method: 'POST', body: JSON.stringify({pwd, action: 'read'}) });
                         if (!res.ok) throw new Error('Auth Failed');
                         const data = await res.json();
-                        localStorage.setItem('LLSC_TOKEN', pwd);
+                        localStorage.setItem('LLSC_MEMO_PWD', pwd);
                         document.getElementById('auth-area').style.display = 'none';
                         const memoEl = document.getElementById('memo-area');
                         memoEl.style.display = 'block';
                         memoEl.value = data.text;
                     } catch (e) { 
                         alert('❌ 密钥验证失败！'); 
-                        localStorage.removeItem('LLSC_TOKEN'); 
+                        localStorage.removeItem('LLSC_MEMO_PWD'); 
                     }
                 }
             }
 
             async function saveMemo() {
-                const pwd = localStorage.getItem('LLSC_TOKEN');
+                const pwd = localStorage.getItem('LLSC_MEMO_PWD');
                 const text = document.getElementById('memo-area').value;
                 if (!pwd) return;
                 try {

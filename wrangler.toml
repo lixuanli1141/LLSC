@@ -7,4 +7,4 @@ enabled = true
 
 [[kv_namespaces]]
 binding = "MY_KV"
-id = "NAV_DATA"
+id = "c1f01fc52ea2473ea86df6082dc763c0"

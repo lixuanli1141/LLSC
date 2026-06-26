@@ -331,8 +331,68 @@ export default {
                 transition: all 0.5s ease; 
             }
 
-            .status-dot.online { background-color: #10b981; opacity: 1; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6), 0 0 12px rgba(16, 185, 129, 0.2); }
+            .status-dot.online { background-color: #10b981; opacity: 1; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6), 0 0 12px rgba(16, 185, 129, 0.2); animation: dot-breathe 2.4s ease-in-out infinite; }
             .status-dot.offline { background-color: #ef4444; opacity: 1; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
+
+            /* 呼吸光晕背景 */
+            .aurora-glow {
+                position: fixed;
+                border-radius: 50%;
+                filter: blur(60px);
+                opacity: 0.25;
+                pointer-events: none;
+                z-index: 0;
+            }
+            .glow-1 {
+                width: 320px; height: 320px;
+                background: radial-gradient(circle, #3b82f6, transparent 70%);
+                top: 8%; left: -10%;
+                animation: drift-1 16s ease-in-out infinite;
+            }
+            .glow-2 {
+                width: 280px; height: 280px;
+                background: radial-gradient(circle, #8b5cf6, transparent 70%);
+                bottom: 5%; right: -8%;
+                animation: drift-2 20s ease-in-out infinite;
+            }
+            @keyframes drift-1 {
+                0%, 100% { transform: translate(0, 0) scale(1); }
+                50% { transform: translate(40px, 30px) scale(1.15); }
+            }
+            @keyframes drift-2 {
+                0%, 100% { transform: translate(0, 0) scale(1); }
+                50% { transform: translate(-30px, -25px) scale(1.1); }
+            }
+            @keyframes dot-breathe {
+                0%, 100% { transform: scale(1); opacity: 1; }
+                50% { transform: scale(1.3); opacity: 0.6; }
+            }
+
+            /* 标题与诗句入场动画 */
+            @keyframes title-in {
+                from { opacity: 0; transform: translateY(14px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes quote-in {
+                from { opacity: 0; transform: translateY(14px); }
+                to { opacity: 0.8; transform: translateY(0); }
+            }
+            #main-title { animation: title-in 0.9s ease-out forwards; }
+            .sub-quote { animation: quote-in 0.9s ease-out 0.35s forwards; opacity: 0; }
+
+            /* 卡片点击水波 */
+            .nav-item { -webkit-tap-highlight-color: transparent; }
+            .ripple {
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(59, 130, 246, 0.35);
+                transform: scale(0);
+                animation: ripple-anim 0.6s ease-out;
+                pointer-events: none;
+            }
+            @keyframes ripple-anim {
+                to { transform: scale(3); opacity: 0; }
+            }
             
             .footer { margin-top: 40px; font-size: 12px; color: var(--text-secondary); letter-spacing: 1px; opacity: 0.5; }
             
@@ -344,8 +404,10 @@ export default {
         </style>
     </head>
     <body>
+        <div class="aurora-glow glow-1"></div>
+        <div class="aurora-glow glow-2"></div>
         <div class="container">
-            <h1>零落山川</h1>
+            <h1 id="main-title">零落山川</h1>
             <div class="sub-quote" id="random-quote">道法推演中...</div>
             <div class="nav-grid">
                 ${cardsHtml}
@@ -464,11 +526,22 @@ export default {
 
                 const quoteEl = document.getElementById('random-quote');
                 const randomText = xianxiaQuotes[Math.floor(Math.random() * xianxiaQuotes.length)];
-                quoteEl.style.opacity = 0;
-                setTimeout(() => {
-                    quoteEl.innerText = "「 " + randomText + " 」";
-                    quoteEl.style.opacity = 1;
-                }, 100);
+                quoteEl.innerText = "「 " + randomText + " 」";
+
+                // 卡片点击水波效果
+                document.querySelectorAll('.nav-item').forEach(card => {
+                    card.addEventListener('click', function(e) {
+                        const rect = this.getBoundingClientRect();
+                        const ripple = document.createElement('span');
+                        const size = Math.max(rect.width, rect.height);
+                        ripple.className = 'ripple';
+                        ripple.style.width = ripple.style.height = size + 'px';
+                        ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+                        ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+                        this.appendChild(ripple);
+                        setTimeout(() => ripple.remove(), 600);
+                    });
+                });
 
                 try {
                     const res = await fetch('/api/status');

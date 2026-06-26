@@ -453,7 +453,7 @@ export default {
                     if (sourceText) {
                         const sourceDiv = document.createElement('div');
                         // 专门为出处设置了不同的字体和透明度，拉开视觉层次
-                        sourceDiv.style.cssText = "margin-top: 12px; font-size: 14px; opacity: 0.65; font-family: 'LXGW WenKai TC', sans-serif; letter-spacing: 1px; text-shadow: none;";
+                        sourceDiv.style.cssText = "margin-top: 12px; font-size: 14px; opacity: 0.65; font-family: 'LXGW WenKai TC', sans-serif; letter-spacing: 1px; text-shadow: none; text-align: right;";
                         sourceDiv.innerText = "—— " + sourceText;
                         quoteEl.appendChild(sourceDiv);
                     }

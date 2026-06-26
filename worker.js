@@ -356,13 +356,8 @@ export default {
             .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
             .toast.error { background: rgba(239, 68, 68, 0.9); box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.4); }
 
-            .float-tools { position: fixed; top: 30px; right: 30px; display: flex; gap: 15px; z-index: 50; }
-            .tool-btn { background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); color: var(--text-secondary); width: 44px; height: 44px; border-radius: 12px; display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s; font-size: 18px; }
-            .tool-btn:hover { border-color: var(--primary-blue); color: var(--primary-blue); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.2); }
-            .tool-btn:active { transform: scale(0.92); }
-
-            /* 隐蔽口令触控区 (右下角极限盲区) */
-            .stealth-trigger-reveal { position: fixed; bottom: 0; right: 0; width: 60px; height: 60px; cursor: pointer; z-index: 999; opacity: 0; -webkit-tap-highlight-color: transparent;}
+            /* 隐蔽口令触控区 (右下角极限盲区) - 双向开关 */
+            .stealth-trigger-reveal { position: fixed; bottom: 0; right: 0; width: 80px; height: 80px; cursor: pointer; z-index: 999; opacity: 0; -webkit-tap-highlight-color: transparent;}
 
             .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
             .modal-overlay.active { display: flex; opacity: 1; }
@@ -396,7 +391,6 @@ export default {
                 .container { padding: 35px 20px; width: 92%; } 
                 .nav-grid { grid-template-columns: 1fr; } 
                 h1 { font-size: 44px; } 
-                .float-tools { top: max(20px, env(safe-area-inset-top)); right: 20px; } 
             }
         </style>
     </head>
@@ -408,14 +402,9 @@ export default {
         <div id="toast" class="toast"></div>
 
         <!-- ================================================== -->
-        <!-- 右下角隐蔽点击触发：隐秘法阵 -->
-        <div class="stealth-trigger-reveal" onclick="openModal('reveal')" title=" "></div>
+        <!-- 右下角隐蔽点击触发：隐秘法阵 / 重置封印双向开关 -->
+        <div class="stealth-trigger-reveal" onclick="handleStealthClick()" title=" "></div>
         <!-- ================================================== -->
-
-        <div class="float-tools">
-            <!-- 登出锁定按钮，默认隐藏，解密后显示 -->
-            <div class="tool-btn" id="logout-btn" onclick="lockSystem()" title="重置封印 (退出登录)" style="display: none;">🔓</div>
-        </div>
 
         <!-- 通用模态框 -->
         <div class="modal-overlay" id="app-modal">
@@ -450,7 +439,7 @@ export default {
                 "大道无情，修仙本就是逆天而行。", "纵然天道崎岖，我也要踏出一条长生路。", "顺为凡，逆则仙，只在中间颠倒颠。"
             ];
 
-            let currentApp = ''; // 'reveal'
+            let isUnlocked = false; // 记录当前是否已解密
 
             function showToast(msg, isError = false) {
                 const toast = document.getElementById('toast');
@@ -479,8 +468,8 @@ export default {
                         const res = await fetch('/api/reveal', { method: 'POST', body: JSON.stringify({ pwd: savedPasscode }) });
                         if (res.ok) {
                             const data = await res.json();
+                            isUnlocked = true;
                             renderPrivateCards(data.items);
-                            document.getElementById('logout-btn').style.display = 'flex';
                             showToast('✨ 隐秘阵法已自动解除隐匿');
                         } else {
                             localStorage.removeItem('LLSC_PASSCODE'); 
@@ -540,10 +529,11 @@ export default {
                         a.className = 'nav-item private-node';
                         a.target = '_blank';
                         a.id = 'node-' + item.originalIdx;
+                        // 完全抹除视觉上的锁标记，实现真正的无差别隐匿
                         a.innerHTML = \`
                             <span class="icon">\${item.icon}</span>
                             <div class="details">
-                                <span class="title">\${item.title} <span style="margin-left: 6px; font-size: 13px; opacity: 0.8;" title="私密洞天">🔒</span></span>
+                                <span class="title">\${item.title}</span>
                                 <span class="desc">\${item.desc}</span>
                             </div>
                             <div class="status-dot" data-idx="\${item.originalIdx}"></div>
@@ -555,15 +545,22 @@ export default {
                 checkStatus(); 
             }
 
-            function openModal(appType) {
-                currentApp = appType;
-                document.getElementById('auth-area').style.display = 'flex';
-                
-                if (appType === 'reveal') {
-                    document.getElementById('modal-title').innerText = '🔑 隐秘法阵';
-                    document.getElementById('sys-pwd').placeholder = '请输入破除隐匿的全局口令...';
-                    document.getElementById('sys-pwd').value = '';
+            // 右下角隐秘触发器双向开关控制逻辑
+            function handleStealthClick() {
+                if (isUnlocked) {
+                    // 如果已经解密，再次点击则直接退隐（锁定系统）
+                    lockSystem();
+                } else {
+                    // 尚未解密，打开认证框
+                    openModal();
                 }
+            }
+
+            function openModal() {
+                document.getElementById('auth-area').style.display = 'flex';
+                document.getElementById('modal-title').innerText = '🔑 隐秘法阵';
+                document.getElementById('sys-pwd').placeholder = '请输入破除隐匿的全局口令...';
+                document.getElementById('sys-pwd').value = '';
                 
                 document.getElementById('app-modal').classList.add('active');
                 setTimeout(() => document.getElementById('sys-pwd').focus(), 100);
@@ -577,27 +574,26 @@ export default {
                 const pwd = document.getElementById('sys-pwd').value;
                 if (!pwd) return;
 
-                if (currentApp === 'reveal') {
-                    try {
-                        const res = await fetch('/api/reveal', { method: 'POST', body: JSON.stringify({ pwd }) });
-                        if (!res.ok) throw new Error('Reveal Failed');
-                        const data = await res.json();
-                        
-                        localStorage.setItem('LLSC_PASSCODE', pwd);
-                        
-                        closeModal();
-                        renderPrivateCards(data.items);
-                        document.getElementById('logout-btn').style.display = 'flex';
-                        showToast('✅ 口令验证成功，隐秘阵法已显现');
-                    } catch (e) { 
-                        document.getElementById('sys-pwd').value = '';
-                        showToast('❌ 口令错误，阵法未响应', true);
-                    }
+                try {
+                    const res = await fetch('/api/reveal', { method: 'POST', body: JSON.stringify({ pwd }) });
+                    if (!res.ok) throw new Error('Reveal Failed');
+                    const data = await res.json();
+                    
+                    localStorage.setItem('LLSC_PASSCODE', pwd);
+                    isUnlocked = true;
+                    
+                    closeModal();
+                    renderPrivateCards(data.items);
+                    showToast('✅ 口令验证成功，隐秘阵法已显现');
+                } catch (e) { 
+                    document.getElementById('sys-pwd').value = '';
+                    showToast('❌ 口令错误，阵法未响应', true);
                 }
             }
 
             function lockSystem() {
                 localStorage.removeItem('LLSC_PASSCODE');
+                isUnlocked = false;
                 window.location.reload();
             }
         </script>

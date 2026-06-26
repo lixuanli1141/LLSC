@@ -60,10 +60,10 @@ export default {
       <html lang="zh-CN">
       <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
         <title>零落山川 | 阵法中枢</title>
         <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; color: #0f172a; margin: 0; padding: 30px 15px; padding-bottom: calc(30px + env(safe-area-inset-bottom)); -webkit-font-smoothing: antialiased; }
+          body { touch-action: manipulation; touch-action: manipulation; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; color: #0f172a; margin: 0; padding: 30px 15px; padding-bottom: calc(30px + env(safe-area-inset-bottom)); -webkit-font-smoothing: antialiased; }
           ::-webkit-scrollbar { display: none; }
           * { scrollbar-width: none; }
           .header { max-width: 800px; margin: 0 auto 24px; display: flex; justify-content: space-between; align-items: center; }
@@ -287,7 +287,7 @@ export default {
     <html lang="zh-CN">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
         <title>零落山川</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -301,7 +301,8 @@ export default {
                 --card-bg: rgba(15, 23, 42, 0.6); --border-color: rgba(255, 255, 255, 0.08); 
                 --primary-blue: #3b82f6; --hover-border: rgba(59, 130, 246, 0.5); --hover-shadow: rgba(29, 78, 216, 0.2);
             }
-            body { 
+            body { touch-action: manipulation; 
+                touch-action: manipulation; /* 禁用双击放大 */
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
                 background-color: var(--bg-base); 
                 background-image: linear-gradient(var(--grid-color) 1px, transparent 1px), linear-gradient(90deg, var(--grid-color) 1px, transparent 1px); 

@@ -11,12 +11,12 @@ const DEFAULT_CONFIG = [
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    const adminPwd = env.ADMIN_PWD || "123456"; 
 
     // ==========================================
-    // 1. 安全层：后台系统鉴权
+    // 1. 安全层：后台系统鉴权 (Admin)
     // ==========================================
     if (url.pathname.startsWith('/admin')) {
-      const adminPwd = env.ADMIN_PWD || "123456"; 
       const expectedAuth = "Basic " + btoa("admin:" + adminPwd);
       const authHeader = request.headers.get("Authorization");
 
@@ -58,6 +58,7 @@ export default {
           .header { max-width: 800px; margin: 0 auto 24px; display: flex; justify-content: space-between; align-items: center; }
           .header h2 { margin: 0; font-size: 24px; color: #1e293b; letter-spacing: 1px; }
           .container { max-width: 800px; margin: 0 auto; }
+          .toolbar { display: flex; gap: 10px; margin-bottom: 20px; }
           .edit-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: all 0.2s ease; position: relative;}
           .edit-card:hover { border-color: #3b82f6; box-shadow: 0 10px 25px -5px rgba(59,130,246,0.1); transform: translateY(-2px); }
           .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px dashed #e2e8f0; }
@@ -70,9 +71,11 @@ export default {
           .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 500; font-size: 15px; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;}
           .btn-primary { background: #1d4ed8; color: white; width: 100%; padding: 14px; font-size: 16px; box-shadow: 0 4px 6px -1px rgba(29, 78, 216, 0.2); }
           .btn-add { background: #ffffff; color: #10b981; border: 2px dashed #10b981; width: 100%; padding: 16px; margin-bottom: 24px; font-size: 16px; font-weight: 600;}
+          .btn-secondary { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+          .btn-secondary:hover { background: #e2e8f0; color: #0f172a; }
           .icon-btn { background: white; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; padding: 6px 10px; margin-left: 6px; font-size: 14px; color: #475569;}
           .back-link { color: #64748b; text-decoration: none; font-size: 15px; }
-          @media (max-width: 600px) { .input-grid { grid-template-columns: 1fr; } }
+          @media (max-width: 600px) { .input-grid { grid-template-columns: 1fr; } .toolbar { flex-direction: column; } }
         </style>
       </head>
       <body>
@@ -82,6 +85,10 @@ export default {
         </div>
         <div class="container">
           ${msgHtml}
+          <div class="toolbar">
+            <button type="button" class="btn btn-secondary" onclick="exportJson()">📦 导出玉简 (Export)</button>
+            <button type="button" class="btn btn-secondary" onclick="importJson()">📜 融合玉简 (Import)</button>
+          </div>
           <form method="POST" id="adminForm">
             <input type="hidden" name="configJson" id="hidden-json">
             <div id="list-container"></div>
@@ -138,6 +145,36 @@ export default {
             siteData.push({ title: "新洞天", url: "https://", desc: "请注入法则描述", icon: \`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>\` });
             render();
           }
+          
+          function exportJson() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(siteData, null, 2));
+            const dlNode = document.createElement('a');
+            dlNode.setAttribute("href", dataStr);
+            dlNode.setAttribute("download", "llsc_nav_config.json");
+            document.body.appendChild(dlNode);
+            dlNode.click();
+            dlNode.remove();
+          }
+
+          function importJson() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'application/json';
+            input.onchange = e => {
+              const file = e.target.files[0];
+              const reader = new FileReader();
+              reader.onload = event => {
+                try {
+                  siteData = JSON.parse(event.target.result);
+                  render();
+                  alert("✅ 阵法图解析成功，请点击最下方按钮保存同步！");
+                } catch(err) { alert("❌ 玉简解析失败，JSON格式有误！"); }
+              };
+              reader.readAsText(file);
+            }
+            input.click();
+          }
+
           render();
         </script>
       </body>
@@ -147,7 +184,36 @@ export default {
     }
 
     // ==========================================
-    // 4. 前台：读取配置与探针接口
+    // 2. API层：须弥芥子 (Vault) & 秘典残卷 (Memo)
+    // ==========================================
+    if (url.pathname === '/api/vault' && request.method === 'POST') {
+      const { pwd } = await request.json();
+      if (pwd !== adminPwd) return new Response("Unauthorized", { status: 401 });
+      
+      let vaultData = await env.MY_KV.get("VAULT_DATA");
+      if (!vaultData) vaultData = JSON.stringify([
+        { name: "Hysteria2 核心链路", content: "hysteria2://..." },
+        { name: "VLESS 备用传输流", content: "vless://..." },
+        { name: "Docker 重启阵法", content: "cd /opt && docker-compose down && docker-compose up -d" }
+      ]);
+      return new Response(vaultData, { headers: { "Content-Type": "application/json;charset=UTF-8" }});
+    }
+
+    if (url.pathname === '/api/memo' && request.method === 'POST') {
+      const { pwd, text, action } = await request.json();
+      if (pwd !== adminPwd) return new Response("Unauthorized", { status: 401 });
+      
+      if (action === 'save') {
+        await env.MY_KV.put("CLOUD_MEMO", text);
+        return new Response('{"status":"saved"}', { headers: { "Content-Type": "application/json" }});
+      } else {
+        const currentMemo = await env.MY_KV.get("CLOUD_MEMO");
+        return new Response(JSON.stringify({ text: currentMemo || "" }), { headers: { "Content-Type": "application/json" }});
+      }
+    }
+
+    // ==========================================
+    // 3. 前台：探针接口
     // ==========================================
     let navDataStr = await env.MY_KV.get("NAV_CONFIG");
     let NAV_ITEMS = navDataStr ? JSON.parse(navDataStr) : DEFAULT_CONFIG;
@@ -167,7 +233,7 @@ export default {
     }
 
     // ==========================================
-    // 5. 前端页面：神级书法字体 + 百句语录
+    // 4. 前端页面：大千世界主入口
     // ==========================================
     const cardsHtml = NAV_ITEMS.map(item => `
       <a href="${item.url}" class="nav-item" target="_blank">
@@ -193,249 +259,112 @@ export default {
         
         <style>
             :root { 
-                --bg-base: #0b1120; 
-                --grid-color: rgba(30, 58, 138, 0.15); 
-                --text-main: #f8fafc; 
-                --text-secondary: #94a3b8; 
-                --card-bg: rgba(15, 23, 42, 0.6); 
-                --border-color: rgba(255, 255, 255, 0.08); 
-                --primary-blue: #3b82f6; 
-                --hover-border: rgba(59, 130, 246, 0.5);
-                --hover-shadow: rgba(29, 78, 216, 0.2);
+                --bg-base: #0b1120; --grid-color: rgba(30, 58, 138, 0.15); 
+                --text-main: #f8fafc; --text-secondary: #94a3b8; 
+                --card-bg: rgba(15, 23, 42, 0.6); --border-color: rgba(255, 255, 255, 0.08); 
+                --primary-blue: #3b82f6; --hover-border: rgba(59, 130, 246, 0.5); --hover-shadow: rgba(29, 78, 216, 0.2);
             }
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background-color: var(--bg-base); background-image: linear-gradient(var(--grid-color) 1px, transparent 1px), linear-gradient(90deg, var(--grid-color) 1px, transparent 1px); background-size: 30px 30px; background-position: center center; color: var(--text-main); display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow-x: hidden;}
+            .container { max-width: 750px; width: 90%; padding: 45px 30px; z-index: 10; background: radial-gradient(circle at top, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.1) 100%); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); position: relative; }
             
-            body { 
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
-                background-color: var(--bg-base); 
-                background-image: 
-                    linear-gradient(var(--grid-color) 1px, transparent 1px),
-                    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-                background-size: 30px 30px;
-                background-position: center center;
-                color: var(--text-main); 
-                display: flex; 
-                flex-direction: column; 
-                justify-content: center; 
-                align-items: center; 
-                min-height: 100vh; 
-                margin: 0; 
-            }
-
-            .container { 
-                max-width: 750px; 
-                width: 90%; 
-                padding: 45px 30px; 
-                z-index: 10;
-                background: radial-gradient(circle at top, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.1) 100%);
-                backdrop-filter: blur(16px);
-                -webkit-backdrop-filter: blur(16px);
-                border: 1px solid rgba(255, 255, 255, 0.05);
-                border-radius: 20px;
-                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            }
-
-            /* 书法主标题：霞鹜文楷 */
-            h1 { 
-                text-align: center; 
-                font-family: 'Long Cang', cursive;
-                font-size: 52px; 
-                font-weight: normal; 
-                margin-top: 0; 
-                margin-bottom: 5px; 
-                letter-spacing: 6px; 
-                text-shadow: 0 2px 15px rgba(255, 255, 255, 0.15);
-            }
-
-            /* 诗词副标题：马善政楷书 */
-            .sub-quote {
-                text-align: center;
-                font-family: 'Ma Shan Zheng', serif;
-                font-size: 16px;
-                color: var(--text-secondary);
-                margin-bottom: 40px;
-                letter-spacing: 2px;
-                opacity: 0.8;
-                text-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
-                transition: opacity 1s ease-in-out;
-            }
-
-            .nav-grid { 
-                display: grid; 
-                grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); 
-                gap: 20px; 
-            }
-
-            .nav-item { 
-                position: relative; 
-                display: flex; 
-                align-items: center; 
-                padding: 18px 22px; 
-                text-decoration: none; 
-                background-color: var(--card-bg); 
-                backdrop-filter: blur(12px);
-                -webkit-backdrop-filter: blur(12px);
-                border: 1px solid var(--border-color); 
-                border-radius: 12px; 
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-                overflow: hidden;
-            }
-
-            .nav-item::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 50%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
-                transform: skewX(-20deg);
-                transition: all 0.5s ease;
-            }
-
+            h1 { text-align: center; font-family: 'Long Cang', cursive; font-size: 52px; font-weight: normal; margin-top: 0; margin-bottom: 5px; letter-spacing: 6px; text-shadow: 0 2px 15px rgba(255, 255, 255, 0.15); }
+            .sub-quote { text-align: center; font-family: 'Ma Shan Zheng', serif; font-size: 16px; color: var(--text-secondary); margin-bottom: 40px; letter-spacing: 2px; opacity: 0.8; text-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
+            
+            .nav-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+            .nav-item { position: relative; display: flex; align-items: center; padding: 18px 22px; text-decoration: none; background-color: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; -webkit-tap-highlight-color: transparent;}
+            .nav-item::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent); transform: skewX(-20deg); transition: all 0.5s ease; }
             .nav-item:hover::before { left: 150%; }
-
-            .nav-item:hover { 
-                border-color: var(--hover-border); 
-                background-color: rgba(30, 41, 59, 0.8); 
-                transform: translateY(-4px); 
-                box-shadow: 0 10px 30px -5px var(--hover-shadow), 0 0 0 1px var(--hover-border) inset; 
-            }
-
+            .nav-item:hover { border-color: var(--hover-border); background-color: rgba(30, 41, 59, 0.8); transform: translateY(-4px); box-shadow: 0 10px 30px -5px var(--hover-shadow), 0 0 0 1px var(--hover-border) inset; }
             .nav-item:hover .title, .nav-item:hover .icon { color: var(--primary-blue); }
-
-            .icon { 
-                display: flex; 
-                align-items: center; 
-                justify-content: center; 
-                margin-right: 18px; 
-                color: var(--text-secondary); 
-                transition: color 0.3s ease; 
-                background: rgba(255, 255, 255, 0.03);
-                padding: 10px;
-                border-radius: 8px;
-                border: 1px solid rgba(255, 255, 255, 0.05);
-            }
-
+            
+            .icon { display: flex; align-items: center; justify-content: center; margin-right: 18px; color: var(--text-secondary); transition: color 0.3s ease; background: rgba(255, 255, 255, 0.03); padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); }
             .icon svg { width: 22px; height: 22px; }
-
-            .details { 
-                display: flex; 
-                flex-direction: column; 
-                overflow: hidden;
-                width: calc(100% - 30px);
-            }
-
-            .title { 
-                font-size: 16px; 
-                font-weight: 500; 
-                font-family: 'LXGW WenKai TC', sans-serif;
-                color: var(--text-main); 
-                transition: color 0.3s ease; 
-                letter-spacing: 0.5px; 
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            .desc { 
-                font-size: 13px; 
-                font-family: 'LXGW WenKai TC', sans-serif;
-                color: var(--text-secondary); 
-                margin-top: 6px; 
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-
-            .status-dot { 
-                position: absolute; 
-                top: 16px; 
-                right: 18px; 
-                width: 8px; 
-                height: 8px; 
-                border-radius: 50%; 
-                background-color: var(--text-secondary); 
-                opacity: 0.3; 
-                transition: all 0.5s ease; 
-            }
-
+            .details { display: flex; flex-direction: column; overflow: hidden; width: calc(100% - 30px); }
+            .title { font-size: 16px; font-weight: 500; font-family: 'LXGW WenKai TC', sans-serif; color: var(--text-main); transition: color 0.3s ease; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .desc { font-size: 13px; font-family: 'LXGW WenKai TC', sans-serif; color: var(--text-secondary); margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            
+            .status-dot { position: absolute; top: 16px; right: 18px; width: 8px; height: 8px; border-radius: 50%; background-color: var(--text-secondary); opacity: 0.3; transition: all 0.5s ease; }
             .status-dot.online { background-color: #10b981; opacity: 1; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6), 0 0 12px rgba(16, 185, 129, 0.2); animation: dot-breathe 2.4s ease-in-out infinite; }
             .status-dot.offline { background-color: #ef4444; opacity: 1; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
 
-            /* 呼吸光晕背景 */
-            .aurora-glow {
-                position: fixed;
-                border-radius: 50%;
-                filter: blur(60px);
-                opacity: 0.25;
-                pointer-events: none;
-                z-index: 0;
-                will-change: transform;
-            }
-            .glow-1 {
-                width: 320px; height: 320px;
-                background: radial-gradient(circle, #3b82f6, transparent 70%);
-                top: 8%; left: -10%;
-                animation: drift-1 16s ease-in-out infinite;
-            }
-            .glow-2 {
-                width: 280px; height: 280px;
-                background: radial-gradient(circle, #0ea5e9, transparent 70%);
-                bottom: 5%; right: -8%;
-                animation: drift-2 20s ease-in-out infinite;
-            }
-            @keyframes drift-1 {
-                0%, 100% { transform: translate(0, 0) scale(1); }
-                50% { transform: translate(40px, 30px) scale(1.15); }
-            }
-            @keyframes drift-2 {
-                0%, 100% { transform: translate(0, 0) scale(1); }
-                50% { transform: translate(-30px, -25px) scale(1.1); }
-            }
-            @keyframes dot-breathe {
-                0%, 100% { transform: scale(1); opacity: 1; }
-                50% { transform: scale(1.3); opacity: 0.6; }
-            }
+            /* 工具栏悬浮按钮 (Vault & Memo) */
+            .float-tools { position: fixed; top: 30px; right: 30px; display: flex; gap: 15px; z-index: 50; }
+            .tool-btn { background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); color: var(--text-secondary); width: 44px; height: 44px; border-radius: 12px; display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s; font-size: 18px; }
+            .tool-btn:hover { border-color: var(--primary-blue); color: var(--primary-blue); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.2); }
 
-            /* 标题与诗句入场动画 */
-            @keyframes title-in {
-                from { opacity: 0; transform: translateY(14px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-            @keyframes quote-in {
-                from { opacity: 0; transform: translateY(14px); }
-                to { opacity: 0.8; transform: translateY(0); }
-            }
-            #main-title { animation: title-in 0.9s ease-out forwards; }
-            .sub-quote { animation: quote-in 0.9s ease-out 0.35s forwards; opacity: 0; }
+            /* 模态框通用样式 */
+            .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 100; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
+            .modal-overlay.active { display: flex; opacity: 1; }
+            .modal-box { background: #0f172a; border: 1px solid var(--border-color); border-radius: 16px; padding: 30px; width: 90%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); transform: translateY(20px); transition: transform 0.3s; }
+            .modal-overlay.active .modal-box { transform: translateY(0); }
+            .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-family: 'LXGW WenKai TC', sans-serif; font-size: 20px; color: white; border-bottom: 1px dashed var(--border-color); padding-bottom: 15px;}
+            .close-btn { cursor: pointer; color: var(--text-secondary); font-size: 24px; transition: color 0.2s; }
+            .close-btn:hover { color: white; }
+            
+            /* 密码输入区 */
+            .auth-area { display: flex; gap: 10px; margin-bottom: 15px; }
+            .auth-input { flex: 1; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: white; font-size: 14px; outline: none; transition: border 0.3s;}
+            .auth-input:focus { border-color: var(--primary-blue); }
+            .auth-submit { padding: 0 20px; background: var(--primary-blue); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.3s; }
+            .auth-submit:hover { opacity: 0.8; }
 
-            /* 卡片点击水波 */
-            .nav-item { -webkit-tap-highlight-color: transparent; }
-            .ripple {
-                position: absolute;
-                border-radius: 50%;
-                background: rgba(59, 130, 246, 0.35);
-                transform: scale(0);
-                transform-origin: center;
-                animation: ripple-anim 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-                pointer-events: none;
-                will-change: transform, opacity;
-            }
-            @keyframes ripple-anim {
-                to { transform: scale(3); opacity: 0; }
-            }
+            /* 须弥芥子列表 */
+            .vault-list { display: flex; flex-direction: column; gap: 12px; display: none; max-height: 400px; overflow-y: auto;}
+            .vault-item { background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+            .vault-info { flex: 1; overflow: hidden; }
+            .vault-name { font-size: 14px; color: #e2e8f0; margin-bottom: 5px; font-family: 'LXGW WenKai TC', sans-serif;}
+            .vault-code { font-family: monospace; font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .copy-btn { background: rgba(59, 130, 246, 0.1); color: var(--primary-blue); border: 1px solid rgba(59, 130, 246, 0.3); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: all 0.2s; margin-left: 10px;}
+            .copy-btn:hover { background: var(--primary-blue); color: white; }
+
+            /* 秘典残卷文本区 */
+            .memo-area { width: 100%; height: 200px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: #e2e8f0; font-family: 'LXGW WenKai TC', sans-serif; font-size: 15px; padding: 15px; box-sizing: border-box; resize: none; outline: none; display: none; line-height: 1.6;}
+            .memo-area:focus { border-color: var(--primary-blue); }
+            .save-status { font-size: 12px; color: #10b981; text-align: right; margin-top: 8px; opacity: 0; transition: opacity 0.3s; }
+
+            .ripple { position: absolute; border-radius: 50%; background: rgba(59, 130, 246, 0.35); transform: scale(0); transform-origin: center; animation: ripple-anim 0.6s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; will-change: transform, opacity; }
+            .aurora-glow { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.25; pointer-events: none; z-index: 0; will-change: transform; }
+            .glow-1 { width: 320px; height: 320px; background: radial-gradient(circle, #3b82f6, transparent 70%); top: 8%; left: -10%; animation: drift-1 16s ease-in-out infinite; }
+            .glow-2 { width: 280px; height: 280px; background: radial-gradient(circle, #0ea5e9, transparent 70%); bottom: 5%; right: -8%; animation: drift-2 20s ease-in-out infinite; }
             
-            .footer { margin-top: 40px; font-size: 12px; color: var(--text-secondary); letter-spacing: 1px; opacity: 0.5; }
+            .footer { margin-top: 40px; font-size: 12px; color: var(--text-secondary); letter-spacing: 1px; opacity: 0.5; z-index: 10; text-align: center; line-height: 1.8;}
             
-            @media (max-width: 600px) { 
-                .container { padding: 35px 20px; width: 92%; } 
-                .nav-grid { grid-template-columns: 1fr; } 
-                h1 { font-size: 44px; }
-            }
+            @keyframes drift-1 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(40px, 30px) scale(1.15); } }
+            @keyframes drift-2 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-30px, -25px) scale(1.1); } }
+            @keyframes dot-breathe { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.6; } }
+            @keyframes ripple-anim { to { transform: scale(3); opacity: 0; } }
+            @media (max-width: 600px) { .container { padding: 35px 20px; width: 92%; } .nav-grid { grid-template-columns: 1fr; } h1 { font-size: 44px; } .float-tools { top: 20px; right: 20px; } }
         </style>
     </head>
     <body>
         <div class="aurora-glow glow-1"></div>
         <div class="aurora-glow glow-2"></div>
+        
+        <div class="float-tools">
+            <div class="tool-btn" onclick="openModal('vault')" title="须弥芥子 (私密链路)">🔒</div>
+            <div class="tool-btn" onclick="openModal('memo')" title="秘典残卷 (云端便签)">📜</div>
+        </div>
+
+        <!-- 通用鉴权与展示模态框 -->
+        <div class="modal-overlay" id="app-modal">
+            <div class="modal-box">
+                <div class="modal-header">
+                    <span id="modal-title">认证中枢</span>
+                    <span class="close-btn" onclick="closeModal()">×</span>
+                </div>
+                
+                <div class="auth-area" id="auth-area">
+                    <input type="password" id="sys-pwd" class="auth-input" placeholder="请输入阵法密钥...">
+                    <button class="auth-submit" onclick="verifyPwd()">启阵</button>
+                </div>
+
+                <div class="vault-list" id="vault-list"></div>
+                
+                <textarea class="memo-area" id="memo-area" placeholder="记录大千世界的灵光一闪... (自动保存)"></textarea>
+                <div class="save-status" id="save-status">阵纹已铭刻 ✓</div>
+            </div>
+        </div>
+
         <div class="container">
             <h1 id="main-title">零落山川</h1>
             <div class="sub-quote" id="random-quote">道法推演中...</div>
@@ -443,110 +372,24 @@ export default {
                 ${cardsHtml}
             </div>
         </div>
-        <div class="footer" id="footer-text">© <span id="current-year"></span> 零落山川 All Rights Reserved.</div>
+        
+        <div class="footer" id="footer-text">
+            © <span id="current-year"></span> 零落山川 All Rights Reserved.<br/>
+            Personal self-built cloud disk · Non-commercial use · Stability not guaranteed.
+        </div>
 
         <script>
             const xianxiaQuotes = [
-                "大道无情，修仙本就是逆天而行。",
-                "修仙界本就弱肉强食，哪有什么真正的道理可言。",
-                "纵然天道崎岖，我也要踏出一条长生路。",
-                "岁月不居，时节如流，修仙无岁月。",
-                "法宝再好，也不如自身的修为靠得住。",
-                "所谓长生，不过是看尽故人离去，独自品尝这无尽的孤寂。",
-                "我韩立行事，何须向他人解释。",
-                "这雨生于天，死于大地，中间的过程，便是人生。",
-                "顺为凡，逆则仙，只在中间颠倒颠。",
-                "道在人为，我命由我不由天！",
-                "我修的不是仙，是这无尽的孤寂。",
-                "魔前一叩三千年，回首凡尘不做仙。",
-                "既然世人皆称我为魔，那我从此，便做这天地间第一大魔！",
-                "我左手是修魔海短暂的因果，右手里百年一个漫长的孤陌。",
-                "如果这天遮了我的眼，那我就捅破这天！",
-                "我命如妖欲封天！",
-                "既然找不到前往仙界的路，那便自己走出来一条。",
-                "仙路尽头谁为峰，一见无始道成空。",
-                "哪怕背负天渊，需一手托原始帝城，我安澜一样无敌于世间！",
-                "登天路，踏歌行，弹指遮天。",
-                "我为天帝，当镇压世间一切敌！",
-                "谁在称无敌，哪个敢言不败？帝落时代都不见！",
-                "一粒尘可填海，一根草斩尽日月星辰，弹指间天翻地覆。",
-                "吾乃万道之尊，执掌诸天星辰！",
-                "星空彼岸，有我无敌。",
-                "历千劫万险，纵使魂飞魄散，我灵识依在，战百世轮回，纵使六道无常，我依然永生！",
-                "待到逆乱阴阳时，以我魔血染青天！",
-                "有些道理，剑鞘里说不通，那就拔剑跟这个世界讲。",
-                "遇事不决，可问春风。春风不语，即随本心。",
-                "我有一剑，可搬山，倒海，降妖，镇魔，摘星，断江，摧城，开天！",
-                "天不生我李淳罡，剑道万古如长夜。",
-                "天上剑仙三百万，见我也须尽低眉。",
-                "愿吾辈剑修，人人皆可一剑开天门。",
-                "世间文字八万个，唯有情字最杀人。",
-                "且视他人之疑目如盏盏鬼火，大胆去走你的夜路。",
-                "莫道书生无胆气，敢叫天地沉入海。",
-                "天不生夫子，万古如长夜。",
-                "若天压我，劈开那天；若地拘我，踏碎那地。",
-                "我等生来自由身，谁敢高高在上。",
-                "原来一生一世那么短暂，原来当你发现所爱的，就应该不顾一切的去追求。",
-                "我要这天，再遮不住我眼；要这地，再埋不了我心。",
-                "长夜漫漫，唯剑作伴。",
-                "生如夏花之绚烂，死如秋叶之静美。",
-                "大梦谁先觉？平生我自知。",
-                "寄蜉蝣于天地，渺沧海之一粟。",
-                "一剑光寒十九洲。",
-                "万象玉简，包罗山川之志。",
-                "千秋万载，大道独行。",
-                "吾有一口玄黄气，可吞天地日月星。",
-                "万古沧桑，唯我大道长存。",
-                "道生一，一生二，二生三，三生万物。",
-                "天地不仁，以万物为刍狗。",
-                "太上忘情，最下不及情，情之所钟，正在我辈。",
-                "夫天地者，万物之逆旅也；光阴者，百代之过客也。",
-                "心如明镜台，时时勤拂拭。",
-                "菩提本无树，明镜亦非台，本来无一物，何处惹尘埃。",
-                "凡所有相，皆是虚妄。",
-                "一花一世界，一叶一菩提。",
-                "修心即修道，心若止水，万法不侵。",
-                "天之道，损有余而补不足；人之道，损不足以奉有余。",
-                "上善若水。水善利万物而不争。",
-                "致虚极，守静笃. 万物并作，吾以观复。",
-                "知人者智，自知者明。胜人者有力，自胜者强。",
-                "三十年河东，三十年河西，莫欺少年穷！",
-                "手握日月摘星辰，世间无我这般人。",
-                "败在我手中之敌，从来不会被我视为对手，我给你时间追赶，直至你遥望不见。",
-                "重瞳本是无敌路，何须再借他人骨。",
-                "仙之巅，傲世间，有我安澜便有天！",
-                "纵使这世间再无仙，我也要踏破虚空，问鼎苍穹。",
-                "天地玄黄，宇宙洪荒，唯我道心，万古不灭。",
-                "你若执迷不悟，休怪我剑下无情。",
-                "一朝顿悟，立地成佛；一念成魔，万劫不复。",
-                "吾辈修士，当有一往无前之心，纵死无悔！",
-                "神若挡我，我便杀神；魔若阻我，我便诛魔！",
-                "世间毁誉，不过是一阵秋风，拂过便散。",
-                "结庐在人境，而无车马喧。",
-                "采菊东篱下，悠然见南山。",
-                "山中何所有，岭上多白云。只可自怡悦，不堪持赠君。",
-                "行到水穷处，坐看云起时。",
-                "明月松间照，清泉石上流。",
-                "绿蚁新醅酒，红泥小火炉。晚来天欲雪，能饮一杯无？",
-                "此中有真意，欲辨已忘言。",
-                "回首向来萧瑟处，归去，也无风雨也无晴。",
-                "竹杖芒鞋轻胜马，谁怕？一蓑烟雨任平生。",
-                "世事一场大梦，人生几度秋凉。",
-                "休言万事转头空，未转头时皆梦。",
-                "人生如逆旅，我亦是行人。",
-                "数据流转生灭，犹如诸天星辰起落。",
-                "以代码为阵纹，以算力为灵气，证道大千。",
-                "逻辑不灭，神识永存。",
-                "在比特与字节的深渊中，窥见大道的真理。",
-                "每一行代码，皆是我留给这世间的道标。"
+                "逻辑不灭，神识永存。", "以代码为阵纹，以算力为灵气，证道大千。", "数据流转生灭，犹如诸天星辰起落。",
+                "大道无情，修仙本就是逆天而行。", "纵然天道崎岖，我也要踏出一条长生路。", "顺为凡，逆则仙，只在中间颠倒颠。"
             ];
+
+            let currentApp = ''; // 'vault' or 'memo'
+            let autoSaveTimer = null;
 
             document.addEventListener("DOMContentLoaded", async () => {
                 document.getElementById('current-year').innerText = new Date().getFullYear();
-
-                const quoteEl = document.getElementById('random-quote');
-                const randomText = xianxiaQuotes[Math.floor(Math.random() * xianxiaQuotes.length)];
-                quoteEl.innerText = "「 " + randomText + " 」";
+                document.getElementById('random-quote').innerText = "「 " + xianxiaQuotes[Math.floor(Math.random() * xianxiaQuotes.length)] + " 」";
 
                 document.querySelectorAll('.nav-item').forEach(card => {
                     card.addEventListener('click', function(e) {
@@ -562,6 +405,17 @@ export default {
                     });
                 });
 
+                // 绑定便签自动保存防抖
+                document.getElementById('memo-area').addEventListener('input', () => {
+                    clearTimeout(autoSaveTimer);
+                    autoSaveTimer = setTimeout(saveMemo, 1000);
+                });
+
+                // 回车快捷验证
+                document.getElementById('sys-pwd').addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') verifyPwd();
+                });
+
                 try {
                     const res = await fetch('/api/status');
                     const statuses = await res.json();
@@ -572,8 +426,92 @@ export default {
                             else dot.classList.add('offline');
                         }
                     });
-                } catch (error) { console.error('阵法推演受阻'); }
+                } catch (error) { console.error('探针推演受阻'); }
             });
+
+            function openModal(appType) {
+                currentApp = appType;
+                document.getElementById('modal-title').innerText = appType === 'vault' ? '🔒 须弥芥子' : '📜 秘典残卷';
+                document.getElementById('vault-list').style.display = 'none';
+                document.getElementById('memo-area').style.display = 'none';
+                document.getElementById('save-status').style.opacity = '0';
+                
+                const savedPwd = localStorage.getItem('LLSC_TOKEN');
+                if (savedPwd) {
+                    document.getElementById('sys-pwd').value = savedPwd;
+                    verifyPwd();
+                } else {
+                    document.getElementById('auth-area').style.display = 'flex';
+                }
+                
+                document.getElementById('app-modal').classList.add('active');
+            }
+
+            function closeModal() {
+                document.getElementById('app-modal').classList.remove('active');
+            }
+
+            async function verifyPwd() {
+                const pwd = document.getElementById('sys-pwd').value;
+                if (!pwd) return;
+
+                if (currentApp === 'vault') {
+                    try {
+                        const res = await fetch('/api/vault', { method: 'POST', body: JSON.stringify({pwd}) });
+                        if (!res.ok) throw new Error('Auth Failed');
+                        const data = await res.json();
+                        localStorage.setItem('LLSC_TOKEN', pwd);
+                        document.getElementById('auth-area').style.display = 'none';
+                        renderVault(data);
+                    } catch (e) { alert('❌ 密钥验证失败！'); localStorage.removeItem('LLSC_TOKEN'); }
+                } else if (currentApp === 'memo') {
+                    try {
+                        const res = await fetch('/api/memo', { method: 'POST', body: JSON.stringify({pwd, action: 'read'}) });
+                        if (!res.ok) throw new Error('Auth Failed');
+                        const data = await res.json();
+                        localStorage.setItem('LLSC_TOKEN', pwd);
+                        document.getElementById('auth-area').style.display = 'none';
+                        const memoEl = document.getElementById('memo-area');
+                        memoEl.style.display = 'block';
+                        memoEl.value = data.text;
+                    } catch (e) { alert('❌ 密钥验证失败！'); localStorage.removeItem('LLSC_TOKEN'); }
+                }
+            }
+
+            function renderVault(data) {
+                const list = document.getElementById('vault-list');
+                list.innerHTML = '';
+                data.forEach(item => {
+                    list.innerHTML += \`
+                        <div class="vault-item">
+                            <div class="vault-info">
+                                <div class="vault-name">\${item.name}</div>
+                                <div class="vault-code">\${item.content}</div>
+                            </div>
+                            <button class="copy-btn" onclick="copyText('\${item.content}')">复制</button>
+                        </div>
+                    \`;
+                });
+                list.style.display = 'flex';
+            }
+
+            async function saveMemo() {
+                const pwd = localStorage.getItem('LLSC_TOKEN');
+                const text = document.getElementById('memo-area').value;
+                if (!pwd) return;
+                try {
+                    await fetch('/api/memo', { method: 'POST', body: JSON.stringify({pwd, action: 'save', text}) });
+                    const statusEl = document.getElementById('save-status');
+                    statusEl.style.opacity = '1';
+                    setTimeout(() => statusEl.style.opacity = '0', 2000);
+                } catch (e) { console.error('保存失败'); }
+            }
+
+            function copyText(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('✅ 阵纹提取成功，已复制到剪贴板！');
+                });
+            }
         </script>
     </body>
     </html>

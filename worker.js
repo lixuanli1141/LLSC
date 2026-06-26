@@ -459,19 +459,19 @@ export default {
                     let source = "";
                     
                     if (author && work && author !== work) {
-                        source = `—— ${author}《${work}》`;
+                        source = "—— " + author + "《" + work + "》";
                     } else if (work) {
-                        source = `—— 《${work}》`;
+                        source = "—— 《" + work + "》";
                     } else if (author) {
-                        source = `—— ${author}`;
+                        source = "—— " + author;
                     } else if (data.creator) {
-                        source = `—— @${data.creator}`;
+                        source = "—— @" + data.creator;
                     } else {
-                        source = `—— 佚名`;
+                        source = "—— 佚名";
                     }
                     
-                    // 使用 <br> 强制换行，提升兼容性，字号调大至 14px 更清晰
-                    quoteEl.innerHTML = `「 ${data.hitokoto} 」<br><span style="display:inline-block; font-size:14px; margin-top:12px; color:#94a3b8; opacity:0.8; font-family:'LXGW WenKai TC', sans-serif; letter-spacing:1px; text-shadow:none;">${source}</span>`;
+                    // 使用加号拼接，彻底避开 Cloudflare Worker 的模板字符串语法冲突
+                    quoteEl.innerHTML = "「 " + data.hitokoto + " 」<br><span style=\"display:inline-block; font-size:14px; margin-top:12px; color:#94a3b8; opacity:0.8; font-family:'LXGW WenKai TC', sans-serif; letter-spacing:1px; text-shadow:none;\">" + source + "</span>";
                 } catch (e) {
                     // 原生语录已彻底抹除，网络超时仅做极简提示
                     quoteEl.innerText = "「 灵气枯竭，未能连接到语录之源... 」";

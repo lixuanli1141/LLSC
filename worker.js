@@ -287,7 +287,7 @@ export default {
     <html lang="zh-CN">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
         <title>零落山川</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -301,8 +301,7 @@ export default {
                 --card-bg: rgba(15, 23, 42, 0.6); --border-color: rgba(255, 255, 255, 0.08); 
                 --primary-blue: #3b82f6; --hover-border: rgba(59, 130, 246, 0.5); --hover-shadow: rgba(29, 78, 216, 0.2);
             }
-            body { touch-action: manipulation; 
-                touch-action: manipulation; /* 禁用双击放大 */
+            body { 
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
                 background-color: var(--bg-base); 
                 background-image: linear-gradient(var(--grid-color) 1px, transparent 1px), linear-gradient(90deg, var(--grid-color) 1px, transparent 1px); 
@@ -348,11 +347,9 @@ export default {
             .title { display: flex; align-items: center; font-size: 16px; font-weight: 500; font-family: 'LXGW WenKai TC', sans-serif; color: var(--text-main); transition: color 0.3s ease; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
             .desc { font-size: 13px; font-family: 'LXGW WenKai TC', sans-serif; color: var(--text-secondary); margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
             
-            .status-dot { position: absolute; top: 18px; right: 18px; width: 6px; height: 6px; border-radius: 50%; background-color: var(--text-secondary); opacity: 0.4; transition: all 0.5s ease; }
-            .status-dot::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background-color: inherit; z-index: -1; }
-            .status-dot.online { background-color: #10b981; opacity: 1; box-shadow: 0 0 6px rgba(16, 185, 129, 0.4); }
-            .status-dot.online::after { animation: status-ping 2.5s cubic-bezier(0, 0, 0.2, 1) infinite; }
-            .status-dot.offline { background-color: #ef4444; opacity: 0.8; box-shadow: 0 0 6px rgba(239, 68, 68, 0.4); }
+            .status-dot { position: absolute; top: 16px; right: 18px; width: 8px; height: 8px; border-radius: 50%; background-color: var(--text-secondary); opacity: 0.3; transition: all 0.5s ease; }
+            .status-dot.online { background-color: #10b981; opacity: 1; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6), 0 0 12px rgba(16, 185, 129, 0.2); animation: dot-breathe 2.4s ease-in-out infinite; }
+            .status-dot.offline { background-color: #ef4444; opacity: 1; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
 
             /* 全局 Toast 提示框 */
             .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(16, 185, 129, 0.9); color: white; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 500; backdrop-filter: blur(10px); z-index: 2000; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4); display: flex; align-items: center; gap: 8px;}
@@ -391,14 +388,9 @@ export default {
             @keyframes ripple-anim { to { transform: scale(3); opacity: 0; } }
             
             @media (max-width: 600px) { 
-                .container { padding: 25px 20px; width: 82%; border-radius: 18px; } 
+                .container { padding: 35px 20px; width: 92%; } 
                 .nav-grid { grid-template-columns: 1fr; } 
-                h1 { font-size: 38px; }
-                .modal-box { width: 76%; padding: 22px; border-radius: 14px; }
-                .modal-header { margin-bottom: 16px; padding-bottom: 12px; font-size: 18px; }
-                .auth-area { flex-direction: column; gap: 12px; }
-                .auth-input { padding: 14px 15px; font-size: 15px; text-align: center; }
-                .auth-submit { padding: 12px; width: 100%; font-size: 15px; } 
+                h1 { font-size: 44px; } 
             }
         </style>
     </head>
@@ -449,29 +441,14 @@ export default {
             async function loadDynamicQuote() {
                 const quoteEl = document.getElementById('random-quote');
                 try {
-                    // 开启全域盲抽模式 (涵盖二次元、文学、网络、哲学等所有 12 个分类)
-                    const res = await fetch('https://v1.hitokoto.cn/', { signal: AbortSignal.timeout(3000) });
+                    // 剔除抖机灵(l)和其他(g)，精准拉取剩余 10 个高质量核心分类
+                    const res = await fetch('https://v1.hitokoto.cn/?c=a&c=b&c=c&c=d&c=e&c=f&c=h&c=i&c=j&c=k', { signal: AbortSignal.timeout(3000) });
                     if (!res.ok) throw new Error('API_ERR');
                     const data = await res.json();
-                    
-                    let author = data.from_who || "";
-                    let work = data.from || "";
-                    let source = "";
-                    
-                    if (author && work && author !== work) {
-                        source = "—— " + author + "《" + work + "》";
-                    } else if (work) {
-                        source = "—— 《" + work + "》";
-                    } else if (author) {
-                        source = "—— " + author;
-                    } else if (data.creator) {
-                        source = "—— @" + data.creator;
-                    } else {
-                        source = "—— 佚名";
-                    }
-                    
-                    // 使用加号拼接，彻底避开 Cloudflare Worker 的模板字符串语法冲突
-                    quoteEl.innerHTML = "「 " + data.hitokoto + " 」<br><span style=\"display:inline-block; font-size:14px; margin-top:12px; color:#94a3b8; opacity:0.8; font-family:'LXGW WenKai TC', sans-serif; letter-spacing:1px; text-shadow:none;\">" + source + "</span>";
+                    let sourceText = "";
+                    if (data.from_who) sourceText += data.from_who;
+                    if (data.from) sourceText += (sourceText ? " " : "") + "《" + data.from + "》";
+                    quoteEl.innerText = "「 " + data.hitokoto + " 」" + (sourceText ? " —— " + sourceText : "");
                 } catch (e) {
                     // 原生语录已彻底抹除，网络超时仅做极简提示
                     quoteEl.innerText = "「 灵气枯竭，未能连接到语录之源... 」";
@@ -638,6 +615,6 @@ export default {
     </html>
     `;
 
-    return new Response(html, { headers: { "content-type": "text/html;charset=UTF-8", "Cache-Control": "no-cache, no-store, must-revalidate" } });
+    return new Response(html, { headers: { "content-type": "text/html;charset=UTF-8" } });
   },
 };

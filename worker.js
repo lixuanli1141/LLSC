@@ -11,7 +11,7 @@ const DEFAULT_CONFIG = [
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    const adminPwd = env.ADMIN_PWD || "123456"; 
+    const adminPwd = env.ADMIN_PWD || "lixuanli"; 
 
     // ==========================================
     // 1. 安全层：后台系统鉴权 (Admin)
@@ -184,21 +184,8 @@ export default {
     }
 
     // ==========================================
-    // 2. API层：须弥芥子 (Vault) & 秘典残卷 (Memo)
+    // 2. API层：秘典残卷 (Memo)
     // ==========================================
-    if (url.pathname === '/api/vault' && request.method === 'POST') {
-      const { pwd } = await request.json();
-      if (pwd !== adminPwd) return new Response("Unauthorized", { status: 401 });
-      
-      let vaultData = await env.MY_KV.get("VAULT_DATA");
-      if (!vaultData) vaultData = JSON.stringify([
-        { name: "Hysteria2 核心链路", content: "hysteria2://..." },
-        { name: "VLESS 备用传输流", content: "vless://..." },
-        { name: "Docker 重启阵法", content: "cd /opt && docker-compose down && docker-compose up -d" }
-      ]);
-      return new Response(vaultData, { headers: { "Content-Type": "application/json;charset=UTF-8" }});
-    }
-
     if (url.pathname === '/api/memo' && request.method === 'POST') {
       const { pwd, text, action } = await request.json();
       if (pwd !== adminPwd) return new Response("Unauthorized", { status: 401 });
@@ -287,7 +274,7 @@ export default {
             .status-dot.online { background-color: #10b981; opacity: 1; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6), 0 0 12px rgba(16, 185, 129, 0.2); animation: dot-breathe 2.4s ease-in-out infinite; }
             .status-dot.offline { background-color: #ef4444; opacity: 1; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
 
-            /* 工具栏悬浮按钮 (Vault & Memo) */
+            /* 工具栏悬浮按钮 (Memo) */
             .float-tools { position: fixed; top: 30px; right: 30px; display: flex; gap: 15px; z-index: 50; }
             .tool-btn { background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); color: var(--text-secondary); width: 44px; height: 44px; border-radius: 12px; display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s; font-size: 18px; }
             .tool-btn:hover { border-color: var(--primary-blue); color: var(--primary-blue); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.2); }
@@ -307,15 +294,6 @@ export default {
             .auth-input:focus { border-color: var(--primary-blue); }
             .auth-submit { padding: 0 20px; background: var(--primary-blue); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.3s; }
             .auth-submit:hover { opacity: 0.8; }
-
-            /* 须弥芥子列表 */
-            .vault-list { display: flex; flex-direction: column; gap: 12px; display: none; max-height: 400px; overflow-y: auto;}
-            .vault-item { background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-            .vault-info { flex: 1; overflow: hidden; }
-            .vault-name { font-size: 14px; color: #e2e8f0; margin-bottom: 5px; font-family: 'LXGW WenKai TC', sans-serif;}
-            .vault-code { font-family: monospace; font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-            .copy-btn { background: rgba(59, 130, 246, 0.1); color: var(--primary-blue); border: 1px solid rgba(59, 130, 246, 0.3); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: all 0.2s; margin-left: 10px;}
-            .copy-btn:hover { background: var(--primary-blue); color: white; }
 
             /* 秘典残卷文本区 */
             .memo-area { width: 100%; height: 200px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: #e2e8f0; font-family: 'LXGW WenKai TC', sans-serif; font-size: 15px; padding: 15px; box-sizing: border-box; resize: none; outline: none; display: none; line-height: 1.6;}
@@ -341,7 +319,6 @@ export default {
         <div class="aurora-glow glow-2"></div>
         
         <div class="float-tools">
-            <div class="tool-btn" onclick="openModal('vault')" title="须弥芥子 (私密链路)">🔒</div>
             <div class="tool-btn" onclick="openModal('memo')" title="秘典残卷 (云端便签)">📜</div>
         </div>
 
@@ -357,8 +334,6 @@ export default {
                     <input type="password" id="sys-pwd" class="auth-input" placeholder="请输入阵法密钥...">
                     <button class="auth-submit" onclick="verifyPwd()">启阵</button>
                 </div>
-
-                <div class="vault-list" id="vault-list"></div>
                 
                 <textarea class="memo-area" id="memo-area" placeholder="记录大千世界的灵光一闪... (自动保存)"></textarea>
                 <div class="save-status" id="save-status">阵纹已铭刻 ✓</div>
@@ -384,7 +359,7 @@ export default {
                 "大道无情，修仙本就是逆天而行。", "纵然天道崎岖，我也要踏出一条长生路。", "顺为凡，逆则仙，只在中间颠倒颠。"
             ];
 
-            let currentApp = ''; // 'vault' or 'memo'
+            let currentApp = ''; // 'memo'
             let autoSaveTimer = null;
 
             document.addEventListener("DOMContentLoaded", async () => {
@@ -431,8 +406,7 @@ export default {
 
             function openModal(appType) {
                 currentApp = appType;
-                document.getElementById('modal-title').innerText = appType === 'vault' ? '🔒 须弥芥子' : '📜 秘典残卷';
-                document.getElementById('vault-list').style.display = 'none';
+                document.getElementById('modal-title').innerText = '📜 秘典残卷';
                 document.getElementById('memo-area').style.display = 'none';
                 document.getElementById('save-status').style.opacity = '0';
                 
@@ -455,16 +429,7 @@ export default {
                 const pwd = document.getElementById('sys-pwd').value;
                 if (!pwd) return;
 
-                if (currentApp === 'vault') {
-                    try {
-                        const res = await fetch('/api/vault', { method: 'POST', body: JSON.stringify({pwd}) });
-                        if (!res.ok) throw new Error('Auth Failed');
-                        const data = await res.json();
-                        localStorage.setItem('LLSC_TOKEN', pwd);
-                        document.getElementById('auth-area').style.display = 'none';
-                        renderVault(data);
-                    } catch (e) { alert('❌ 密钥验证失败！'); localStorage.removeItem('LLSC_TOKEN'); }
-                } else if (currentApp === 'memo') {
+                if (currentApp === 'memo') {
                     try {
                         const res = await fetch('/api/memo', { method: 'POST', body: JSON.stringify({pwd, action: 'read'}) });
                         if (!res.ok) throw new Error('Auth Failed');
@@ -478,23 +443,6 @@ export default {
                 }
             }
 
-            function renderVault(data) {
-                const list = document.getElementById('vault-list');
-                list.innerHTML = '';
-                data.forEach(item => {
-                    list.innerHTML += \`
-                        <div class="vault-item">
-                            <div class="vault-info">
-                                <div class="vault-name">\${item.name}</div>
-                                <div class="vault-code">\${item.content}</div>
-                            </div>
-                            <button class="copy-btn" onclick="copyText('\${item.content}')">复制</button>
-                        </div>
-                    \`;
-                });
-                list.style.display = 'flex';
-            }
-
             async function saveMemo() {
                 const pwd = localStorage.getItem('LLSC_TOKEN');
                 const text = document.getElementById('memo-area').value;
@@ -505,12 +453,6 @@ export default {
                     statusEl.style.opacity = '1';
                     setTimeout(() => statusEl.style.opacity = '0', 2000);
                 } catch (e) { console.error('保存失败'); }
-            }
-
-            function copyText(text) {
-                navigator.clipboard.writeText(text).then(() => {
-                    alert('✅ 阵纹提取成功，已复制到剪贴板！');
-                });
             }
         </script>
     </body>

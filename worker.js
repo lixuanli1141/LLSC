@@ -185,7 +185,7 @@ export default {
         <title>零落山川</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=LXGW+WenKai+TC&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Long+Cang&family=Ma+Shan+Zheng&family=LXGW+WenKai+TC&display=swap" rel="stylesheet">
         
         <style>
             :root { 
@@ -233,7 +233,7 @@ export default {
             /* 书法主标题：霞鹜文楷 */
             h1 { 
                 text-align: center; 
-                font-family: 'LXGW WenKai TC', cursive;
+                font-family: 'Long Cang', cursive;
                 font-size: 52px; 
                 font-weight: normal; 
                 margin-top: 0; 

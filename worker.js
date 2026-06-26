@@ -2,10 +2,10 @@
 // 默认初始数据兜底配置
 // ==========================================
 const DEFAULT_CONFIG = [
-  { url: "https://drive.ing.nn.kg", title: "私人云盘", desc: "OpenList / Alist 文件管理", lockPwd: "", icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>` },
-  { url: "https://media.lxlhub.qzz.io", title: "流媒体中心", desc: "MoonTV 影视库", lockPwd: "", icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></svg>` },
-  { url: "https://quiz.ing.nn.kg", title: "在线题库", desc: "自定义刷题与测试系统", lockPwd: "", icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>` },
-  { url: "https://ops.lxlhub.qzz.io", title: "服务器探针", desc: "VPS 资源监控状态", lockPwd: "", icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>` }
+  { url: "https://drive.ing.nn.kg", title: "私人云盘", desc: "OpenList / Alist 文件管理", isPrivate: false, isHidden: false, icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>` },
+  { url: "https://media.lxlhub.qzz.io", title: "流媒体中心", desc: "MoonTV 影视库", isPrivate: false, isHidden: false, icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></svg>` },
+  { url: "https://quiz.ing.nn.kg", title: "在线题库", desc: "自定义刷题与测试系统", isPrivate: false, isHidden: false, icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>` },
+  { url: "https://ops.lxlhub.qzz.io", title: "服务器探针", desc: "VPS 资源监控状态", isPrivate: false, isHidden: false, icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>` }
 ];
 
 export default {
@@ -77,7 +77,12 @@ export default {
           .btn-secondary:active { transform: scale(0.97); }
           .icon-btn { background: white; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; padding: 6px 10px; margin-left: 6px; font-size: 14px; color: #475569;}
           .back-link { color: #64748b; text-decoration: none; font-size: 15px; }
-          @media (max-width: 600px) { .input-grid { grid-template-columns: 1fr; } .toolbar { flex-direction: column; } }
+          
+          .checkbox-group { display: flex; gap: 20px; margin-top: 10px; padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px dashed #cbd5e1; }
+          .checkbox-label { display: flex; align-items: center; cursor: pointer; font-size: 14px; font-weight: 500; }
+          .checkbox-label input { width: 16px; height: 16px; margin-right: 8px; cursor: pointer;}
+          
+          @media (max-width: 600px) { .input-grid { grid-template-columns: 1fr; } .toolbar { flex-direction: column; } .checkbox-group { flex-direction: column; gap: 10px; } }
         </style>
       </head>
       <body>
@@ -101,6 +106,12 @@ export default {
 
         <script>
           let siteData = ${currentConfig};
+          // 清理旧数据的兼容性处理
+          siteData = siteData.map(item => ({
+             ...item,
+             isPrivate: item.isPrivate || false,
+             isHidden: item.isHidden || false
+          }));
 
           function render() {
             const container = document.getElementById('list-container');
@@ -126,17 +137,21 @@ export default {
                       <input type="url" value="\${item.url}" oninput="updateItem(\${index}, 'url', this.value)" required>
                     </div>
                   </div>
-                  <div class="input-grid">
-                    <div class="form-group">
-                      <label>法则解析 (Description)</label>
-                      <input type="text" value="\${item.desc}" oninput="updateItem(\${index}, 'desc', this.value)">
-                    </div>
-                    <div class="form-group">
-                      <label>阵眼密钥 (留空即公开)</label>
-                      <input type="text" value="\${item.lockPwd || ''}" oninput="updateItem(\${index}, 'lockPwd', this.value)" placeholder="填入密码即变为私密洞天">
-                    </div>
-                  </div>
                   <div class="form-group">
+                    <label>法则解析 (Description)</label>
+                    <input type="text" value="\${item.desc}" oninput="updateItem(\${index}, 'desc', this.value)">
+                  </div>
+                  <div class="checkbox-group">
+                      <label class="checkbox-label" style="color: #ef4444;">
+                        <input type="checkbox" \${item.isPrivate ? 'checked' : ''} onchange="updateItem(\${index}, 'isPrivate', this.checked)">
+                        🔒 设为私密 (输入全局口令后显示)
+                      </label>
+                      <label class="checkbox-label" style="color: #64748b;">
+                        <input type="checkbox" \${item.isHidden ? 'checked' : ''} onchange="updateItem(\${index}, 'isHidden', this.checked)">
+                        👻 彻底隐藏 (即使有口令也不显示)
+                      </label>
+                  </div>
+                  <div class="form-group" style="margin-top: 15px;">
                     <label>阵纹代码 (SVG Icon)</label>
                     <textarea oninput="updateItem(\${index}, 'icon', this.value)">\${item.icon}</textarea>
                   </div>
@@ -150,7 +165,7 @@ export default {
           function deleteItem(index) { if(confirm('要将此洞天从星图中抹除吗？')) { siteData.splice(index, 1); render(); } }
           function moveItem(index, dir) { const temp = siteData[index]; siteData[index] = siteData[index + dir]; siteData[index + dir] = temp; render(); }
           function addItem() {
-            siteData.push({ title: "新洞天", url: "https://", desc: "请注入法则描述", lockPwd: "", icon: \`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>\` });
+            siteData.push({ title: "新洞天", url: "https://", desc: "请注入法则描述", isPrivate: false, isHidden: false, icon: \`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>\` });
             render();
           }
           
@@ -192,7 +207,7 @@ export default {
     }
 
     // ==========================================
-    // 2. API层：秘典残卷 (Memo) & 节点破阵 (Unlock)
+    // 2. API层：数据交互
     // ==========================================
     let navDataStr = await env.MY_KV.get("NAV_CONFIG");
     let NAV_ITEMS = navDataStr ? JSON.parse(navDataStr) : DEFAULT_CONFIG;
@@ -210,22 +225,24 @@ export default {
       }
     }
 
-    if (url.pathname === '/api/unlock' && request.method === 'POST') {
-      const { idx, pwd } = await request.json();
-      const item = NAV_ITEMS[idx];
-      if (!item) return new Response("Not found", { status: 404 });
-      if (item.lockPwd && item.lockPwd === pwd) {
-        return new Response(JSON.stringify({ url: item.url }), { headers: { "Content-Type": "application/json" } });
+    if (url.pathname === '/api/reveal' && request.method === 'POST') {
+      const { pwd } = await request.json();
+      if (pwd === adminPwd) {
+        // 返回未被彻底隐藏，且标记为私密的节点
+        const privateItems = NAV_ITEMS
+          .map((item, idx) => ({ ...item, originalIdx: idx }))
+          .filter(item => item.isPrivate && !item.isHidden);
+        return new Response(JSON.stringify({ items: privateItems }), { headers: { "Content-Type": "application/json" } });
       } else {
         return new Response("Unauthorized", { status: 401 });
       }
     }
 
-    // ==========================================
-    // 3. 前台：探针接口 (支持前端隐藏URL进行推演)
-    // ==========================================
-    if (url.pathname === '/api/status') {
-      const results = await Promise.all(NAV_ITEMS.map(async (item, idx) => {
+    if (url.pathname === '/api/status' && request.method === 'POST') {
+      const { indices } = await request.json();
+      const results = await Promise.all(indices.map(async (idx) => {
+        const item = NAV_ITEMS[idx];
+        if (!item || item.isHidden) return { idx, ok: false };
         try {
           const res = await fetch(item.url, { 
             method: 'GET', 
@@ -239,26 +256,24 @@ export default {
     }
 
     // ==========================================
-    // 4. 前端页面：大千世界主入口
+    // 3. 前端页面：大千世界主入口
     // ==========================================
-    const cardsHtml = NAV_ITEMS.map((item, idx) => {
-      const isLocked = !!item.lockPwd;
-      // 后端直接剥离加密节点的真实 URL，防止爬虫或审查源码提取
-      const targetUrl = isLocked ? `javascript:openUnlockModal(${idx}, '${item.title}')` : item.url;
-      const targetAttr = isLocked ? '' : 'target="_blank"';
-      const lockBadge = isLocked ? `<span style="margin-left: 6px; font-size: 13px; opacity: 0.8;" title="私密洞天">🔒</span>` : '';
+    
+    // SSR 仅渲染公开且未彻底隐藏的节点
+    const publicItems = NAV_ITEMS
+      .map((item, idx) => ({ ...item, originalIdx: idx }))
+      .filter(item => !item.isHidden && !item.isPrivate);
 
-      return `
-      <a href="${targetUrl}" class="nav-item" ${targetAttr}>
+    const cardsHtml = publicItems.map(item => `
+      <a href="${item.url}" class="nav-item" target="_blank" id="node-${item.originalIdx}">
           <span class="icon">${item.icon}</span>
           <div class="details">
-              <span class="title">${item.title}${lockBadge}</span>
+              <span class="title">${item.title}</span>
               <span class="desc">${item.desc}</span>
           </div>
-          <div class="status-dot" data-idx="${idx}"></div>
+          <div class="status-dot" data-idx="${item.originalIdx}"></div>
       </a>
-      `;
-    }).join('');
+    `).join('');
 
     const html = `
     <!DOCTYPE html>
@@ -297,7 +312,7 @@ export default {
 
             .container { max-width: 750px; width: 90%; padding: 45px 30px; z-index: 10; background: radial-gradient(circle at top, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.1) 100%); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); position: relative; }
             
-            h1 { text-align: center; font-family: 'Long Cang', cursive; font-size: 52px; font-weight: normal; margin-top: 0; margin-bottom: 5px; letter-spacing: 6px; text-shadow: 0 2px 15px rgba(255, 255, 255, 0.15); }
+            h1 { text-align: center; font-family: 'Long Cang', cursive; font-size: 52px; font-weight: normal; margin-top: 0; margin-bottom: 5px; letter-spacing: 6px; text-shadow: 0 2px 15px rgba(255, 255, 255, 0.15); cursor: default; }
             .sub-quote { text-align: center; font-family: 'Ma Shan Zheng', serif; font-size: 16px; color: var(--text-secondary); margin-bottom: 40px; letter-spacing: 2px; opacity: 0.8; text-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
             
             .nav-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
@@ -309,6 +324,11 @@ export default {
             .nav-item:active { transform: scale(0.97); }
             .nav-item:hover .title, .nav-item:hover .icon { color: var(--primary-blue); }
             
+            /* 私密节点入场动画 */
+            @keyframes fade-in-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+            .private-node { animation: fade-in-up 0.5s ease forwards; border-color: rgba(16, 185, 129, 0.2); }
+            .private-node:hover { border-color: rgba(16, 185, 129, 0.6); box-shadow: 0 10px 30px -5px rgba(16, 185, 129, 0.15), 0 0 0 1px rgba(16, 185, 129, 0.4) inset; }
+
             @media (-webkit-min-device-pixel-ratio: 2) {
                 .nav-item { border-width: 0.5px; }
                 .container { border-width: 0.5px; }
@@ -324,14 +344,15 @@ export default {
             .status-dot.online { background-color: #10b981; opacity: 1; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6), 0 0 12px rgba(16, 185, 129, 0.2); animation: dot-breathe 2.4s ease-in-out infinite; }
             .status-dot.offline { background-color: #ef4444; opacity: 1; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
 
-            /* 工具栏悬浮按钮 (Memo) */
             .float-tools { position: fixed; top: 30px; right: 30px; display: flex; gap: 15px; z-index: 50; }
             .tool-btn { background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); color: var(--text-secondary); width: 44px; height: 44px; border-radius: 12px; display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s; font-size: 18px; }
             .tool-btn:hover { border-color: var(--primary-blue); color: var(--primary-blue); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.2); }
             .tool-btn:active { transform: scale(0.92); }
 
-            /* 模态框通用样式 */
-            .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 100; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
+            /* 隐蔽口令触控区 (彻底防被发现) */
+            .stealth-trigger { position: fixed; bottom: 0; right: 0; width: 40px; height: 40px; cursor: pointer; z-index: 999; opacity: 0; -webkit-tap-highlight-color: transparent;}
+
+            .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
             .modal-overlay.active { display: flex; opacity: 1; }
             .modal-box { background: #0f172a; border: 1px solid var(--border-color); border-radius: 16px; padding: 30px; width: 90%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); transform: translateY(20px); transition: transform 0.3s; }
             .modal-overlay.active .modal-box { transform: translateY(0); }
@@ -339,7 +360,6 @@ export default {
             .close-btn { cursor: pointer; color: var(--text-secondary); font-size: 24px; transition: color 0.2s; }
             .close-btn:hover { color: white; }
             
-            /* 密码输入区 */
             .auth-area { display: flex; gap: 10px; margin-bottom: 15px; }
             .auth-input { flex: 1; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: white; font-size: 14px; outline: none; transition: border 0.3s;}
             .auth-input:focus { border-color: var(--primary-blue); }
@@ -347,14 +367,12 @@ export default {
             .auth-submit:hover { opacity: 0.8; }
             .auth-submit:active { transform: scale(0.95); }
 
-            /* 秘典残卷文本区 */
             .memo-area { width: 100%; height: 200px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: #e2e8f0; font-family: 'LXGW WenKai TC', sans-serif; font-size: 15px; padding: 15px; box-sizing: border-box; resize: none; outline: none; display: none; line-height: 1.6;}
             .memo-area:focus { border-color: var(--primary-blue); }
             .save-status { font-size: 12px; color: #10b981; text-align: right; margin-top: 8px; opacity: 0; transition: opacity 0.3s; }
 
             .ripple { position: absolute; border-radius: 50%; background: rgba(59, 130, 246, 0.35); transform: scale(0); transform-origin: center; animation: ripple-anim 0.6s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; will-change: transform, opacity; }
             
-            /* GPU硬件加速光晕 */
             .aurora-glow { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.25; pointer-events: none; z-index: 0; will-change: transform; transform: translateZ(0); }
             .glow-1 { width: 320px; height: 320px; background: radial-gradient(circle, #3b82f6, transparent 70%); top: 8%; left: -10%; animation: drift-1 16s ease-in-out infinite; }
             .glow-2 { width: 280px; height: 280px; background: radial-gradient(circle, #0ea5e9, transparent 70%); bottom: 5%; right: -8%; animation: drift-2 20s ease-in-out infinite; }
@@ -366,7 +384,6 @@ export default {
             @keyframes dot-breathe { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.6; } }
             @keyframes ripple-anim { to { transform: scale(3); opacity: 0; } }
             
-            /* 移动端全面屏适配 */
             @media (max-width: 600px) { 
                 .container { padding: 35px 20px; width: 92%; } 
                 .nav-grid { grid-template-columns: 1fr; } 
@@ -379,11 +396,14 @@ export default {
         <div class="aurora-glow glow-1"></div>
         <div class="aurora-glow glow-2"></div>
         
+        <!-- 隐蔽的边缘触发器 -->
+        <div class="stealth-trigger" onclick="openModal('reveal')" title=" "></div>
+
         <div class="float-tools">
             <div class="tool-btn" onclick="openModal('memo')" title="秘典残卷 (云端便签)">📜</div>
         </div>
 
-        <!-- 通用鉴权与展示模态框 -->
+        <!-- 通用模态框 -->
         <div class="modal-overlay" id="app-modal">
             <div class="modal-box">
                 <div class="modal-header">
@@ -392,11 +412,12 @@ export default {
                 </div>
                 
                 <div class="auth-area" id="auth-area">
-                    <input type="password" id="sys-pwd" class="auth-input" placeholder="请输入阵法密钥...">
+                    <input type="password" id="sys-pwd" class="auth-input" placeholder="请输入阵法口令...">
                     <button class="auth-submit" onclick="verifyPwd()">破阵</button>
                 </div>
                 
-                <textarea class="memo-area" id="memo-area" placeholder="记录大千世界的灵光一闪... (自动保存)"></textarea>
+                <!-- Placeholder 中注入了你之前要求的免责声明，保障合规又不破坏 UI -->
+                <textarea class="memo-area" id="memo-area" placeholder="Personal self-built cloud disk · Non-commercial use · Stability not guaranteed.&#10;记录大千世界的灵光一闪... (自动保存)"></textarea>
                 <div class="save-status" id="save-status">阵纹已铭刻 ✓</div>
             </div>
         </div>
@@ -419,27 +440,14 @@ export default {
                 "大道无情，修仙本就是逆天而行。", "纵然天道崎岖，我也要踏出一条长生路。", "顺为凡，逆则仙，只在中间颠倒颠。"
             ];
 
-            let currentApp = ''; // 'memo' or 'unlock'
-            let unlockIdx = null;
+            let currentApp = ''; // 'memo' or 'reveal'
             let autoSaveTimer = null;
 
             document.addEventListener("DOMContentLoaded", async () => {
                 document.getElementById('current-year').innerText = new Date().getFullYear();
                 document.getElementById('random-quote').innerText = "「 " + xianxiaQuotes[Math.floor(Math.random() * xianxiaQuotes.length)] + " 」";
 
-                document.querySelectorAll('.nav-item').forEach(card => {
-                    card.addEventListener('click', function(e) {
-                        const rect = this.getBoundingClientRect();
-                        const ripple = document.createElement('span');
-                        const size = Math.max(rect.width, rect.height);
-                        ripple.className = 'ripple';
-                        ripple.style.width = ripple.style.height = size + 'px';
-                        ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
-                        ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
-                        this.appendChild(ripple);
-                        setTimeout(() => ripple.remove(), 600);
-                    });
-                });
+                bindRipple(document.querySelectorAll('.nav-item'));
 
                 // 绑定便签自动保存防抖
                 document.getElementById('memo-area').addEventListener('input', () => {
@@ -452,11 +460,56 @@ export default {
                     if (e.key === 'Enter') verifyPwd();
                 });
 
+                // 自动检查是否已有口令记忆，静默加载私密节点
+                const savedPasscode = localStorage.getItem('LLSC_PASSCODE');
+                if (savedPasscode) {
+                    try {
+                        const res = await fetch('/api/reveal', { method: 'POST', body: JSON.stringify({ pwd: savedPasscode }) });
+                        if (res.ok) {
+                            const data = await res.json();
+                            renderPrivateCards(data.items);
+                        } else {
+                            localStorage.removeItem('LLSC_PASSCODE'); // 密码修改或过期，清除记忆
+                        }
+                    } catch(e) {}
+                }
+
+                // 推演页面上已有节点的状态
+                checkStatus();
+            });
+
+            function bindRipple(elements) {
+                elements.forEach(card => {
+                    // 防止重复绑定
+                    if(card.dataset.rippleBound) return;
+                    card.dataset.rippleBound = true;
+                    
+                    card.addEventListener('click', function(e) {
+                        const rect = this.getBoundingClientRect();
+                        const ripple = document.createElement('span');
+                        const size = Math.max(rect.width, rect.height);
+                        ripple.className = 'ripple';
+                        ripple.style.width = ripple.style.height = size + 'px';
+                        ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+                        ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+                        this.appendChild(ripple);
+                        setTimeout(() => ripple.remove(), 600);
+                    });
+                });
+            }
+
+            async function checkStatus() {
+                // 仅检测还没被推演过状态的探针点
+                const dots = document.querySelectorAll('.status-dot:not(.checked)');
+                if (dots.length === 0) return;
+                
+                const indices = Array.from(dots).map(dot => parseInt(dot.getAttribute('data-idx')));
+                dots.forEach(dot => dot.classList.add('checked')); // 打上标记防重复检测
+                
                 try {
-                    const res = await fetch('/api/status');
+                    const res = await fetch('/api/status', { method: 'POST', body: JSON.stringify({ indices }) });
                     const statuses = await res.json();
                     statuses.forEach(status => {
-                        // 使用索引匹配状态灯，防止泄露真实URL
                         const dot = document.querySelector(\`.status-dot[data-idx="\${status.idx}"]\`);
                         if (dot) {
                             if (status.ok) dot.classList.add('online');
@@ -464,40 +517,58 @@ export default {
                         }
                     });
                 } catch (error) { console.error('探针推演受阻'); }
-            });
+            }
 
-            function openUnlockModal(idx, title) {
-                currentApp = 'unlock';
-                unlockIdx = idx;
-                document.getElementById('modal-title').innerText = '🔒 解除封印 : ' + title;
-                document.getElementById('memo-area').style.display = 'none';
-                document.getElementById('save-status').style.opacity = '0';
-                
-                document.getElementById('sys-pwd').value = '';
-                document.getElementById('sys-pwd').placeholder = '请输入节点专属密码...';
-                document.getElementById('auth-area').style.display = 'flex';
-                
-                document.getElementById('app-modal').classList.add('active');
-                setTimeout(() => document.getElementById('sys-pwd').focus(), 100);
+            function renderPrivateCards(items) {
+                const grid = document.querySelector('.nav-grid');
+                items.forEach(item => {
+                    if (!document.getElementById('node-' + item.originalIdx)) {
+                        const a = document.createElement('a');
+                        a.href = item.url;
+                        a.className = 'nav-item private-node';
+                        a.target = '_blank';
+                        a.id = 'node-' + item.originalIdx;
+                        a.innerHTML = \`
+                            <span class="icon">\${item.icon}</span>
+                            <div class="details">
+                                <span class="title">\${item.title} <span style="margin-left: 6px; font-size: 13px; opacity: 0.8;" title="私密洞天">🔒</span></span>
+                                <span class="desc">\${item.desc}</span>
+                            </div>
+                            <div class="status-dot" data-idx="\${item.originalIdx}"></div>
+                        \`;
+                        grid.appendChild(a);
+                    }
+                });
+                bindRipple(document.querySelectorAll('.private-node'));
+                checkStatus(); // 检测新挂载节点的状态
             }
 
             function openModal(appType) {
                 currentApp = appType;
-                document.getElementById('modal-title').innerText = '📜 秘典残卷';
-                document.getElementById('memo-area').style.display = 'none';
                 document.getElementById('save-status').style.opacity = '0';
-                document.getElementById('sys-pwd').placeholder = '请输入全局管理员密钥...';
+                document.getElementById('auth-area').style.display = 'flex';
                 
-                const savedPwd = localStorage.getItem('LLSC_TOKEN');
-                if (savedPwd) {
-                    document.getElementById('sys-pwd').value = savedPwd;
-                    verifyPwd();
-                } else {
-                    document.getElementById('auth-area').style.display = 'flex';
+                if (appType === 'reveal') {
+                    document.getElementById('modal-title').innerText = '🔑 隐秘法阵';
+                    document.getElementById('memo-area').style.display = 'none';
+                    document.getElementById('sys-pwd').placeholder = '请输入破除隐匿的口令...';
                     document.getElementById('sys-pwd').value = '';
+                } else if (appType === 'memo') {
+                    document.getElementById('modal-title').innerText = '📜 秘典残卷';
+                    document.getElementById('memo-area').style.display = 'none';
+                    document.getElementById('sys-pwd').placeholder = '请输入全局管理员密钥...';
+                    
+                    const savedPwd = localStorage.getItem('LLSC_TOKEN');
+                    if (savedPwd) {
+                        document.getElementById('sys-pwd').value = savedPwd;
+                        verifyPwd();
+                    } else {
+                        document.getElementById('sys-pwd').value = '';
+                    }
                 }
                 
                 document.getElementById('app-modal').classList.add('active');
+                setTimeout(() => document.getElementById('sys-pwd').focus(), 100);
             }
 
             function closeModal() {
@@ -508,15 +579,19 @@ export default {
                 const pwd = document.getElementById('sys-pwd').value;
                 if (!pwd) return;
 
-                if (currentApp === 'unlock') {
+                if (currentApp === 'reveal') {
                     try {
-                        const res = await fetch('/api/unlock', { method: 'POST', body: JSON.stringify({idx: unlockIdx, pwd}) });
-                        if (!res.ok) throw new Error('Unlock Failed');
+                        const res = await fetch('/api/reveal', { method: 'POST', body: JSON.stringify({ pwd }) });
+                        if (!res.ok) throw new Error('Reveal Failed');
                         const data = await res.json();
+                        
+                        // 记住口令，实现下次免密加载
+                        localStorage.setItem('LLSC_PASSCODE', pwd);
+                        
                         closeModal();
-                        window.open(data.url, '_blank');
+                        renderPrivateCards(data.items);
                     } catch (e) { 
-                        alert('❌ 密码错误，无法破开此阵！'); 
+                        alert('❌ 口令错误，阵法未响应！'); 
                         document.getElementById('sys-pwd').value = '';
                     }
                 } else if (currentApp === 'memo') {

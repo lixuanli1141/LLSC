@@ -15,9 +15,9 @@ export default {
     // 后台系统的绝对入口密码
     const adminPwd = env.ADMIN_PWD || "lixuanli"; 
 
-    // 获取系统动态安全配置（口令与秘典密钥）
+    // 获取系统动态安全配置（口令）
     let sysConfigStr = await env.MY_KV.get("SYS_CONFIG");
-    let sysConfig = sysConfigStr ? JSON.parse(sysConfigStr) : { revealPwd: "5201314", memoPwd: "5201314" };
+    let sysConfig = sysConfigStr ? JSON.parse(sysConfigStr) : { revealPwd: "5201314" };
 
     // ==========================================
     // 1. 安全层：后台系统鉴权 (Admin)
@@ -37,12 +37,11 @@ export default {
         const formData = await request.formData();
         const newJson = formData.get("configJson");
         const newRevealPwd = formData.get("revealPwd") || "5201314";
-        const newMemoPwd = formData.get("memoPwd") || "5201314";
         
         try {
           JSON.parse(newJson); 
           await env.MY_KV.put("NAV_CONFIG", newJson);
-          await env.MY_KV.put("SYS_CONFIG", JSON.stringify({ revealPwd: newRevealPwd, memoPwd: newMemoPwd }));
+          await env.MY_KV.put("SYS_CONFIG", JSON.stringify({ revealPwd: newRevealPwd }));
           return Response.redirect(url.origin + "/admin?msg=success", 302);
         } catch (e) {
           return new Response("数据编译错误，保存失败！", { status: 400 });
@@ -113,15 +112,9 @@ export default {
                 <div class="card-header">
                     <span class="badge" style="background:#fef2f2;color:#ef4444;">🛡️ 核心动态密钥配置</span>
                 </div>
-                <div class="input-grid">
-                    <div class="form-group">
-                        <label>隐秘法阵口令 (右下角触发)</label>
-                        <input type="text" name="revealPwd" value="${sysConfig.revealPwd}" required>
-                    </div>
-                    <div class="form-group">
-                        <label>秘典残卷密钥 (左下角触发)</label>
-                        <input type="text" name="memoPwd" value="${sysConfig.memoPwd}" required>
-                    </div>
+                <div class="form-group">
+                    <label>隐秘法阵口令 (右下角极限盲区触发)</label>
+                    <input type="text" name="revealPwd" value="${sysConfig.revealPwd}" required>
                 </div>
             </div>
 
@@ -134,7 +127,6 @@ export default {
 
         <script>
           let siteData = ${currentConfig};
-          // 清理旧数据的兼容性处理
           siteData = siteData.map(item => ({
              ...item,
              isPrivate: item.isPrivate || false,
@@ -239,19 +231,6 @@ export default {
     // ==========================================
     let navDataStr = await env.MY_KV.get("NAV_CONFIG");
     let NAV_ITEMS = navDataStr ? JSON.parse(navDataStr) : DEFAULT_CONFIG;
-
-    if (url.pathname === '/api/memo' && request.method === 'POST') {
-      const { pwd, text, action } = await request.json();
-      if (pwd !== sysConfig.memoPwd) return new Response("Unauthorized", { status: 401 });
-      
-      if (action === 'save') {
-        await env.MY_KV.put("CLOUD_MEMO", text);
-        return new Response('{"status":"saved"}', { headers: { "Content-Type": "application/json" }});
-      } else {
-        const currentMemo = await env.MY_KV.get("CLOUD_MEMO");
-        return new Response(JSON.stringify({ text: currentMemo || "" }), { headers: { "Content-Type": "application/json" }});
-      }
-    }
 
     if (url.pathname === '/api/reveal' && request.method === 'POST') {
       const { pwd } = await request.json();
@@ -372,10 +351,17 @@ export default {
             .status-dot.online { background-color: #10b981; opacity: 1; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6), 0 0 12px rgba(16, 185, 129, 0.2); animation: dot-breathe 2.4s ease-in-out infinite; }
             .status-dot.offline { background-color: #ef4444; opacity: 1; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
 
-            /* ============================================================ */
-            /* 极简隐蔽触发器 (分别位于屏幕左下角和右下角死角，完全透明) */
-            /* ============================================================ */
-            .stealth-trigger-memo { position: fixed; bottom: 0; left: 0; width: 60px; height: 60px; cursor: pointer; z-index: 999; opacity: 0; -webkit-tap-highlight-color: transparent;}
+            /* 全局 Toast 提示框 */
+            .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(16, 185, 129, 0.9); color: white; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 500; backdrop-filter: blur(10px); z-index: 2000; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4); display: flex; align-items: center; gap: 8px;}
+            .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+            .toast.error { background: rgba(239, 68, 68, 0.9); box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.4); }
+
+            .float-tools { position: fixed; top: 30px; right: 30px; display: flex; gap: 15px; z-index: 50; }
+            .tool-btn { background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); color: var(--text-secondary); width: 44px; height: 44px; border-radius: 12px; display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s; font-size: 18px; }
+            .tool-btn:hover { border-color: var(--primary-blue); color: var(--primary-blue); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.2); }
+            .tool-btn:active { transform: scale(0.92); }
+
+            /* 隐蔽口令触控区 (右下角极限盲区) */
             .stealth-trigger-reveal { position: fixed; bottom: 0; right: 0; width: 60px; height: 60px; cursor: pointer; z-index: 999; opacity: 0; -webkit-tap-highlight-color: transparent;}
 
             .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
@@ -392,10 +378,6 @@ export default {
             .auth-submit { padding: 0 20px; background: var(--primary-blue); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.3s; }
             .auth-submit:hover { opacity: 0.8; }
             .auth-submit:active { transform: scale(0.95); }
-
-            .memo-area { width: 100%; height: 200px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: #e2e8f0; font-family: 'LXGW WenKai TC', sans-serif; font-size: 15px; padding: 15px; box-sizing: border-box; resize: none; outline: none; display: none; line-height: 1.6;}
-            .memo-area:focus { border-color: var(--primary-blue); }
-            .save-status { font-size: 12px; color: #10b981; text-align: right; margin-top: 8px; opacity: 0; transition: opacity 0.3s; }
 
             .ripple { position: absolute; border-radius: 50%; background: rgba(59, 130, 246, 0.35); transform: scale(0); transform-origin: center; animation: ripple-anim 0.6s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; will-change: transform, opacity; }
             
@@ -414,6 +396,7 @@ export default {
                 .container { padding: 35px 20px; width: 92%; } 
                 .nav-grid { grid-template-columns: 1fr; } 
                 h1 { font-size: 44px; } 
+                .float-tools { top: max(20px, env(safe-area-inset-top)); right: 20px; } 
             }
         </style>
     </head>
@@ -421,12 +404,18 @@ export default {
         <div class="aurora-glow glow-1"></div>
         <div class="aurora-glow glow-2"></div>
         
+        <!-- 全局提示框 -->
+        <div id="toast" class="toast"></div>
+
         <!-- ================================================== -->
-        <!-- 左下角隐蔽点击触发：秘典残卷 -->
-        <div class="stealth-trigger-memo" onclick="openModal('memo')" title=" "></div>
         <!-- 右下角隐蔽点击触发：隐秘法阵 -->
         <div class="stealth-trigger-reveal" onclick="openModal('reveal')" title=" "></div>
         <!-- ================================================== -->
+
+        <div class="float-tools">
+            <!-- 登出锁定按钮，默认隐藏，解密后显示 -->
+            <div class="tool-btn" id="logout-btn" onclick="lockSystem()" title="重置封印 (退出登录)" style="display: none;">🔓</div>
+        </div>
 
         <!-- 通用模态框 -->
         <div class="modal-overlay" id="app-modal">
@@ -440,9 +429,6 @@ export default {
                     <input type="password" id="sys-pwd" class="auth-input" placeholder="请输入阵法口令...">
                     <button class="auth-submit" onclick="verifyPwd()">破阵</button>
                 </div>
-                
-                <textarea class="memo-area" id="memo-area" placeholder="记录大千世界的灵光一闪... (自动保存)"></textarea>
-                <div class="save-status" id="save-status">阵纹已铭刻 ✓</div>
             </div>
         </div>
 
@@ -455,8 +441,7 @@ export default {
         </div>
         
         <div class="footer" id="footer-text">
-            © <span id="current-year"></span> 零落山川 All Rights Reserved.<br/>
-            Personal self-built cloud disk · Non-commercial use · Stability not guaranteed.
+            © <span id="current-year"></span> 零落山川 All Rights Reserved.
         </div>
 
         <script>
@@ -465,20 +450,22 @@ export default {
                 "大道无情，修仙本就是逆天而行。", "纵然天道崎岖，我也要踏出一条长生路。", "顺为凡，逆则仙，只在中间颠倒颠。"
             ];
 
-            let currentApp = ''; // 'memo' or 'reveal'
-            let autoSaveTimer = null;
+            let currentApp = ''; // 'reveal'
+
+            function showToast(msg, isError = false) {
+                const toast = document.getElementById('toast');
+                toast.innerText = msg;
+                if(isError) toast.classList.add('error');
+                else toast.classList.remove('error');
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3000);
+            }
 
             document.addEventListener("DOMContentLoaded", async () => {
                 document.getElementById('current-year').innerText = new Date().getFullYear();
                 document.getElementById('random-quote').innerText = "「 " + xianxiaQuotes[Math.floor(Math.random() * xianxiaQuotes.length)] + " 」";
 
                 bindRipple(document.querySelectorAll('.nav-item'));
-
-                // 绑定便签自动保存防抖
-                document.getElementById('memo-area').addEventListener('input', () => {
-                    clearTimeout(autoSaveTimer);
-                    autoSaveTimer = setTimeout(saveMemo, 1000);
-                });
 
                 // 回车快捷验证
                 document.getElementById('sys-pwd').addEventListener('keypress', function (e) {
@@ -493,8 +480,10 @@ export default {
                         if (res.ok) {
                             const data = await res.json();
                             renderPrivateCards(data.items);
+                            document.getElementById('logout-btn').style.display = 'flex';
+                            showToast('✨ 隐秘阵法已自动解除隐匿');
                         } else {
-                            localStorage.removeItem('LLSC_PASSCODE'); // 密码修改或过期，清除记忆
+                            localStorage.removeItem('LLSC_PASSCODE'); 
                         }
                     } catch(e) {}
                 }
@@ -505,7 +494,6 @@ export default {
 
             function bindRipple(elements) {
                 elements.forEach(card => {
-                    // 防止重复绑定
                     if(card.dataset.rippleBound) return;
                     card.dataset.rippleBound = true;
                     
@@ -524,12 +512,11 @@ export default {
             }
 
             async function checkStatus() {
-                // 仅检测还没被推演过状态的探针点
                 const dots = document.querySelectorAll('.status-dot:not(.checked)');
                 if (dots.length === 0) return;
                 
                 const indices = Array.from(dots).map(dot => parseInt(dot.getAttribute('data-idx')));
-                dots.forEach(dot => dot.classList.add('checked')); // 打上标记防重复检测
+                dots.forEach(dot => dot.classList.add('checked')); 
                 
                 try {
                     const res = await fetch('/api/status', { method: 'POST', body: JSON.stringify({ indices }) });
@@ -565,31 +552,17 @@ export default {
                     }
                 });
                 bindRipple(document.querySelectorAll('.private-node'));
-                checkStatus(); // 检测新挂载节点的状态
+                checkStatus(); 
             }
 
             function openModal(appType) {
                 currentApp = appType;
-                document.getElementById('save-status').style.opacity = '0';
                 document.getElementById('auth-area').style.display = 'flex';
                 
                 if (appType === 'reveal') {
                     document.getElementById('modal-title').innerText = '🔑 隐秘法阵';
-                    document.getElementById('memo-area').style.display = 'none';
                     document.getElementById('sys-pwd').placeholder = '请输入破除隐匿的全局口令...';
                     document.getElementById('sys-pwd').value = '';
-                } else if (appType === 'memo') {
-                    document.getElementById('modal-title').innerText = '📜 秘典残卷';
-                    document.getElementById('memo-area').style.display = 'none';
-                    document.getElementById('sys-pwd').placeholder = '请输入便签专属密钥...';
-                    
-                    const savedPwd = localStorage.getItem('LLSC_MEMO_PWD');
-                    if (savedPwd) {
-                        document.getElementById('sys-pwd').value = savedPwd;
-                        verifyPwd();
-                    } else {
-                        document.getElementById('sys-pwd').value = '';
-                    }
                 }
                 
                 document.getElementById('app-modal').classList.add('active');
@@ -610,42 +583,22 @@ export default {
                         if (!res.ok) throw new Error('Reveal Failed');
                         const data = await res.json();
                         
-                        // 记住口令，实现下次免密加载
                         localStorage.setItem('LLSC_PASSCODE', pwd);
                         
                         closeModal();
                         renderPrivateCards(data.items);
+                        document.getElementById('logout-btn').style.display = 'flex';
+                        showToast('✅ 口令验证成功，隐秘阵法已显现');
                     } catch (e) { 
-                        alert('❌ 口令错误，阵法未响应！'); 
                         document.getElementById('sys-pwd').value = '';
-                    }
-                } else if (currentApp === 'memo') {
-                    try {
-                        const res = await fetch('/api/memo', { method: 'POST', body: JSON.stringify({pwd, action: 'read'}) });
-                        if (!res.ok) throw new Error('Auth Failed');
-                        const data = await res.json();
-                        localStorage.setItem('LLSC_MEMO_PWD', pwd);
-                        document.getElementById('auth-area').style.display = 'none';
-                        const memoEl = document.getElementById('memo-area');
-                        memoEl.style.display = 'block';
-                        memoEl.value = data.text;
-                    } catch (e) { 
-                        alert('❌ 密钥验证失败！'); 
-                        localStorage.removeItem('LLSC_MEMO_PWD'); 
+                        showToast('❌ 口令错误，阵法未响应', true);
                     }
                 }
             }
 
-            async function saveMemo() {
-                const pwd = localStorage.getItem('LLSC_MEMO_PWD');
-                const text = document.getElementById('memo-area').value;
-                if (!pwd) return;
-                try {
-                    await fetch('/api/memo', { method: 'POST', body: JSON.stringify({pwd, action: 'save', text}) });
-                    const statusEl = document.getElementById('save-status');
-                    statusEl.style.opacity = '1';
-                    setTimeout(() => statusEl.style.opacity = '0', 2000);
-                } catch (e) { console.error('保存失败'); }
+            function lockSystem() {
+                localStorage.removeItem('LLSC_PASSCODE');
+                window.location.reload();
             }
         </script>
     </body>

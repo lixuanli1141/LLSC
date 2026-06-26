@@ -347,9 +347,11 @@ export default {
             .title { display: flex; align-items: center; font-size: 16px; font-weight: 500; font-family: 'LXGW WenKai TC', sans-serif; color: var(--text-main); transition: color 0.3s ease; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
             .desc { font-size: 13px; font-family: 'LXGW WenKai TC', sans-serif; color: var(--text-secondary); margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
             
-            .status-dot { position: absolute; top: 16px; right: 18px; width: 8px; height: 8px; border-radius: 50%; background-color: var(--text-secondary); opacity: 0.3; transition: all 0.5s ease; }
-            .status-dot.online { background-color: #10b981; opacity: 1; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6), 0 0 12px rgba(16, 185, 129, 0.2); animation: dot-breathe 2.4s ease-in-out infinite; }
-            .status-dot.offline { background-color: #ef4444; opacity: 1; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
+            .status-dot { position: absolute; top: 18px; right: 18px; width: 6px; height: 6px; border-radius: 50%; background-color: var(--text-secondary); opacity: 0.4; transition: all 0.5s ease; }
+            .status-dot::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background-color: inherit; z-index: -1; }
+            .status-dot.online { background-color: #10b981; opacity: 1; box-shadow: 0 0 6px rgba(16, 185, 129, 0.4); }
+            .status-dot.online::after { animation: status-ping 2.5s cubic-bezier(0, 0, 0.2, 1) infinite; }
+            .status-dot.offline { background-color: #ef4444; opacity: 0.8; box-shadow: 0 0 6px rgba(239, 68, 68, 0.4); }
 
             /* 全局 Toast 提示框 */
             .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(16, 185, 129, 0.9); color: white; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 500; backdrop-filter: blur(10px); z-index: 2000; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4); display: flex; align-items: center; gap: 8px;}
@@ -384,7 +386,7 @@ export default {
             
             @keyframes drift-1 { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(40px, 30px, 0) scale(1.15); } }
             @keyframes drift-2 { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(-30px, -25px, 0) scale(1.1); } }
-            @keyframes dot-breathe { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.6; } }
+            @keyframes status-ping { 0% { transform: scale(1); opacity: 0.8; } 75%, 100% { transform: scale(3.5); opacity: 0; } }
             @keyframes ripple-anim { to { transform: scale(3); opacity: 0; } }
             
             @media (max-width: 600px) { 

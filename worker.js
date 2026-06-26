@@ -51,10 +51,12 @@ export default {
       <html lang="zh-CN">
       <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
         <title>零落山川 | 阵法中枢</title>
         <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; color: #0f172a; margin: 0; padding: 30px 15px; }
+          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; color: #0f172a; margin: 0; padding: 30px 15px; padding-bottom: calc(30px + env(safe-area-inset-bottom)); -webkit-font-smoothing: antialiased; }
+          ::-webkit-scrollbar { display: none; }
+          * { scrollbar-width: none; }
           .header { max-width: 800px; margin: 0 auto 24px; display: flex; justify-content: space-between; align-items: center; }
           .header h2 { margin: 0; font-size: 24px; color: #1e293b; letter-spacing: 1px; }
           .container { max-width: 800px; margin: 0 auto; }
@@ -72,7 +74,7 @@ export default {
           .btn-primary { background: #1d4ed8; color: white; width: 100%; padding: 14px; font-size: 16px; box-shadow: 0 4px 6px -1px rgba(29, 78, 216, 0.2); }
           .btn-add { background: #ffffff; color: #10b981; border: 2px dashed #10b981; width: 100%; padding: 16px; margin-bottom: 24px; font-size: 16px; font-weight: 600;}
           .btn-secondary { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
-          .btn-secondary:hover { background: #e2e8f0; color: #0f172a; }
+          .btn-secondary:active { transform: scale(0.97); }
           .icon-btn { background: white; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer; padding: 6px 10px; margin-left: 6px; font-size: 14px; color: #475569;}
           .back-link { color: #64748b; text-decoration: none; font-size: 15px; }
           @media (max-width: 600px) { .input-grid { grid-template-columns: 1fr; } .toolbar { flex-direction: column; } }
@@ -238,7 +240,7 @@ export default {
     <html lang="zh-CN">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
         <title>零落山川</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -246,12 +248,29 @@ export default {
         
         <style>
             :root { 
-                --bg-base: #0b1120; --grid-color: rgba(30, 58, 138, 0.15); 
+                --bg-base: #0b1120; 
+                --grid-color: rgba(30, 58, 138, 0.08); /* 调暗网格线，防止高分屏噪点 */
                 --text-main: #f8fafc; --text-secondary: #94a3b8; 
                 --card-bg: rgba(15, 23, 42, 0.6); --border-color: rgba(255, 255, 255, 0.08); 
                 --primary-blue: #3b82f6; --hover-border: rgba(59, 130, 246, 0.5); --hover-shadow: rgba(29, 78, 216, 0.2);
             }
-            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background-color: var(--bg-base); background-image: linear-gradient(var(--grid-color) 1px, transparent 1px), linear-gradient(90deg, var(--grid-color) 1px, transparent 1px); background-size: 30px 30px; background-position: center center; color: var(--text-main); display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow-x: hidden;}
+            body { 
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
+                background-color: var(--bg-base); 
+                background-image: linear-gradient(var(--grid-color) 1px, transparent 1px), linear-gradient(90deg, var(--grid-color) 1px, transparent 1px); 
+                background-size: 50px 50px; /* 放大网格适应高分屏 */
+                background-position: center center; 
+                color: var(--text-main); 
+                display: flex; flex-direction: column; justify-content: center; align-items: center; 
+                min-height: 100vh; margin: 0; overflow-x: hidden;
+                padding-bottom: env(safe-area-inset-bottom); /* 底部安全区防遮挡 */
+                -webkit-font-smoothing: antialiased; /* 抗锯齿渲染 */
+            }
+            
+            /* 隐藏全局滚动条，保持纯净感 */
+            ::-webkit-scrollbar { display: none; }
+            * { scrollbar-width: none; }
+
             .container { max-width: 750px; width: 90%; padding: 45px 30px; z-index: 10; background: radial-gradient(circle at top, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.1) 100%); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); position: relative; }
             
             h1 { text-align: center; font-family: 'Long Cang', cursive; font-size: 52px; font-weight: normal; margin-top: 0; margin-bottom: 5px; letter-spacing: 6px; text-shadow: 0 2px 15px rgba(255, 255, 255, 0.15); }
@@ -260,10 +279,19 @@ export default {
             .nav-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
             .nav-item { position: relative; display: flex; align-items: center; padding: 18px 22px; text-decoration: none; background-color: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; -webkit-tap-highlight-color: transparent;}
             .nav-item::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent); transform: skewX(-20deg); transition: all 0.5s ease; }
+            
+            /* 交互反馈优化 */
             .nav-item:hover::before { left: 150%; }
             .nav-item:hover { border-color: var(--hover-border); background-color: rgba(30, 41, 59, 0.8); transform: translateY(-4px); box-shadow: 0 10px 30px -5px var(--hover-shadow), 0 0 0 1px var(--hover-border) inset; }
+            .nav-item:active { transform: scale(0.97); } /* 点击物理回缩阻尼感 */
             .nav-item:hover .title, .nav-item:hover .icon { color: var(--primary-blue); }
             
+            /* 高分屏下启用极细边框 (Hairline Border) */
+            @media (-webkit-min-device-pixel-ratio: 2) {
+                .nav-item { border-width: 0.5px; }
+                .container { border-width: 0.5px; }
+            }
+
             .icon { display: flex; align-items: center; justify-content: center; margin-right: 18px; color: var(--text-secondary); transition: color 0.3s ease; background: rgba(255, 255, 255, 0.03); padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); }
             .icon svg { width: 22px; height: 22px; }
             .details { display: flex; flex-direction: column; overflow: hidden; width: calc(100% - 30px); }
@@ -278,6 +306,7 @@ export default {
             .float-tools { position: fixed; top: 30px; right: 30px; display: flex; gap: 15px; z-index: 50; }
             .tool-btn { background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); color: var(--text-secondary); width: 44px; height: 44px; border-radius: 12px; display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s; font-size: 18px; }
             .tool-btn:hover { border-color: var(--primary-blue); color: var(--primary-blue); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.2); }
+            .tool-btn:active { transform: scale(0.92); }
 
             /* 模态框通用样式 */
             .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 100; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
@@ -294,6 +323,7 @@ export default {
             .auth-input:focus { border-color: var(--primary-blue); }
             .auth-submit { padding: 0 20px; background: var(--primary-blue); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.3s; }
             .auth-submit:hover { opacity: 0.8; }
+            .auth-submit:active { transform: scale(0.95); }
 
             /* 秘典残卷文本区 */
             .memo-area { width: 100%; height: 200px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: #e2e8f0; font-family: 'LXGW WenKai TC', sans-serif; font-size: 15px; padding: 15px; box-sizing: border-box; resize: none; outline: none; display: none; line-height: 1.6;}
@@ -301,17 +331,26 @@ export default {
             .save-status { font-size: 12px; color: #10b981; text-align: right; margin-top: 8px; opacity: 0; transition: opacity 0.3s; }
 
             .ripple { position: absolute; border-radius: 50%; background: rgba(59, 130, 246, 0.35); transform: scale(0); transform-origin: center; animation: ripple-anim 0.6s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; will-change: transform, opacity; }
-            .aurora-glow { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.25; pointer-events: none; z-index: 0; will-change: transform; }
+            
+            /* GPU硬件加速光晕 */
+            .aurora-glow { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.25; pointer-events: none; z-index: 0; will-change: transform; transform: translateZ(0); }
             .glow-1 { width: 320px; height: 320px; background: radial-gradient(circle, #3b82f6, transparent 70%); top: 8%; left: -10%; animation: drift-1 16s ease-in-out infinite; }
             .glow-2 { width: 280px; height: 280px; background: radial-gradient(circle, #0ea5e9, transparent 70%); bottom: 5%; right: -8%; animation: drift-2 20s ease-in-out infinite; }
             
-            .footer { margin-top: 40px; font-size: 12px; color: var(--text-secondary); letter-spacing: 1px; opacity: 0.5; z-index: 10; text-align: center; line-height: 1.8;}
+            .footer { margin-top: 40px; margin-bottom: env(safe-area-inset-bottom); font-size: 12px; color: var(--text-secondary); letter-spacing: 1px; opacity: 0.5; z-index: 10; text-align: center; line-height: 1.8;}
             
-            @keyframes drift-1 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(40px, 30px) scale(1.15); } }
-            @keyframes drift-2 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-30px, -25px) scale(1.1); } }
+            @keyframes drift-1 { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(40px, 30px, 0) scale(1.15); } }
+            @keyframes drift-2 { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(-30px, -25px, 0) scale(1.1); } }
             @keyframes dot-breathe { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.6; } }
             @keyframes ripple-anim { to { transform: scale(3); opacity: 0; } }
-            @media (max-width: 600px) { .container { padding: 35px 20px; width: 92%; } .nav-grid { grid-template-columns: 1fr; } h1 { font-size: 44px; } .float-tools { top: 20px; right: 20px; } }
+            
+            /* 移动端全面屏适配 */
+            @media (max-width: 600px) { 
+                .container { padding: 35px 20px; width: 92%; } 
+                .nav-grid { grid-template-columns: 1fr; } 
+                h1 { font-size: 44px; } 
+                .float-tools { top: max(20px, env(safe-area-inset-top)); right: 20px; } 
+            }
         </style>
     </head>
     <body>

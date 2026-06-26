@@ -441,14 +441,22 @@ export default {
             async function loadDynamicQuote() {
                 const quoteEl = document.getElementById('random-quote');
                 try {
-                    // 剔除抖机灵(l)和其他(g)，精准拉取剩余 10 个高质量核心分类
-                    const res = await fetch('https://v1.hitokoto.cn/?c=a&c=b&c=c&c=d&c=e&c=f&c=h&c=i&c=j&c=k', { signal: AbortSignal.timeout(3000) });
+                    // 开启全域盲抽模式
+                    const res = await fetch('https://v1.hitokoto.cn/', { signal: AbortSignal.timeout(3000) });
                     if (!res.ok) throw new Error('API_ERR');
                     const data = await res.json();
                     let sourceText = "";
                     if (data.from_who) sourceText += data.from_who;
                     if (data.from) sourceText += (sourceText ? " " : "") + "《" + data.from + "》";
-                    quoteEl.innerText = "「 " + data.hitokoto + " 」" + (sourceText ? " —— " + sourceText : "");
+                    
+                    quoteEl.innerText = "「 " + data.hitokoto + " 」";
+                    if (sourceText) {
+                        const sourceDiv = document.createElement('div');
+                        // 专门为出处设置了不同的字体和透明度，拉开视觉层次
+                        sourceDiv.style.cssText = "margin-top: 12px; font-size: 14px; opacity: 0.65; font-family: 'LXGW WenKai TC', sans-serif; letter-spacing: 1px; text-shadow: none;";
+                        sourceDiv.innerText = "—— " + sourceText;
+                        quoteEl.appendChild(sourceDiv);
+                    }
                 } catch (e) {
                     // 原生语录已彻底抹除，网络超时仅做极简提示
                     quoteEl.innerText = "「 灵气枯竭，未能连接到语录之源... 」";

@@ -391,9 +391,14 @@ export default {
             @keyframes ripple-anim { to { transform: scale(3); opacity: 0; } }
             
             @media (max-width: 600px) { 
-                .container { padding: 35px 20px; width: 92%; } 
+                .container { padding: 25px 20px; width: 82%; border-radius: 18px; } 
                 .nav-grid { grid-template-columns: 1fr; } 
-                h1 { font-size: 44px; } 
+                h1 { font-size: 38px; }
+                .modal-box { width: 76%; padding: 22px; border-radius: 14px; }
+                .modal-header { margin-bottom: 16px; padding-bottom: 12px; font-size: 18px; }
+                .auth-area { flex-direction: column; gap: 12px; }
+                .auth-input { padding: 14px 15px; font-size: 15px; text-align: center; }
+                .auth-submit { padding: 12px; width: 100%; font-size: 15px; } 
             }
         </style>
     </head>

@@ -60,10 +60,10 @@ export default {
       <html lang="zh-CN">
       <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
         <title>零落山川 | 阵法中枢</title>
         <style>
-          body { touch-action: manipulation; touch-action: manipulation; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; color: #0f172a; margin: 0; padding: 30px 15px; padding-bottom: calc(30px + env(safe-area-inset-bottom)); -webkit-font-smoothing: antialiased; }
+          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; color: #0f172a; margin: 0; padding: 30px 15px; padding-bottom: calc(30px + env(safe-area-inset-bottom)); -webkit-font-smoothing: antialiased; }
           ::-webkit-scrollbar { display: none; }
           * { scrollbar-width: none; }
           .header { max-width: 800px; margin: 0 auto 24px; display: flex; justify-content: space-between; align-items: center; }
@@ -287,7 +287,7 @@ export default {
     <html lang="zh-CN">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
         <title>零落山川</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -301,8 +301,7 @@ export default {
                 --card-bg: rgba(15, 23, 42, 0.6); --border-color: rgba(255, 255, 255, 0.08); 
                 --primary-blue: #3b82f6; --hover-border: rgba(59, 130, 246, 0.5); --hover-shadow: rgba(29, 78, 216, 0.2);
             }
-            body { touch-action: manipulation; 
-                touch-action: manipulation; /* 禁用双击放大 */
+            body { 
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
                 background-color: var(--bg-base); 
                 background-image: linear-gradient(var(--grid-color) 1px, transparent 1px), linear-gradient(90deg, var(--grid-color) 1px, transparent 1px); 
@@ -348,11 +347,9 @@ export default {
             .title { display: flex; align-items: center; font-size: 16px; font-weight: 500; font-family: 'LXGW WenKai TC', sans-serif; color: var(--text-main); transition: color 0.3s ease; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
             .desc { font-size: 13px; font-family: 'LXGW WenKai TC', sans-serif; color: var(--text-secondary); margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
             
-            .status-dot { position: absolute; top: 18px; right: 18px; width: 6px; height: 6px; border-radius: 50%; background-color: var(--text-secondary); opacity: 0.4; transition: all 0.5s ease; }
-            .status-dot::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background-color: inherit; z-index: -1; }
-            .status-dot.online { background-color: #10b981; opacity: 1; box-shadow: 0 0 6px rgba(16, 185, 129, 0.4); }
-            .status-dot.online::after { animation: status-ping 2.5s cubic-bezier(0, 0, 0.2, 1) infinite; }
-            .status-dot.offline { background-color: #ef4444; opacity: 0.8; box-shadow: 0 0 6px rgba(239, 68, 68, 0.4); }
+            .status-dot { position: absolute; top: 16px; right: 18px; width: 8px; height: 8px; border-radius: 50%; background-color: var(--text-secondary); opacity: 0.3; transition: all 0.5s ease; }
+            .status-dot.online { background-color: #10b981; opacity: 1; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6), 0 0 12px rgba(16, 185, 129, 0.2); animation: dot-breathe 2.4s ease-in-out infinite; }
+            .status-dot.offline { background-color: #ef4444; opacity: 1; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
 
             /* 全局 Toast 提示框 */
             .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(16, 185, 129, 0.9); color: white; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 500; backdrop-filter: blur(10px); z-index: 2000; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4); display: flex; align-items: center; gap: 8px;}
@@ -387,18 +384,13 @@ export default {
             
             @keyframes drift-1 { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(40px, 30px, 0) scale(1.15); } }
             @keyframes drift-2 { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(-30px, -25px, 0) scale(1.1); } }
-            @keyframes status-ping { 0% { transform: scale(1); opacity: 0.8; } 75%, 100% { transform: scale(3.5); opacity: 0; } }
+            @keyframes dot-breathe { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.6; } }
             @keyframes ripple-anim { to { transform: scale(3); opacity: 0; } }
             
             @media (max-width: 600px) { 
-                .container { padding: 25px 20px; width: 82%; border-radius: 18px; } 
+                .container { padding: 35px 20px; width: 92%; } 
                 .nav-grid { grid-template-columns: 1fr; } 
-                h1 { font-size: 38px; }
-                .modal-box { width: 76%; padding: 22px; border-radius: 14px; }
-                .modal-header { margin-bottom: 16px; padding-bottom: 12px; font-size: 18px; }
-                .auth-area { flex-direction: column; gap: 12px; }
-                .auth-input { padding: 14px 15px; font-size: 15px; text-align: center; }
-                .auth-submit { padding: 12px; width: 100%; font-size: 15px; } 
+                h1 { font-size: 44px; } 
             }
         </style>
     </head>
@@ -442,12 +434,23 @@ export default {
         </div>
 
         <script>
-            const xianxiaQuotes = [
-                "逻辑不灭，神识永存。", "以代码为阵纹，以算力为灵气，证道大千。", "数据流转生灭，犹如诸天星辰起落。",
-                "大道无情，修仙本就是逆天而行。", "纵然天道崎岖，我也要踏出一条长生路。", "顺为凡，逆则仙，只在中间颠倒颠。"
-            ];
+
 
             let isUnlocked = false; // 记录当前是否已解密
+
+            async function loadDynamicQuote() {
+                const quoteEl = document.getElementById('random-quote');
+                try {
+                    // 不加任何参数，开启全域盲抽模式 (涵盖二次元、文学、网络、哲学等所有 12 个分类)
+                    const res = await fetch('https://v1.hitokoto.cn/', { signal: AbortSignal.timeout(3000) });
+                    if (!res.ok) throw new Error('API_ERR');
+                    const data = await res.json();
+                    quoteEl.innerText = "「 " + data.hitokoto + " 」";
+                } catch (e) {
+                    // 原生语录已彻底抹除，网络超时仅做极简提示
+                    quoteEl.innerText = "「 灵气枯竭，未能连接到语录之源... 」";
+                }
+            }
 
             function showToast(msg, isError = false) {
                 const toast = document.getElementById('toast');
@@ -460,7 +463,7 @@ export default {
 
             document.addEventListener("DOMContentLoaded", async () => {
                 document.getElementById('current-year').innerText = new Date().getFullYear();
-                document.getElementById('random-quote').innerText = "「 " + xianxiaQuotes[Math.floor(Math.random() * xianxiaQuotes.length)] + " 」";
+                loadDynamicQuote();
 
                 bindRipple(document.querySelectorAll('.nav-item'));
 

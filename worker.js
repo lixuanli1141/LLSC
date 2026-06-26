@@ -441,8 +441,8 @@ export default {
             async function loadDynamicQuote() {
                 const quoteEl = document.getElementById('random-quote');
                 try {
-                    // 不加任何参数，开启全域盲抽模式 (涵盖二次元、文学、网络、哲学等所有 12 个分类)
-                    const res = await fetch('https://v1.hitokoto.cn/', { signal: AbortSignal.timeout(3000) });
+                    // 剔除抖机灵(l)和其他(g)，精准拉取剩余 10 个高质量核心分类
+                    const res = await fetch('https://v1.hitokoto.cn/?c=a&c=b&c=c&c=d&c=e&c=f&c=h&c=i&c=j&c=k', { signal: AbortSignal.timeout(3000) });
                     if (!res.ok) throw new Error('API_ERR');
                     const data = await res.json();
                     quoteEl.innerText = "「 " + data.hitokoto + " 」";

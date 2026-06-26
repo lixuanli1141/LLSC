@@ -349,8 +349,7 @@ export default {
         </div>
         
         <div class="footer" id="footer-text">
-            © <span id="current-year"></span> 零落山川 All Rights Reserved.<br/>
-            联系邮箱: LXLHUB@outlook.com
+            © <span id="current-year"></span> 零落山川 All Rights Reserved.
         </div>
 
         <script>

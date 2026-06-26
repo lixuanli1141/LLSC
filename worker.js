@@ -230,10 +230,10 @@ export default {
                 box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             }
 
-            /* 书法主标题：马善政楷书 */
+            /* 书法主标题：霞鹜文楷 */
             h1 { 
                 text-align: center; 
-                font-family: 'Ma Shan Zheng', cursive;
+                font-family: 'LXGW WenKai TC', cursive;
                 font-size: 52px; 
                 font-weight: normal; 
                 margin-top: 0; 
@@ -242,10 +242,10 @@ export default {
                 text-shadow: 0 2px 15px rgba(255, 255, 255, 0.15);
             }
 
-            /* 诗词副标题：霞鹜文楷 */
+            /* 诗词副标题：马善政楷书 */
             .sub-quote {
                 text-align: center;
-                font-family: 'LXGW WenKai TC', serif;
+                font-family: 'Ma Shan Zheng', serif;
                 font-size: 16px;
                 color: var(--text-secondary);
                 margin-bottom: 40px;

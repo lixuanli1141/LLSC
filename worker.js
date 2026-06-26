@@ -2,10 +2,10 @@
 // 默认初始数据兜底配置
 // ==========================================
 const DEFAULT_CONFIG = [
-  { url: "https://drive.ing.nn.kg", title: "私人云盘", desc: "OpenList / Alist 文件管理", icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>` },
-  { url: "https://media.lxlhub.qzz.io", title: "流媒体中心", desc: "MoonTV 影视库", icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></svg>` },
-  { url: "https://quiz.ing.nn.kg", title: "在线题库", desc: "自定义刷题与测试系统", icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>` },
-  { url: "https://ops.lxlhub.qzz.io", title: "服务器探针", desc: "VPS 资源监控状态", icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>` }
+  { url: "https://drive.ing.nn.kg", title: "私人云盘", desc: "OpenList / Alist 文件管理", lockPwd: "", icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>` },
+  { url: "https://media.lxlhub.qzz.io", title: "流媒体中心", desc: "MoonTV 影视库", lockPwd: "", icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></svg>` },
+  { url: "https://quiz.ing.nn.kg", title: "在线题库", desc: "自定义刷题与测试系统", lockPwd: "", icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>` },
+  { url: "https://ops.lxlhub.qzz.io", title: "服务器探针", desc: "VPS 资源监控状态", lockPwd: "", icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>` }
 ];
 
 export default {
@@ -126,9 +126,15 @@ export default {
                       <input type="url" value="\${item.url}" oninput="updateItem(\${index}, 'url', this.value)" required>
                     </div>
                   </div>
-                  <div class="form-group">
-                    <label>法则解析 (Description)</label>
-                    <input type="text" value="\${item.desc}" oninput="updateItem(\${index}, 'desc', this.value)">
+                  <div class="input-grid">
+                    <div class="form-group">
+                      <label>法则解析 (Description)</label>
+                      <input type="text" value="\${item.desc}" oninput="updateItem(\${index}, 'desc', this.value)">
+                    </div>
+                    <div class="form-group">
+                      <label>阵眼密钥 (留空即公开)</label>
+                      <input type="text" value="\${item.lockPwd || ''}" oninput="updateItem(\${index}, 'lockPwd', this.value)" placeholder="填入密码即变为私密洞天">
+                    </div>
                   </div>
                   <div class="form-group">
                     <label>阵纹代码 (SVG Icon)</label>
@@ -144,7 +150,7 @@ export default {
           function deleteItem(index) { if(confirm('要将此洞天从星图中抹除吗？')) { siteData.splice(index, 1); render(); } }
           function moveItem(index, dir) { const temp = siteData[index]; siteData[index] = siteData[index + dir]; siteData[index + dir] = temp; render(); }
           function addItem() {
-            siteData.push({ title: "新洞天", url: "https://", desc: "请注入法则描述", icon: \`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>\` });
+            siteData.push({ title: "新洞天", url: "https://", desc: "请注入法则描述", lockPwd: "", icon: \`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>\` });
             render();
           }
           
@@ -186,8 +192,11 @@ export default {
     }
 
     // ==========================================
-    // 2. API层：秘典残卷 (Memo)
+    // 2. API层：秘典残卷 (Memo) & 节点破阵 (Unlock)
     // ==========================================
+    let navDataStr = await env.MY_KV.get("NAV_CONFIG");
+    let NAV_ITEMS = navDataStr ? JSON.parse(navDataStr) : DEFAULT_CONFIG;
+
     if (url.pathname === '/api/memo' && request.method === 'POST') {
       const { pwd, text, action } = await request.json();
       if (pwd !== adminPwd) return new Response("Unauthorized", { status: 401 });
@@ -201,22 +210,30 @@ export default {
       }
     }
 
-    // ==========================================
-    // 3. 前台：探针接口
-    // ==========================================
-    let navDataStr = await env.MY_KV.get("NAV_CONFIG");
-    let NAV_ITEMS = navDataStr ? JSON.parse(navDataStr) : DEFAULT_CONFIG;
+    if (url.pathname === '/api/unlock' && request.method === 'POST') {
+      const { idx, pwd } = await request.json();
+      const item = NAV_ITEMS[idx];
+      if (!item) return new Response("Not found", { status: 404 });
+      if (item.lockPwd && item.lockPwd === pwd) {
+        return new Response(JSON.stringify({ url: item.url }), { headers: { "Content-Type": "application/json" } });
+      } else {
+        return new Response("Unauthorized", { status: 401 });
+      }
+    }
 
+    // ==========================================
+    // 3. 前台：探针接口 (支持前端隐藏URL进行推演)
+    // ==========================================
     if (url.pathname === '/api/status') {
-      const results = await Promise.all(NAV_ITEMS.map(async (item) => {
+      const results = await Promise.all(NAV_ITEMS.map(async (item, idx) => {
         try {
           const res = await fetch(item.url, { 
             method: 'GET', 
             headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Hub-Monitor' }, 
             signal: AbortSignal.timeout(3000) 
           });
-          return { url: item.url, ok: res.ok };
-        } catch (error) { return { url: item.url, ok: false }; }
+          return { idx, ok: res.ok };
+        } catch (error) { return { idx, ok: false }; }
       }));
       return new Response(JSON.stringify(results), { headers: { "Content-Type": "application/json;charset=UTF-8", "Cache-Control": "no-store" } });
     }
@@ -224,16 +241,24 @@ export default {
     // ==========================================
     // 4. 前端页面：大千世界主入口
     // ==========================================
-    const cardsHtml = NAV_ITEMS.map(item => `
-      <a href="${item.url}" class="nav-item" target="_blank">
+    const cardsHtml = NAV_ITEMS.map((item, idx) => {
+      const isLocked = !!item.lockPwd;
+      // 后端直接剥离加密节点的真实 URL，防止爬虫或审查源码提取
+      const targetUrl = isLocked ? `javascript:openUnlockModal(${idx}, '${item.title}')` : item.url;
+      const targetAttr = isLocked ? '' : 'target="_blank"';
+      const lockBadge = isLocked ? `<span style="margin-left: 6px; font-size: 13px; opacity: 0.8;" title="私密洞天">🔒</span>` : '';
+
+      return `
+      <a href="${targetUrl}" class="nav-item" ${targetAttr}>
           <span class="icon">${item.icon}</span>
           <div class="details">
-              <span class="title">${item.title}</span>
+              <span class="title">${item.title}${lockBadge}</span>
               <span class="desc">${item.desc}</span>
           </div>
-          <div class="status-dot" data-url="${item.url}"></div>
+          <div class="status-dot" data-idx="${idx}"></div>
       </a>
-    `).join('');
+      `;
+    }).join('');
 
     const html = `
     <!DOCTYPE html>
@@ -249,7 +274,7 @@ export default {
         <style>
             :root { 
                 --bg-base: #0b1120; 
-                --grid-color: rgba(30, 58, 138, 0.08); /* 调暗网格线，防止高分屏噪点 */
+                --grid-color: rgba(30, 58, 138, 0.08); 
                 --text-main: #f8fafc; --text-secondary: #94a3b8; 
                 --card-bg: rgba(15, 23, 42, 0.6); --border-color: rgba(255, 255, 255, 0.08); 
                 --primary-blue: #3b82f6; --hover-border: rgba(59, 130, 246, 0.5); --hover-shadow: rgba(29, 78, 216, 0.2);
@@ -258,16 +283,15 @@ export default {
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
                 background-color: var(--bg-base); 
                 background-image: linear-gradient(var(--grid-color) 1px, transparent 1px), linear-gradient(90deg, var(--grid-color) 1px, transparent 1px); 
-                background-size: 50px 50px; /* 放大网格适应高分屏 */
+                background-size: 50px 50px; 
                 background-position: center center; 
                 color: var(--text-main); 
                 display: flex; flex-direction: column; justify-content: center; align-items: center; 
                 min-height: 100vh; margin: 0; overflow-x: hidden;
-                padding-bottom: env(safe-area-inset-bottom); /* 底部安全区防遮挡 */
-                -webkit-font-smoothing: antialiased; /* 抗锯齿渲染 */
+                padding-bottom: env(safe-area-inset-bottom); 
+                -webkit-font-smoothing: antialiased; 
             }
             
-            /* 隐藏全局滚动条，保持纯净感 */
             ::-webkit-scrollbar { display: none; }
             * { scrollbar-width: none; }
 
@@ -280,13 +304,11 @@ export default {
             .nav-item { position: relative; display: flex; align-items: center; padding: 18px 22px; text-decoration: none; background-color: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; -webkit-tap-highlight-color: transparent;}
             .nav-item::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent); transform: skewX(-20deg); transition: all 0.5s ease; }
             
-            /* 交互反馈优化 */
             .nav-item:hover::before { left: 150%; }
             .nav-item:hover { border-color: var(--hover-border); background-color: rgba(30, 41, 59, 0.8); transform: translateY(-4px); box-shadow: 0 10px 30px -5px var(--hover-shadow), 0 0 0 1px var(--hover-border) inset; }
-            .nav-item:active { transform: scale(0.97); } /* 点击物理回缩阻尼感 */
+            .nav-item:active { transform: scale(0.97); }
             .nav-item:hover .title, .nav-item:hover .icon { color: var(--primary-blue); }
             
-            /* 高分屏下启用极细边框 (Hairline Border) */
             @media (-webkit-min-device-pixel-ratio: 2) {
                 .nav-item { border-width: 0.5px; }
                 .container { border-width: 0.5px; }
@@ -295,7 +317,7 @@ export default {
             .icon { display: flex; align-items: center; justify-content: center; margin-right: 18px; color: var(--text-secondary); transition: color 0.3s ease; background: rgba(255, 255, 255, 0.03); padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); }
             .icon svg { width: 22px; height: 22px; }
             .details { display: flex; flex-direction: column; overflow: hidden; width: calc(100% - 30px); }
-            .title { font-size: 16px; font-weight: 500; font-family: 'LXGW WenKai TC', sans-serif; color: var(--text-main); transition: color 0.3s ease; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .title { display: flex; align-items: center; font-size: 16px; font-weight: 500; font-family: 'LXGW WenKai TC', sans-serif; color: var(--text-main); transition: color 0.3s ease; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
             .desc { font-size: 13px; font-family: 'LXGW WenKai TC', sans-serif; color: var(--text-secondary); margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
             
             .status-dot { position: absolute; top: 16px; right: 18px; width: 8px; height: 8px; border-radius: 50%; background-color: var(--text-secondary); opacity: 0.3; transition: all 0.5s ease; }
@@ -371,7 +393,7 @@ export default {
                 
                 <div class="auth-area" id="auth-area">
                     <input type="password" id="sys-pwd" class="auth-input" placeholder="请输入阵法密钥...">
-                    <button class="auth-submit" onclick="verifyPwd()">启阵</button>
+                    <button class="auth-submit" onclick="verifyPwd()">破阵</button>
                 </div>
                 
                 <textarea class="memo-area" id="memo-area" placeholder="记录大千世界的灵光一闪... (自动保存)"></textarea>
@@ -397,7 +419,8 @@ export default {
                 "大道无情，修仙本就是逆天而行。", "纵然天道崎岖，我也要踏出一条长生路。", "顺为凡，逆则仙，只在中间颠倒颠。"
             ];
 
-            let currentApp = ''; // 'memo'
+            let currentApp = ''; // 'memo' or 'unlock'
+            let unlockIdx = null;
             let autoSaveTimer = null;
 
             document.addEventListener("DOMContentLoaded", async () => {
@@ -433,7 +456,8 @@ export default {
                     const res = await fetch('/api/status');
                     const statuses = await res.json();
                     statuses.forEach(status => {
-                        const dot = document.querySelector(\`.status-dot[data-url="\${status.url}"]\`);
+                        // 使用索引匹配状态灯，防止泄露真实URL
+                        const dot = document.querySelector(\`.status-dot[data-idx="\${status.idx}"]\`);
                         if (dot) {
                             if (status.ok) dot.classList.add('online');
                             else dot.classList.add('offline');
@@ -442,11 +466,27 @@ export default {
                 } catch (error) { console.error('探针推演受阻'); }
             });
 
+            function openUnlockModal(idx, title) {
+                currentApp = 'unlock';
+                unlockIdx = idx;
+                document.getElementById('modal-title').innerText = '🔒 解除封印 : ' + title;
+                document.getElementById('memo-area').style.display = 'none';
+                document.getElementById('save-status').style.opacity = '0';
+                
+                document.getElementById('sys-pwd').value = '';
+                document.getElementById('sys-pwd').placeholder = '请输入节点专属密码...';
+                document.getElementById('auth-area').style.display = 'flex';
+                
+                document.getElementById('app-modal').classList.add('active');
+                setTimeout(() => document.getElementById('sys-pwd').focus(), 100);
+            }
+
             function openModal(appType) {
                 currentApp = appType;
                 document.getElementById('modal-title').innerText = '📜 秘典残卷';
                 document.getElementById('memo-area').style.display = 'none';
                 document.getElementById('save-status').style.opacity = '0';
+                document.getElementById('sys-pwd').placeholder = '请输入全局管理员密钥...';
                 
                 const savedPwd = localStorage.getItem('LLSC_TOKEN');
                 if (savedPwd) {
@@ -454,6 +494,7 @@ export default {
                     verifyPwd();
                 } else {
                     document.getElementById('auth-area').style.display = 'flex';
+                    document.getElementById('sys-pwd').value = '';
                 }
                 
                 document.getElementById('app-modal').classList.add('active');
@@ -467,7 +508,18 @@ export default {
                 const pwd = document.getElementById('sys-pwd').value;
                 if (!pwd) return;
 
-                if (currentApp === 'memo') {
+                if (currentApp === 'unlock') {
+                    try {
+                        const res = await fetch('/api/unlock', { method: 'POST', body: JSON.stringify({idx: unlockIdx, pwd}) });
+                        if (!res.ok) throw new Error('Unlock Failed');
+                        const data = await res.json();
+                        closeModal();
+                        window.open(data.url, '_blank');
+                    } catch (e) { 
+                        alert('❌ 密码错误，无法破开此阵！'); 
+                        document.getElementById('sys-pwd').value = '';
+                    }
+                } else if (currentApp === 'memo') {
                     try {
                         const res = await fetch('/api/memo', { method: 'POST', body: JSON.stringify({pwd, action: 'read'}) });
                         if (!res.ok) throw new Error('Auth Failed');
@@ -477,7 +529,10 @@ export default {
                         const memoEl = document.getElementById('memo-area');
                         memoEl.style.display = 'block';
                         memoEl.value = data.text;
-                    } catch (e) { alert('❌ 密钥验证失败！'); localStorage.removeItem('LLSC_TOKEN'); }
+                    } catch (e) { 
+                        alert('❌ 密钥验证失败！'); 
+                        localStorage.removeItem('LLSC_TOKEN'); 
+                    }
                 }
             }
 

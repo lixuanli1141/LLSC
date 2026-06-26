@@ -7,4 +7,4 @@ enabled = true
 
 [[kv_namespaces]]
 binding = "MY_KV"
-id = "在这里填入你的KV命名空间ID"
+id = "NAV_DATA"

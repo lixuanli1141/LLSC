@@ -155,7 +155,11 @@ export default {
     if (url.pathname === '/api/status') {
       const results = await Promise.all(NAV_ITEMS.map(async (item) => {
         try {
-          const res = await fetch(item.url, { method: 'GET', headers: { 'User-Agent': 'Hub-Monitor' }, signal: AbortSignal.timeout(3000) });
+          const res = await fetch(item.url, { 
+            method: 'GET', 
+            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Hub-Monitor' }, 
+            signal: AbortSignal.timeout(3000) 
+          });
           return { url: item.url, ok: res.ok };
         } catch (error) { return { url: item.url, ok: false }; }
       }));
@@ -314,10 +318,33 @@ export default {
 
             .icon svg { width: 22px; height: 22px; }
 
-            .details { display: flex; flex-direction: column; }
+            .details { 
+                display: flex; 
+                flex-direction: column; 
+                overflow: hidden;
+                width: calc(100% - 30px);
+            }
 
-            .title { font-size: 16px; font-weight: 500; color: var(--text-main); transition: color 0.3s ease; letter-spacing: 0.5px; }
-            .desc { font-size: 13px; color: var(--text-secondary); margin-top: 6px; }
+            .title { 
+                font-size: 16px; 
+                font-weight: 500; 
+                font-family: 'LXGW WenKai TC', sans-serif;
+                color: var(--text-main); 
+                transition: color 0.3s ease; 
+                letter-spacing: 0.5px; 
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .desc { 
+                font-size: 13px; 
+                font-family: 'LXGW WenKai TC', sans-serif;
+                color: var(--text-secondary); 
+                margin-top: 6px; 
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
 
             .status-dot { 
                 position: absolute; 
@@ -342,6 +369,7 @@ export default {
                 opacity: 0.25;
                 pointer-events: none;
                 z-index: 0;
+                will-change: transform;
             }
             .glow-1 {
                 width: 320px; height: 320px;
@@ -351,7 +379,7 @@ export default {
             }
             .glow-2 {
                 width: 280px; height: 280px;
-                background: radial-gradient(circle, #8b5cf6, transparent 70%);
+                background: radial-gradient(circle, #0ea5e9, transparent 70%);
                 bottom: 5%; right: -8%;
                 animation: drift-2 20s ease-in-out infinite;
             }
@@ -387,8 +415,10 @@ export default {
                 border-radius: 50%;
                 background: rgba(59, 130, 246, 0.35);
                 transform: scale(0);
-                animation: ripple-anim 0.6s ease-out;
+                transform-origin: center;
+                animation: ripple-anim 0.6s cubic-bezier(0.4, 0, 0.2, 1);
                 pointer-events: none;
+                will-change: transform, opacity;
             }
             @keyframes ripple-anim {
                 to { transform: scale(3); opacity: 0; }
@@ -399,7 +429,7 @@ export default {
             @media (max-width: 600px) { 
                 .container { padding: 35px 20px; width: 92%; } 
                 .nav-grid { grid-template-columns: 1fr; } 
-                h1 { font-size: 44px; } /* 手机端标题稍微缩小避免换行 */
+                h1 { font-size: 44px; }
             }
         </style>
     </head>
@@ -416,9 +446,7 @@ export default {
         <div class="footer" id="footer-text">© <span id="current-year"></span> 零落山川 All Rights Reserved.</div>
 
         <script>
-            // 100 句修仙/玄幻大圆满金句库
             const xianxiaQuotes = [
-                // 凡人修仙传
                 "大道无情，修仙本就是逆天而行。",
                 "修仙界本就弱肉强食，哪有什么真正的道理可言。",
                 "纵然天道崎岖，我也要踏出一条长生路。",
@@ -426,7 +454,6 @@ export default {
                 "法宝再好，也不如自身的修为靠得住。",
                 "所谓长生，不过是看尽故人离去，独自品尝这无尽的孤寂。",
                 "我韩立行事，何须向他人解释。",
-                // 仙逆 / 求魔
                 "这雨生于天，死于大地，中间的过程，便是人生。",
                 "顺为凡，逆则仙，只在中间颠倒颠。",
                 "道在人为，我命由我不由天！",
@@ -437,7 +464,6 @@ export default {
                 "如果这天遮了我的眼，那我就捅破这天！",
                 "我命如妖欲封天！",
                 "既然找不到前往仙界的路，那便自己走出来一条。",
-                // 遮天 / 完美世界
                 "仙路尽头谁为峰，一见无始道成空。",
                 "哪怕背负天渊，需一手托原始帝城，我安澜一样无敌于世间！",
                 "登天路，踏歌行，弹指遮天。",
@@ -448,7 +474,6 @@ export default {
                 "星空彼岸，有我无敌。",
                 "历千劫万险，纵使魂飞魄散，我灵识依在，战百世轮回，纵使六道无常，我依然永生！",
                 "待到逆乱阴阳时，以我魔血染青天！",
-                // 剑来 / 雪中悍刀行
                 "有些道理，剑鞘里说不通，那就拔剑跟这个世界讲。",
                 "遇事不决，可问春风。春风不语，即随本心。",
                 "我有一剑，可搬山，倒海，降妖，镇魔，摘星，断江，摧城，开天！",
@@ -458,7 +483,6 @@ export default {
                 "世间文字八万个，唯有情字最杀人。",
                 "且视他人之疑目如盏盏鬼火，大胆去走你的夜路。",
                 "莫道书生无胆气，敢叫天地沉入海。",
-                // 将夜 / 悟空传
                 "天不生夫子，万古如长夜。",
                 "若天压我，劈开那天；若地拘我，踏碎那地。",
                 "我等生来自由身，谁敢高高在上。",
@@ -466,7 +490,6 @@ export default {
                 "我要这天，再遮不住我眼；要这地，再埋不了我心。",
                 "长夜漫漫，唯剑作伴。",
                 "生如夏花之绚烂，死如秋叶之静美。",
-                // 古典道法
                 "大梦谁先觉？平生我自知。",
                 "寄蜉蝣于天地，渺沧海之一粟。",
                 "一剑光寒十九洲。",
@@ -485,9 +508,8 @@ export default {
                 "修心即修道，心若止水，万法不侵。",
                 "天之道，损有余而补不足；人之道，损不足以奉有余。",
                 "上善若水。水善利万物而不争。",
-                "致虚极，守静笃。万物并作，吾以观复。",
+                "致虚极，守静笃. 万物并作，吾以观复。",
                 "知人者智，自知者明。胜人者有力，自胜者强。",
-                // 硬核霸气
                 "三十年河东，三十年河西，莫欺少年穷！",
                 "手握日月摘星辰，世间无我这般人。",
                 "败在我手中之敌，从来不会被我视为对手，我给你时间追赶，直至你遥望不见。",
@@ -500,7 +522,6 @@ export default {
                 "吾辈修士，当有一往无前之心，纵死无悔！",
                 "神若挡我，我便杀神；魔若阻我，我便诛魔！",
                 "世间毁誉，不过是一阵秋风，拂过便散。",
-                // 归隐山林 
                 "结庐在人境，而无车马喧。",
                 "采菊东篱下，悠然见南山。",
                 "山中何所有，岭上多白云。只可自怡悦，不堪持赠君。",
@@ -513,7 +534,6 @@ export default {
                 "世事一场大梦，人生几度秋凉。",
                 "休言万事转头空，未转头时皆梦。",
                 "人生如逆旅，我亦是行人。",
-                // 赛博修仙
                 "数据流转生灭，犹如诸天星辰起落。",
                 "以代码为阵纹，以算力为灵气，证道大千。",
                 "逻辑不灭，神识永存。",
@@ -528,7 +548,6 @@ export default {
                 const randomText = xianxiaQuotes[Math.floor(Math.random() * xianxiaQuotes.length)];
                 quoteEl.innerText = "「 " + randomText + " 」";
 
-                // 卡片点击水波效果
                 document.querySelectorAll('.nav-item').forEach(card => {
                     card.addEventListener('click', function(e) {
                         const rect = this.getBoundingClientRect();

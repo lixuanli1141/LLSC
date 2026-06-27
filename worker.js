@@ -34,7 +34,7 @@ export default {
     const adminPwd = env.ADMIN_PWD || "lixuanli"; 
     // 启用 KV 边缘缓存穿透 (cacheTtl: 60秒)，极大降低 KV 读延迟，提升响应速度
     const sysConfigStr = await env.MY_KV.get("SYS_CONFIG", { cacheTtl: 60 });
-    const sysConfig = sysConfigStr ? JSON.parse(sysConfigStr) : { revealPwd: "5201314" }; 
+    const sysConfig = sysConfigStr ? JSON.parse(sysConfigStr) : { revealPwd: "5201314", quoteInterval: 60 }; 
 
     // ==========================================
     // 1. 后台中枢鉴权层 (/admin)
@@ -54,11 +54,13 @@ export default {
         const formData = await request.formData();
         const newJson = formData.get("configJson");
         const newRevealPwd = formData.get("revealPwd") || "5201314";
+        const newQuoteInterval = parseInt(formData.get("quoteInterval"), 10);
+        const quoteInt = isNaN(newQuoteInterval) ? 60 : newQuoteInterval;
         
         try {
           JSON.parse(newJson); 
           await env.MY_KV.put("NAV_CONFIG", newJson);
-          await env.MY_KV.put("SYS_CONFIG", JSON.stringify({ revealPwd: newRevealPwd }));
+          await env.MY_KV.put("SYS_CONFIG", JSON.stringify({ revealPwd: newRevealPwd, quoteInterval: quoteInt }));
           return Response.redirect(url.origin + "/admin?msg=success", 302);
         } catch (e) {
           return new Response("数据编译错误，保存失败！", { status: 400 });
@@ -124,11 +126,17 @@ export default {
           <form method="POST" id="adminForm">
             <div class="edit-card" style="border-color: #f87171; box-shadow: 0 4px 6px -1px rgba(239,68,68,0.1);">
                 <div class="card-header">
-                    <span class="badge" style="background:#fef2f2;color:#ef4444;">🛡️ 核心动态密钥配置</span>
+                    <span class="badge" style="background:#fef2f2;color:#ef4444;">🛡️ 核心中枢法阵配置</span>
                 </div>
-                <div class="form-group">
-                    <label>隐秘法阵口令 (右下角极限盲区触发)</label>
-                    <input type="text" name="revealPwd" value="${sysConfig.revealPwd}" required>
+                <div class="input-grid">
+                    <div class="form-group">
+                        <label>隐秘法阵口令 (右下角极限盲区触发)</label>
+                        <input type="text" name="revealPwd" value="${sysConfig.revealPwd}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>语录聚灵周期 (秒) - 设为0则关闭</label>
+                        <input type="number" name="quoteInterval" value="${sysConfig.quoteInterval !== undefined ? sysConfig.quoteInterval : 60}" min="0" required>
+                    </div>
                 </div>
             </div>
             <input type="hidden" name="configJson" id="hidden-json">
@@ -503,8 +511,28 @@ export default {
                 document.addEventListener("DOMContentLoaded", async () => {
                     document.getElementById('current-year').innerText = new Date().getFullYear();
                     
+                    const intervalSec = ${sysConfig.quoteInterval !== undefined ? sysConfig.quoteInterval : 60};
                     loadDynamicQuote(); 
-                    quoteTimer = setInterval(loadDynamicQuote, 60000);
+                    if (intervalSec > 0) {
+                        // 阵法核心：严格对齐东八区 (北京时间 UTC+8) 物理时钟
+                        // 效果：若设为60秒，则精准在每分钟的 00 秒刷新；若设为86400秒(1天)，则精准在每天北京时间 00:00:00 刷新
+                        const alignToBeijingTime = () => {
+                            const now = new Date();
+                            const utcMs = now.getTime() + (now.getTimezoneOffset() * 60000);
+                            const bjMs = utcMs + (8 * 3600000); // 换算为北京时间绝对毫秒数
+                            const intervalMs = intervalSec * 1000;
+                            
+                            // 精准计算距离下一个北京时间物理周期的毫秒差
+                            const delay = intervalMs - (bjMs % intervalMs);
+                            
+                            quoteTimer = setTimeout(() => {
+                                loadDynamicQuote();
+                                // 初次精准卡点后，切回常规周期循环
+                                quoteTimer = setInterval(loadDynamicQuote, intervalMs);
+                            }, delay);
+                        };
+                        alignToBeijingTime();
+                    }
 
                     bindRipple(document.querySelectorAll('.nav-item')); 
 

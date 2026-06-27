@@ -104,6 +104,13 @@ export default {
         </style>
       </head>
       <body>
+        <!-- 灵海潮汐流体背景 -->
+        <div class="fluid-container">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+        </div>
+
         <div class="header">
           <h2>⚙️ 阵法中枢 (Admin)</h2>
           <a href="/" class="back-link">← 归去</a>
@@ -382,9 +389,9 @@ export default {
             .auth-submit:active { transform: scale(0.95); }
 
             .ripple { position: absolute; border-radius: 50%; background: rgba(59, 130, 246, 0.35); transform: scale(0); transform-origin: center; animation: ripple-anim 0.6s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; will-change: transform, opacity; }
-            .aurora-glow { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.25; pointer-events: none; z-index: 0; will-change: transform; transform: translateZ(0); }
-            .glow-1 { width: 320px; height: 320px; background: radial-gradient(circle, #3b82f6, transparent 70%); top: 8%; left: -10%; animation: drift-1 16s ease-in-out infinite; }
-            .glow-2 { width: 280px; height: 280px; background: radial-gradient(circle, #0ea5e9, transparent 70%); bottom: 5%; right: -8%; animation: drift-2 20s ease-in-out infinite; }
+            
+            
+            
             
             .footer { margin-top: 40px; margin-bottom: env(safe-area-inset-bottom); font-size: 12px; color: var(--text-secondary); letter-spacing: 1px; opacity: 0.5; z-index: 10; text-align: center; line-height: 1.8;}
             
@@ -410,8 +417,15 @@ export default {
         </style>
     </head>
     <body>
-        <div class="aurora-glow glow-1"></div>
-        <div class="aurora-glow glow-2"></div>
+        <!-- 灵海潮汐流体背景 -->
+        <div class="fluid-container">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+        </div>
+
+        
+        
         <div id="toast" class="toast"></div>
 
         <div class="stealth-trigger-reveal" id="stealth-trigger" title=" "></div>
@@ -661,8 +675,3 @@ export default {
         </script>
     </body>
     </html>
-    `;
-
-    return new Response(html, { headers: SECURE_HEADERS });
-  }
-}

@@ -1,13 +1,12 @@
 /**
  * ==============================================================================
- * 零落山川 (LingLuo ShanChuan) - 极简隐秘个人枢纽阵法 [终极典藏版]
+ * 零落山川 (LingLuo ShanChuan) - 极简隐秘个人枢纽阵法 [时空校准典藏版]
  * 架构: Cloudflare Workers + KV (Serverless)
  * 特性: 双盲区触发、雷达探针、动态语录、移动端极致适配、无差别隐匿
- * 优化: 边缘缓存穿透、IIFE 作用域隔离、骨架屏级平滑过渡、军工级安全 Header
+ * 优化: 边缘缓存穿透、IIFE 作用域隔离、骨架屏级平滑过渡、军工级安全 Header、北京时间对齐
  * ==============================================================================
  */
 
-// 默认初始数据兜底配置 (大千世界初始洞天)
 const DEFAULT_CONFIG = [
   { url: "https://drive.ing.nn.kg", title: "私人云盘", desc: "OpenList / Alist 文件管理", isPrivate: false, isHidden: false, icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>` },
   { url: "https://media.lxlhub.qzz.io", title: "流媒体中心", desc: "MoonTV 影视库", isPrivate: false, isHidden: false, icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/></svg>` },
@@ -15,7 +14,6 @@ const DEFAULT_CONFIG = [
   { url: "https://ops.lxlhub.qzz.io", title: "服务器探针", desc: "VPS 资源监控状态", isPrivate: false, isHidden: false, icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>` }
 ];
 
-// 全局安全 Header，防止 Clickjacking 和 XSS 嗅探
 const SECURE_HEADERS = {
   "Content-Type": "text/html;charset=UTF-8",
   "X-Frame-Options": "DENY",
@@ -28,17 +26,10 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     
-    // ==========================================
-    // [环境与鉴权配置]
-    // ==========================================
     const adminPwd = env.ADMIN_PWD || "lixuanli"; 
-    // 启用 KV 边缘缓存穿透 (cacheTtl: 60秒)，极大降低 KV 读延迟，提升响应速度
     const sysConfigStr = await env.MY_KV.get("SYS_CONFIG", { cacheTtl: 60 });
     const sysConfig = sysConfigStr ? JSON.parse(sysConfigStr) : { revealPwd: "5201314", quoteInterval: 60 }; 
 
-    // ==========================================
-    // 1. 后台中枢鉴权层 (/admin)
-    // ==========================================
     if (url.pathname.startsWith('/admin')) {
       const expectedAuth = "Basic " + btoa("admin:" + adminPwd);
       const authHeader = request.headers.get("Authorization");
@@ -124,6 +115,7 @@ export default {
             <button type="button" class="btn btn-secondary" onclick="importJson()">📜 融合玉简</button>
           </div>
           <form method="POST" id="adminForm">
+            <!-- 【重点修复：动态后台时间配置表单】 -->
             <div class="edit-card" style="border-color: #f87171; box-shadow: 0 4px 6px -1px rgba(239,68,68,0.1);">
                 <div class="card-header">
                     <span class="badge" style="background:#fef2f2;color:#ef4444;">🛡️ 核心中枢法阵配置</span>
@@ -139,6 +131,7 @@ export default {
                     </div>
                 </div>
             </div>
+
             <input type="hidden" name="configJson" id="hidden-json">
             <div id="list-container"></div>
             <button type="button" class="btn btn-add" onclick="addItem()">+ 凝练新节点</button>
@@ -158,7 +151,7 @@ export default {
             const container = document.getElementById('list-container');
             container.innerHTML = '';
             siteData.forEach((item, index) => {
-              container.innerHTML += ` + "\`" + `
+              container.innerHTML += ` + "`" + `
                 <div class="edit-card">
                   <div class="card-header">
                     <span class="badge">洞天 #\${index + 1}</span>
@@ -179,7 +172,7 @@ export default {
                   </div>
                   <div class="form-group" style="margin-top: 15px;"><label>阵纹代码 (SVG Icon)</label><textarea oninput="updateItem(\${index}, 'icon', this.value)">\${item.icon}</textarea></div>
                 </div>
-              ` + "\`" + `;
+              ` + "`" + `;
             });
             document.getElementById('hidden-json').value = JSON.stringify(siteData);
           }
@@ -229,9 +222,6 @@ export default {
       return new Response(adminHtml, { headers: SECURE_HEADERS });
     }
 
-    // ==========================================
-    // 2. API 数据层 (/api/reveal & /api/status)
-    // ==========================================
     const navDataStr = await env.MY_KV.get("NAV_CONFIG", { cacheTtl: 60 });
     const NAV_ITEMS = navDataStr ? JSON.parse(navDataStr) : DEFAULT_CONFIG;
 
@@ -264,9 +254,6 @@ export default {
       return new Response(JSON.stringify(results), { headers: { "Content-Type": "application/json;charset=UTF-8", "Cache-Control": "no-store" } });
     }
 
-    // ==========================================
-    // 3. 前端大千世界主入口 (SSR 渲染)
-    // ==========================================
     const publicItems = NAV_ITEMS
       .map((item, idx) => ({ ...item, originalIdx: idx }))
       .filter(item => !item.isHidden && !item.isPrivate);
@@ -291,7 +278,7 @@ export default {
         <title>零落山川</title>
         <link rel="preconnect" href="https://fonts.loli.net">
         <link rel="preconnect" href="https://gstatic.loli.net" crossorigin>
-        <!-- 终极优化：异步非阻塞加载字体 (彻底消除网络波动导致的白屏) -->
+        <!-- 终极优化：异步非阻塞加载字体 -->
         <link rel="stylesheet" href="https://fonts.loli.net/css2?family=Long+Cang&family=Ma+Shan+Zheng&family=LXGW+WenKai+TC&display=swap" media="print" onload="this.media='all'">
         <noscript><link rel="stylesheet" href="https://fonts.loli.net/css2?family=Long+Cang&family=Ma+Shan+Zheng&family=LXGW+WenKai+TC&display=swap"></noscript>
         
@@ -460,6 +447,8 @@ export default {
             (() => {
                 let isUnlocked = false; 
                 let quoteTimer = null; 
+                // 【重点注入】：从后端传入的前端时间变量
+                const intervalSec = ${sysConfig.quoteInterval !== undefined ? sysConfig.quoteInterval : 60};
 
                 async function loadDynamicQuote() {
                     const quoteEl = document.getElementById('random-quote');
@@ -511,18 +500,17 @@ export default {
                 document.addEventListener("DOMContentLoaded", async () => {
                     document.getElementById('current-year').innerText = new Date().getFullYear();
                     
-                    const intervalSec = ${sysConfig.quoteInterval !== undefined ? sysConfig.quoteInterval : 60};
                     loadDynamicQuote(); 
+                    
+                    // 阵法核心：严格对齐东八区 (北京时间 UTC+8) 物理时钟
                     if (intervalSec > 0) {
-                        // 阵法核心：严格对齐东八区 (北京时间 UTC+8) 物理时钟
-                        // 效果：若设为60秒，则精准在每分钟的 00 秒刷新；若设为86400秒(1天)，则精准在每天北京时间 00:00:00 刷新
                         const alignToBeijingTime = () => {
                             const now = new Date();
                             const utcMs = now.getTime() + (now.getTimezoneOffset() * 60000);
-                            const bjMs = utcMs + (8 * 3600000); // 换算为北京时间绝对毫秒数
+                            const bjMs = utcMs + (8 * 3600000); // 换算为北京绝对毫秒数
                             const intervalMs = intervalSec * 1000;
                             
-                            // 精准计算距离下一个北京时间物理周期的毫秒差
+                            // 精准计算距离下一个物理周期的毫秒差
                             const delay = intervalMs - (bjMs % intervalMs);
                             
                             quoteTimer = setTimeout(() => {

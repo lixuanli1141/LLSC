@@ -661,3 +661,8 @@ export default {
         </script>
     </body>
     </html>
+    `;
+
+    return new Response(html, { headers: SECURE_HEADERS });
+  }
+}

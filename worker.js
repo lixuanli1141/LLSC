@@ -104,6 +104,13 @@ export default {
         </style>
       </head>
       <body>
+        <!-- 灵海潮汐流体背景 -->
+        <div class="fluid-container">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+        </div>
+
         <div class="header">
           <h2>⚙️ 阵法中枢 (Admin)</h2>
           <a href="/" class="back-link">← 归去</a>
@@ -284,7 +291,7 @@ export default {
         
         <style>
             :root { 
-                --bg-base: #030712; 
+                --bg-base: #0b1120; 
                 --grid-color: rgba(30, 58, 138, 0.08); 
                 --text-main: #f8fafc; 
                 --text-secondary: #94a3b8; 
@@ -295,7 +302,6 @@ export default {
                 --hover-shadow: rgba(29, 78, 216, 0.2);
             }
             body { 
-                perspective: 1000px;
                 touch-action: manipulation; 
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
                 background-color: var(--bg-base); 
@@ -315,11 +321,11 @@ export default {
                 max-width: 750px; width: 90%; padding: 45px 30px; z-index: 10; 
                 background: radial-gradient(circle at top, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.1) 100%); 
                 backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); 
-                border: 1px solid rgba(59, 130, 246, 0.15); border-radius: 20px; 
-                box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8), 0 0 0 1px rgba(59, 130, 246, 0.1) inset; position: relative; 
+                border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; 
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); position: relative; 
             }
             
-            h1 { text-align: center; font-family: 'Long Cang', cursive; font-size: 52px; font-weight: normal; margin-top: 0; margin-bottom: 25px; letter-spacing: 6px; text-shadow: 0 0 15px rgba(59, 130, 246, 0.3); cursor: default; }
+            h1 { text-align: center; font-family: 'Long Cang', cursive; font-size: 52px; font-weight: normal; margin-top: 0; margin-bottom: 25px; letter-spacing: 6px; text-shadow: 0 2px 15px rgba(255, 255, 255, 0.15); cursor: default; }
             
             .quote-container { opacity: 0; transform: translateY(5px); transition: opacity 0.8s ease, transform 0.8s ease; margin-bottom: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center;}
             .quote-container.loaded { opacity: 1; transform: translateY(0); }
@@ -350,7 +356,7 @@ export default {
             .private-node { animation: fade-in-up 0.5s ease forwards; border-color: rgba(16, 185, 129, 0.2); }
             .private-node:hover { border-color: rgba(16, 185, 129, 0.6); box-shadow: 0 10px 30px -5px rgba(16, 185, 129, 0.15), 0 0 0 1px rgba(16, 185, 129, 0.4) inset; }
 
-            .icon { display: flex; align-items: center; justify-content: center; margin-right: 18px; color: var(--text-secondary); transition: color 0.3s ease; background: rgba(255, 255, 255, 0.03); padding: 10px; border-radius: 8px; border: 1px solid rgba(59, 130, 246, 0.15); }
+            .icon { display: flex; align-items: center; justify-content: center; margin-right: 18px; color: var(--text-secondary); transition: color 0.3s ease; background: rgba(255, 255, 255, 0.03); padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); }
             .icon svg { width: 22px; height: 22px; }
             .details { display: flex; flex-direction: column; overflow: hidden; width: calc(100% - 30px); }
             .title { display: flex; align-items: center; font-size: 16px; font-weight: 500; font-family: 'LXGW WenKai TC', sans-serif; color: var(--text-main); transition: color 0.3s ease; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -389,8 +395,8 @@ export default {
             
             .footer { margin-top: 40px; margin-bottom: env(safe-area-inset-bottom); font-size: 12px; color: var(--text-secondary); letter-spacing: 1px; opacity: 0.5; z-index: 10; text-align: center; line-height: 1.8;}
             
-             50% { transform: translate3d(40px, 30px, 0) scale(1.15); } }
-             50% { transform: translate3d(-30px, -25px, 0) scale(1.1); } }
+            @keyframes drift-1 { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(40px, 30px, 0) scale(1.15); } }
+            @keyframes drift-2 { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(-30px, -25px, 0) scale(1.1); } }
             @keyframes status-ping { 0% { transform: scale(1); opacity: 0.8; } 75%, 100% { transform: scale(3.5); opacity: 0; } }
             @keyframes ripple-anim { to { transform: scale(3); opacity: 0; } }
             
@@ -411,8 +417,15 @@ export default {
         </style>
     </head>
     <body>
-        <div class="tunnel-container" id="tunnel"></div>
-        <div class="abyss-core"></div>
+        <!-- 灵海潮汐流体背景 -->
+        <div class="fluid-container">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+        </div>
+
+        
+        
         <div id="toast" class="toast"></div>
 
         <div class="stealth-trigger-reveal" id="stealth-trigger" title=" "></div>
@@ -500,25 +513,6 @@ export default {
 
                 document.addEventListener("DOMContentLoaded", async () => {
                     document.getElementById('current-year').innerText = new Date().getFullYear();
-
-                    // 虚空跃迁 3D 光轨生成
-                    const tunnel = document.getElementById('tunnel');
-                    if(tunnel) {
-                        const streakCount = 150;
-                        for (let i = 0; i < streakCount; i++) {
-                            const streak = document.createElement('div');
-                            streak.className = 'light-streak';
-                            const angle = Math.random() * 360;
-                            const radius = 200 + Math.random() * 600;
-                            const length = 50 + Math.random() * 150;
-                            const depth = Math.random() * 1000 - 500;
-                            streak.style.height = length + 'px';
-                            streak.style.transform = 'rotate(' + angle + 'deg) translateY(' + radius + 'px) translateZ(' + depth + 'px)';
-                            streak.style.opacity = Math.random() * 0.8 + 0.2;
-                            tunnel.appendChild(streak);
-                        }
-                    }
-
                     
                     loadDynamicQuote(); 
                     
@@ -681,8 +675,3 @@ export default {
         </script>
     </body>
     </html>
-    `;
-
-    return new Response(html, { headers: SECURE_HEADERS });
-  }
-}

@@ -1,8 +1,8 @@
 /**
  * ==============================================================================
- * 零落山川 (LingLuo ShanChuan) - 极简隐秘个人枢纽阵法 [时空校准典藏版]
+ * 零落山川 (LingLuo ShanChuan) - 极简隐秘个人枢纽阵法 [量子雨·时空典藏版]
  * 架构: Cloudflare Workers + KV (Serverless)
- * 特性: 双盲区触发、雷达探针、动态语录、移动端极致适配、无差别隐匿
+ * 特性: 双盲区触发、雷达探针、动态语录、移动端极致适配、无差别隐匿、量子雨背景
  * 优化: 边缘缓存穿透、IIFE 作用域隔离、骨架屏级平滑过渡、军工级安全 Header、北京时间对齐
  * ==============================================================================
  */
@@ -104,13 +104,6 @@ export default {
         </style>
       </head>
       <body>
-        <!-- 灵海潮汐流体背景 -->
-        <div class="fluid-container">
-            <div class="blob blob-1"></div>
-            <div class="blob blob-2"></div>
-            <div class="blob blob-3"></div>
-        </div>
-
         <div class="header">
           <h2>⚙️ 阵法中枢 (Admin)</h2>
           <a href="/" class="back-link">← 归去</a>
@@ -289,23 +282,19 @@ export default {
     
     <style>
         :root { 
-            --bg-base: #0b1120; 
-            --grid-color: rgba(30, 58, 138, 0.08); 
+            --bg-base: #050505; 
             --text-main: #f8fafc; 
             --text-secondary: #94a3b8; 
-            --card-bg: rgba(15, 23, 42, 0.6); 
-            --border-color: rgba(255, 255, 255, 0.08); 
-            --primary-blue: #3b82f6; 
-            --hover-border: rgba(59, 130, 246, 0.5); 
-            --hover-shadow: rgba(29, 78, 216, 0.2);
+            --card-bg: rgba(10, 15, 25, 0.65); 
+            --border-color: rgba(16, 185, 129, 0.2); 
+            --primary-blue: #10b981; 
+            --hover-border: rgba(16, 185, 129, 0.5); 
+            --hover-shadow: rgba(16, 185, 129, 0.2);
         }
         body { 
             touch-action: manipulation; 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
             background-color: var(--bg-base); 
-            background-image: linear-gradient(var(--grid-color) 1px, transparent 1px), linear-gradient(90deg, var(--grid-color) 1px, transparent 1px); 
-            background-size: 50px 50px; 
-            background-position: center center; 
             color: var(--text-main); 
             display: flex; flex-direction: column; justify-content: center; align-items: center; 
             min-height: 100vh; margin: 0; overflow-x: hidden;
@@ -315,35 +304,29 @@ export default {
         ::-webkit-scrollbar { display: none; }
         * { scrollbar-width: none; }
 
-        /* 灵海潮汐流体背景 CSS */
-        .fluid-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            filter: blur(70px); z-index: 1; overflow: hidden; transform: translateZ(0); pointer-events: none;
-        }
-        .blob { position: absolute; border-radius: 50%; animation: fluid-move infinite alternate ease-in-out; }
-        .blob-1 { width: 55vw; height: 55vw; background: radial-gradient(circle, rgba(59,130,246,0.5), transparent 70%); top: -10%; left: -10%; animation-duration: 25s; }
-        .blob-2 { width: 65vw; height: 65vw; background: radial-gradient(circle, rgba(14,165,233,0.4), transparent 70%); bottom: -20%; right: -10%; animation-duration: 32s; animation-delay: -5s; }
-        .blob-3 { width: 45vw; height: 45vw; background: radial-gradient(circle, rgba(16,185,129,0.3), transparent 70%); top: 30%; left: 35%; animation-duration: 38s; animation-delay: -12s; }
-        @keyframes fluid-move {
-            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-            33% { transform: translate(15vw, 10vh) scale(1.1) rotate(15deg); }
-            66% { transform: translate(-10vw, 20vh) scale(0.9) rotate(-15deg); }
-            100% { transform: translate(5vw, -10vh) scale(1.05) rotate(5deg); }
+        /* 量子代码雨画布容器 */
+        #matrix-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            opacity: 0.8;
+            pointer-events: none;
         }
 
         .container { 
             max-width: 750px; width: 90%; padding: 45px 30px; z-index: 10; 
-            background: radial-gradient(circle at top, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.1) 100%); 
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); 
-            border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; 
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); position: relative; 
+            background: var(--card-bg); 
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); 
+            border: 1px solid var(--border-color); border-radius: 20px; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(16, 185, 129, 0.1) inset; position: relative; 
         }
         
-        h1 { text-align: center; font-family: 'Long Cang', cursive; font-size: 52px; font-weight: normal; margin-top: 0; margin-bottom: 25px; letter-spacing: 6px; text-shadow: 0 2px 15px rgba(255, 255, 255, 0.15); cursor: default; }
+        h1 { text-align: center; font-family: 'Long Cang', cursive; font-size: 52px; font-weight: normal; margin-top: 0; margin-bottom: 25px; letter-spacing: 6px; color: #10b981; text-shadow: 0 0 15px rgba(16, 185, 129, 0.4); cursor: default; }
         
         .quote-container { opacity: 0; transform: translateY(5px); transition: opacity 0.8s ease, transform 0.8s ease; margin-bottom: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center;}
         .quote-container.loaded { opacity: 1; transform: translateY(0); }
-        .sub-quote { text-align: center; font-family: 'Ma Shan Zheng', serif; font-size: 16px; color: var(--text-secondary); letter-spacing: 2px; opacity: 0.8; text-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
+        .sub-quote { text-align: center; font-family: 'Ma Shan Zheng', serif; font-size: 16px; color: var(--text-secondary); letter-spacing: 2px; opacity: 0.8; text-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
         
         .quote-source {
             margin-top: 12px; font-size: 14px; opacity: 0.65;
@@ -352,11 +335,11 @@ export default {
         }
 
         .nav-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
-        .nav-item { position: relative; display: flex; align-items: center; padding: 18px 22px; text-decoration: none; background-color: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; -webkit-tap-highlight-color: transparent;}
-        .nav-item::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent); transform: skewX(-20deg); transition: all 0.5s ease; }
+        .nav-item { position: relative; display: flex; align-items: center; padding: 18px 22px; text-decoration: none; background-color: rgba(5, 5, 5, 0.5); backdrop-filter: blur(12px); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; -webkit-tap-highlight-color: transparent;}
+        .nav-item::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(16,185,129,0.05), transparent); transform: skewX(-20deg); transition: all 0.5s ease; }
         
         .nav-item:hover::before { left: 150%; }
-        .nav-item:hover { border-color: var(--hover-border); background-color: rgba(30, 41, 59, 0.8); transform: translateY(-4px); box-shadow: 0 10px 30px -5px var(--hover-shadow), 0 0 0 1px var(--hover-border) inset; }
+        .nav-item:hover { border-color: var(--hover-border); background-color: rgba(16, 185, 129, 0.1); transform: translateY(-4px); box-shadow: 0 10px 30px -5px var(--hover-shadow), 0 0 0 1px var(--hover-border) inset; }
         .nav-item:active { transform: scale(0.97); }
         .nav-item:hover .title, .nav-item:hover .icon { color: var(--primary-blue); }
         
@@ -364,7 +347,7 @@ export default {
         .private-node { animation: fade-in-up 0.5s ease forwards; border-color: rgba(16, 185, 129, 0.2); }
         .private-node:hover { border-color: rgba(16, 185, 129, 0.6); box-shadow: 0 10px 30px -5px rgba(16, 185, 129, 0.15), 0 0 0 1px rgba(16, 185, 129, 0.4) inset; }
 
-        .icon { display: flex; align-items: center; justify-content: center; margin-right: 18px; color: var(--text-secondary); transition: color 0.3s ease; background: rgba(255, 255, 255, 0.03); padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .icon { display: flex; align-items: center; justify-content: center; margin-right: 18px; color: var(--text-secondary); transition: color 0.3s ease; background: rgba(16, 185, 129, 0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.15); }
         .icon svg { width: 22px; height: 22px; }
         .details { display: flex; flex-direction: column; overflow: hidden; width: calc(100% - 30px); }
         .title { display: flex; align-items: center; font-size: 16px; font-weight: 500; font-family: 'LXGW WenKai TC', sans-serif; color: var(--text-main); transition: color 0.3s ease; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -384,19 +367,19 @@ export default {
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
         .modal-overlay.active { display: flex; opacity: 1; }
-        .modal-box { background: #0f172a; border: 1px solid var(--border-color); border-radius: 16px; padding: 30px; width: 90%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); transform: translateY(20px) scale(0.95); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .modal-box { background: #050505; border: 1px solid var(--border-color); border-radius: 16px; padding: 30px; width: 90%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); transform: translateY(20px) scale(0.95); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .modal-overlay.active .modal-box { transform: translateY(0) scale(1); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-family: 'LXGW WenKai TC', sans-serif; font-size: 20px; color: white; border-bottom: 1px dashed var(--border-color); padding-bottom: 15px;}
         .close-btn { cursor: pointer; color: var(--text-secondary); font-size: 24px; transition: color 0.2s; }
         .close-btn:hover { color: white; }
         .auth-area { display: flex; gap: 10px; margin-bottom: 15px; }
-        .auth-input { flex: 1; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: white; font-size: 14px; outline: none; transition: border 0.3s;}
+        .auth-input { flex: 1; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(16, 185, 129, 0.05); color: white; font-size: 14px; outline: none; transition: border 0.3s;}
         .auth-input:focus { border-color: var(--primary-blue); }
         .auth-submit { padding: 0 20px; background: var(--primary-blue); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.3s; }
         .auth-submit:hover { opacity: 0.8; }
         .auth-submit:active { transform: scale(0.95); }
 
-        .ripple { position: absolute; border-radius: 50%; background: rgba(59, 130, 246, 0.35); transform: scale(0); transform-origin: center; animation: ripple-anim 0.6s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; will-change: transform, opacity; }
+        .ripple { position: absolute; border-radius: 50%; background: rgba(16, 185, 129, 0.35); transform: scale(0); transform-origin: center; animation: ripple-anim 0.6s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; will-change: transform, opacity; }
         
         .footer { margin-top: 40px; margin-bottom: env(safe-area-inset-bottom); font-size: 12px; color: var(--text-secondary); letter-spacing: 1px; opacity: 0.5; z-index: 10; text-align: center; line-height: 1.8;}
         
@@ -420,12 +403,7 @@ export default {
     </style>
 </head>
 <body>
-    <!-- 灵海潮汐流体背景 -->
-    <div class="fluid-container">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
-    </div>
+    <canvas id="matrix-canvas"></canvas>
 
     <div id="toast" class="toast"></div>
 
@@ -460,9 +438,53 @@ export default {
 
     <script>
         (() => {
+            // =====================================
+            // 量子代码雨 (Matrix Rain) 引擎
+            // =====================================
+            function initMatrixRain() {
+                const canvas = document.getElementById('matrix-canvas');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                
+                let width = canvas.width = window.innerWidth;
+                let height = canvas.height = window.innerHeight;
+                
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%"\'#&_(),.;:?!\\|{}<>[]^~'.split('');
+                const fontSize = 14;
+                let columns = width / fontSize;
+                let drops = [];
+                for(let x = 0; x < columns; x++) drops[x] = 1;
+                
+                function draw() {
+                    ctx.fillStyle = 'rgba(5, 5, 5, 0.05)';
+                    ctx.fillRect(0, 0, width, height);
+                    ctx.fillStyle = '#10b981';
+                    ctx.font = fontSize + 'px monospace';
+                    
+                    for(let i = 0; i < drops.length; i++) {
+                        const text = chars[Math.floor(Math.random() * chars.length)];
+                        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                        if(drops[i] * fontSize > height && Math.random() > 0.975) drops[i] = 0;
+                        drops[i]++;
+                    }
+                }
+                
+                let matrixInterval = setInterval(draw, 33);
+                
+                window.addEventListener('resize', () => {
+                    width = canvas.width = window.innerWidth;
+                    height = canvas.height = window.innerHeight;
+                    columns = width / fontSize;
+                    drops = [];
+                    for(let x = 0; x < columns; x++) drops[x] = 1;
+                });
+            }
+
+            // =====================================
+            // 原有核心逻辑
+            // =====================================
             let isUnlocked = false; 
             let quoteTimer = null; 
-            // 【重点注入】：从后端传入的前端时间变量
             const intervalSec = ${sysConfig.quoteInterval !== undefined ? sysConfig.quoteInterval : 60};
 
             async function loadDynamicQuote() {
@@ -515,22 +537,19 @@ export default {
             document.addEventListener("DOMContentLoaded", async () => {
                 document.getElementById('current-year').innerText = new Date().getFullYear();
                 
+                initMatrixRain(); // 启动代码雨
                 loadDynamicQuote(); 
                 
-                // 阵法核心：严格对齐东八区 (北京时间 UTC+8) 物理时钟
                 if (intervalSec > 0) {
                     const alignToBeijingTime = () => {
                         const now = new Date();
                         const utcMs = now.getTime() + (now.getTimezoneOffset() * 60000);
-                        const bjMs = utcMs + (8 * 3600000); // 换算为北京绝对毫秒数
+                        const bjMs = utcMs + (8 * 3600000);
                         const intervalMs = intervalSec * 1000;
-                        
-                        // 精准计算距离下一个物理周期的毫秒差
                         const delay = intervalMs - (bjMs % intervalMs);
                         
                         quoteTimer = setTimeout(() => {
                             loadDynamicQuote();
-                            // 初次精准卡点后，切回常规周期循环
                             quoteTimer = setInterval(loadDynamicQuote, intervalMs);
                         }, delay);
                     };

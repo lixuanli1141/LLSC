@@ -281,7 +281,9 @@ export default {
         <title>零落山川</title>
         <link rel="preconnect" href="https://fonts.loli.net">
         <link rel="preconnect" href="https://gstatic.loli.net" crossorigin>
-        <link href="https://fonts.loli.net/css2?family=Long+Cang&family=Ma+Shan+Zheng&family=LXGW+WenKai+TC&display=swap" rel="stylesheet">
+        <!-- 终极优化：异步非阻塞加载字体 (彻底消除网络波动导致的白屏) -->
+        <link rel="stylesheet" href="https://fonts.loli.net/css2?family=Long+Cang&family=Ma+Shan+Zheng&family=LXGW+WenKai+TC&display=swap" media="print" onload="this.media='all'">
+        <noscript><link rel="stylesheet" href="https://fonts.loli.net/css2?family=Long+Cang&family=Ma+Shan+Zheng&family=LXGW+WenKai+TC&display=swap"></noscript>
         
         <style>
             /* 基础色彩与布局定义 */

@@ -512,8 +512,8 @@ export default {
                             const radius = 200 + Math.random() * 600;
                             const length = 50 + Math.random() * 150;
                             const depth = Math.random() * 1000 - 500;
-                            streak.style.height = `${length}px`;
-                            streak.style.transform = `rotate(${angle}deg) translateY(${radius}px) translateZ(${depth}px)`;
+                            streak.style.height = length + 'px';
+                            streak.style.transform = 'rotate(' + angle + 'deg) translateY(' + radius + 'px) translateZ(' + depth + 'px)';
                             streak.style.opacity = Math.random() * 0.8 + 0.2;
                             tunnel.appendChild(streak);
                         }

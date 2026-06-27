@@ -451,7 +451,6 @@ export default {
         
         <div class="footer" id="footer-text">
             © <span id="current-year"></span> 零落山川 All Rights Reserved.
-            <br>Personal self-built cloud disk · Non-commercial use · Stability not guaranteed.
         </div>
 
         <script>

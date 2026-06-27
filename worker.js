@@ -1,8 +1,8 @@
 /**
  * ==============================================================================
- * 零落山川 (LingLuo ShanChuan) - 极简隐秘个人枢纽阵法 [量子雨·时空典藏版]
+ * 零落山川 (LingLuo ShanChuan) - 极简隐秘个人枢纽阵法 [时空校准典藏版]
  * 架构: Cloudflare Workers + KV (Serverless)
- * 特性: 双盲区触发、雷达探针、动态语录、移动端极致适配、无差别隐匿、量子雨背景
+ * 特性: 双盲区触发、雷达探针、动态语录、移动端极致适配、无差别隐匿
  * 优化: 边缘缓存穿透、IIFE 作用域隔离、骨架屏级平滑过渡、军工级安全 Header、北京时间对齐
  * ==============================================================================
  */
@@ -269,432 +269,399 @@ export default {
       </a>
     `).join('');
 
-    const html = `<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>零落山川</title>
-    <link rel="preconnect" href="https://fonts.loli.net">
-    <link rel="preconnect" href="https://gstatic.loli.net" crossorigin>
-    <link rel="stylesheet" href="https://fonts.loli.net/css2?family=Long+Cang&family=Ma+Shan+Zheng&family=LXGW+WenKai+TC&display=swap" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://fonts.loli.net/css2?family=Long+Cang&family=Ma+Shan+Zheng&family=LXGW+WenKai+TC&display=swap"></noscript>
-    
-    <style>
-        :root { 
-            --bg-base: #050505; 
-            --text-main: #f8fafc; 
-            --text-secondary: #94a3b8; 
-            --card-bg: rgba(10, 15, 25, 0.65); 
-            --border-color: rgba(16, 185, 129, 0.2); 
-            --primary-blue: #10b981; 
-            --hover-border: rgba(16, 185, 129, 0.5); 
-            --hover-shadow: rgba(16, 185, 129, 0.2);
-        }
-        body { 
-            touch-action: manipulation; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
-            background-color: var(--bg-base); 
-            color: var(--text-main); 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            min-height: 100vh; margin: 0; overflow-x: hidden;
-            padding-bottom: env(safe-area-inset-bottom); 
-            -webkit-font-smoothing: antialiased; 
-        }
-        ::-webkit-scrollbar { display: none; }
-        * { scrollbar-width: none; }
-
-        /* 量子代码雨画布容器 */
-        #matrix-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 0;
-            opacity: 0.8;
-            pointer-events: none;
-        }
-
-        .container { 
-            max-width: 750px; width: 90%; padding: 45px 30px; z-index: 10; 
-            background: var(--card-bg); 
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); 
-            border: 1px solid var(--border-color); border-radius: 20px; 
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(16, 185, 129, 0.1) inset; position: relative; 
-        }
+    const html = `
+    <!DOCTYPE html>
+    <html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+        <title>零落山川</title>
+        <link rel="preconnect" href="https://fonts.loli.net">
+        <link rel="preconnect" href="https://gstatic.loli.net" crossorigin>
+        <!-- 终极优化：异步非阻塞加载字体 -->
+        <link rel="stylesheet" href="https://fonts.loli.net/css2?family=Long+Cang&family=Ma+Shan+Zheng&family=LXGW+WenKai+TC&display=swap" media="print" onload="this.media='all'">
+        <noscript><link rel="stylesheet" href="https://fonts.loli.net/css2?family=Long+Cang&family=Ma+Shan+Zheng&family=LXGW+WenKai+TC&display=swap"></noscript>
         
-        h1 { text-align: center; font-family: 'Long Cang', cursive; font-size: 52px; font-weight: normal; margin-top: 0; margin-bottom: 25px; letter-spacing: 6px; color: #10b981; text-shadow: 0 0 15px rgba(16, 185, 129, 0.4); cursor: default; }
-        
-        .quote-container { opacity: 0; transform: translateY(5px); transition: opacity 0.8s ease, transform 0.8s ease; margin-bottom: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center;}
-        .quote-container.loaded { opacity: 1; transform: translateY(0); }
-        .sub-quote { text-align: center; font-family: 'Ma Shan Zheng', serif; font-size: 16px; color: var(--text-secondary); letter-spacing: 2px; opacity: 0.8; text-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
-        
-        .quote-source {
-            margin-top: 12px; font-size: 14px; opacity: 0.65;
-            font-family: 'LXGW WenKai TC', sans-serif; letter-spacing: 1px;
-            text-shadow: none; text-align: right; width: 100%; max-width: 400px;
-        }
+        <style>
+            :root { 
+                --bg-base: #0b1120; 
+                --grid-color: rgba(30, 58, 138, 0.08); 
+                --text-main: #f8fafc; 
+                --text-secondary: #94a3b8; 
+                --card-bg: rgba(15, 23, 42, 0.6); 
+                --border-color: rgba(255, 255, 255, 0.08); 
+                --primary-blue: #3b82f6; 
+                --hover-border: rgba(59, 130, 246, 0.5); 
+                --hover-shadow: rgba(29, 78, 216, 0.2);
+            }
+            body { 
+                touch-action: manipulation; 
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
+                background-color: var(--bg-base); 
+                background-image: linear-gradient(var(--grid-color) 1px, transparent 1px), linear-gradient(90deg, var(--grid-color) 1px, transparent 1px); 
+                background-size: 50px 50px; 
+                background-position: center center; 
+                color: var(--text-main); 
+                display: flex; flex-direction: column; justify-content: center; align-items: center; 
+                min-height: 100vh; margin: 0; overflow-x: hidden;
+                padding-bottom: env(safe-area-inset-bottom); 
+                -webkit-font-smoothing: antialiased; 
+            }
+            ::-webkit-scrollbar { display: none; }
+            * { scrollbar-width: none; }
 
-        .nav-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
-        .nav-item { position: relative; display: flex; align-items: center; padding: 18px 22px; text-decoration: none; background-color: rgba(5, 5, 5, 0.5); backdrop-filter: blur(12px); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; -webkit-tap-highlight-color: transparent;}
-        .nav-item::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(16,185,129,0.05), transparent); transform: skewX(-20deg); transition: all 0.5s ease; }
-        
-        .nav-item:hover::before { left: 150%; }
-        .nav-item:hover { border-color: var(--hover-border); background-color: rgba(16, 185, 129, 0.1); transform: translateY(-4px); box-shadow: 0 10px 30px -5px var(--hover-shadow), 0 0 0 1px var(--hover-border) inset; }
-        .nav-item:active { transform: scale(0.97); }
-        .nav-item:hover .title, .nav-item:hover .icon { color: var(--primary-blue); }
-        
-        @keyframes fade-in-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .private-node { animation: fade-in-up 0.5s ease forwards; border-color: rgba(16, 185, 129, 0.2); }
-        .private-node:hover { border-color: rgba(16, 185, 129, 0.6); box-shadow: 0 10px 30px -5px rgba(16, 185, 129, 0.15), 0 0 0 1px rgba(16, 185, 129, 0.4) inset; }
+            .container { 
+                max-width: 750px; width: 90%; padding: 45px 30px; z-index: 10; 
+                background: radial-gradient(circle at top, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.1) 100%); 
+                backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); 
+                border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; 
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); position: relative; 
+            }
+            
+            h1 { text-align: center; font-family: 'Long Cang', cursive; font-size: 52px; font-weight: normal; margin-top: 0; margin-bottom: 25px; letter-spacing: 6px; text-shadow: 0 2px 15px rgba(255, 255, 255, 0.15); cursor: default; }
+            
+            .quote-container { opacity: 0; transform: translateY(5px); transition: opacity 0.8s ease, transform 0.8s ease; margin-bottom: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center;}
+            .quote-container.loaded { opacity: 1; transform: translateY(0); }
+            .sub-quote { text-align: center; font-family: 'Ma Shan Zheng', serif; font-size: 16px; color: var(--text-secondary); letter-spacing: 2px; opacity: 0.8; text-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
+            
+            .quote-source {
+                margin-top: 12px;
+                font-size: 14px;
+                opacity: 0.65;
+                font-family: 'LXGW WenKai TC', sans-serif;
+                letter-spacing: 1px;
+                text-shadow: none;
+                text-align: right;
+                width: 100%;
+                max-width: 400px;
+            }
 
-        .icon { display: flex; align-items: center; justify-content: center; margin-right: 18px; color: var(--text-secondary); transition: color 0.3s ease; background: rgba(16, 185, 129, 0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.15); }
-        .icon svg { width: 22px; height: 22px; }
-        .details { display: flex; flex-direction: column; overflow: hidden; width: calc(100% - 30px); }
-        .title { display: flex; align-items: center; font-size: 16px; font-weight: 500; font-family: 'LXGW WenKai TC', sans-serif; color: var(--text-main); transition: color 0.3s ease; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .desc { font-size: 13px; font-family: 'LXGW WenKai TC', sans-serif; color: var(--text-secondary); margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        
-        .status-dot { position: absolute; top: 18px; right: 18px; width: 6px; height: 6px; border-radius: 50%; background-color: var(--text-secondary); opacity: 0.4; transition: all 0.5s ease; }
-        .status-dot::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background-color: inherit; z-index: -1; }
-        .status-dot.online { background-color: #10b981; opacity: 1; box-shadow: 0 0 6px rgba(16, 185, 129, 0.4); }
-        .status-dot.online::after { animation: status-ping 2.5s cubic-bezier(0, 0, 0.2, 1) infinite; }
-        .status-dot.offline { background-color: #ef4444; opacity: 0.8; box-shadow: 0 0 6px rgba(239, 68, 68, 0.4); }
+            .nav-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+            .nav-item { position: relative; display: flex; align-items: center; padding: 18px 22px; text-decoration: none; background-color: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--border-color); border-radius: 12px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; -webkit-tap-highlight-color: transparent;}
+            .nav-item::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent); transform: skewX(-20deg); transition: all 0.5s ease; }
+            
+            .nav-item:hover::before { left: 150%; }
+            .nav-item:hover { border-color: var(--hover-border); background-color: rgba(30, 41, 59, 0.8); transform: translateY(-4px); box-shadow: 0 10px 30px -5px var(--hover-shadow), 0 0 0 1px var(--hover-border) inset; }
+            .nav-item:active { transform: scale(0.97); }
+            .nav-item:hover .title, .nav-item:hover .icon { color: var(--primary-blue); }
+            
+            @keyframes fade-in-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+            .private-node { animation: fade-in-up 0.5s ease forwards; border-color: rgba(16, 185, 129, 0.2); }
+            .private-node:hover { border-color: rgba(16, 185, 129, 0.6); box-shadow: 0 10px 30px -5px rgba(16, 185, 129, 0.15), 0 0 0 1px rgba(16, 185, 129, 0.4) inset; }
 
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(16, 185, 129, 0.9); color: white; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 500; backdrop-filter: blur(10px); z-index: 2000; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4); display: flex; align-items: center; gap: 8px;}
-        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-        .toast.error { background: rgba(239, 68, 68, 0.9); box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.4); }
+            .icon { display: flex; align-items: center; justify-content: center; margin-right: 18px; color: var(--text-secondary); transition: color 0.3s ease; background: rgba(255, 255, 255, 0.03); padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); }
+            .icon svg { width: 22px; height: 22px; }
+            .details { display: flex; flex-direction: column; overflow: hidden; width: calc(100% - 30px); }
+            .title { display: flex; align-items: center; font-size: 16px; font-weight: 500; font-family: 'LXGW WenKai TC', sans-serif; color: var(--text-main); transition: color 0.3s ease; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .desc { font-size: 13px; font-family: 'LXGW WenKai TC', sans-serif; color: var(--text-secondary); margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            
+            .status-dot { position: absolute; top: 18px; right: 18px; width: 6px; height: 6px; border-radius: 50%; background-color: var(--text-secondary); opacity: 0.4; transition: all 0.5s ease; }
+            .status-dot::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background-color: inherit; z-index: -1; }
+            .status-dot.online { background-color: #10b981; opacity: 1; box-shadow: 0 0 6px rgba(16, 185, 129, 0.4); }
+            .status-dot.online::after { animation: status-ping 2.5s cubic-bezier(0, 0, 0.2, 1) infinite; }
+            .status-dot.offline { background-color: #ef4444; opacity: 0.8; box-shadow: 0 0 6px rgba(239, 68, 68, 0.4); }
 
-        .stealth-trigger-reveal { position: fixed; bottom: 0; right: 0; width: 80px; height: 80px; cursor: pointer; z-index: 999; opacity: 0; -webkit-tap-highlight-color: transparent;}
+            .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(16, 185, 129, 0.9); color: white; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 500; backdrop-filter: blur(10px); z-index: 2000; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4); display: flex; align-items: center; gap: 8px;}
+            .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+            .toast.error { background: rgba(239, 68, 68, 0.9); box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.4); }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
-        .modal-overlay.active { display: flex; opacity: 1; }
-        .modal-box { background: #050505; border: 1px solid var(--border-color); border-radius: 16px; padding: 30px; width: 90%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); transform: translateY(20px) scale(0.95); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .modal-overlay.active .modal-box { transform: translateY(0) scale(1); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-family: 'LXGW WenKai TC', sans-serif; font-size: 20px; color: white; border-bottom: 1px dashed var(--border-color); padding-bottom: 15px;}
-        .close-btn { cursor: pointer; color: var(--text-secondary); font-size: 24px; transition: color 0.2s; }
-        .close-btn:hover { color: white; }
-        .auth-area { display: flex; gap: 10px; margin-bottom: 15px; }
-        .auth-input { flex: 1; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(16, 185, 129, 0.05); color: white; font-size: 14px; outline: none; transition: border 0.3s;}
-        .auth-input:focus { border-color: var(--primary-blue); }
-        .auth-submit { padding: 0 20px; background: var(--primary-blue); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.3s; }
-        .auth-submit:hover { opacity: 0.8; }
-        .auth-submit:active { transform: scale(0.95); }
+            .stealth-trigger-reveal { position: fixed; bottom: 0; right: 0; width: 80px; height: 80px; cursor: pointer; z-index: 999; opacity: 0; -webkit-tap-highlight-color: transparent;}
 
-        .ripple { position: absolute; border-radius: 50%; background: rgba(16, 185, 129, 0.35); transform: scale(0); transform-origin: center; animation: ripple-anim 0.6s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; will-change: transform, opacity; }
-        
-        .footer { margin-top: 40px; margin-bottom: env(safe-area-inset-bottom); font-size: 12px; color: var(--text-secondary); letter-spacing: 1px; opacity: 0.5; z-index: 10; text-align: center; line-height: 1.8;}
-        
-        @keyframes status-ping { 0% { transform: scale(1); opacity: 0.8; } 75%, 100% { transform: scale(3.5); opacity: 0; } }
-        @keyframes ripple-anim { to { transform: scale(3); opacity: 0; } }
-        
-        @media (max-width: 600px) { 
-            .container { padding: 25px 20px; width: 82%; border-radius: 18px; } 
-            .nav-grid { grid-template-columns: 1fr; } 
-            h1 { font-size: 38px; }
-            .modal-box { width: 76%; padding: 22px; border-radius: 14px; }
-            .modal-header { margin-bottom: 16px; padding-bottom: 12px; font-size: 18px; }
-            .auth-area { flex-direction: column; gap: 12px; }
-            .auth-input { padding: 14px 15px; font-size: 15px; text-align: center; }
-            .auth-submit { padding: 12px; width: 100%; font-size: 15px; } 
-        }
-        @media (-webkit-min-device-pixel-ratio: 2) {
-            .nav-item { border-width: 0.5px; }
-            .container { border-width: 0.5px; }
-        }
-    </style>
-</head>
-<body>
-    <canvas id="matrix-canvas"></canvas>
+            .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
+            .modal-overlay.active { display: flex; opacity: 1; }
+            .modal-box { background: #0f172a; border: 1px solid var(--border-color); border-radius: 16px; padding: 30px; width: 90%; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); transform: translateY(20px) scale(0.95); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+            .modal-overlay.active .modal-box { transform: translateY(0) scale(1); }
+            .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-family: 'LXGW WenKai TC', sans-serif; font-size: 20px; color: white; border-bottom: 1px dashed var(--border-color); padding-bottom: 15px;}
+            .close-btn { cursor: pointer; color: var(--text-secondary); font-size: 24px; transition: color 0.2s; }
+            .close-btn:hover { color: white; }
+            .auth-area { display: flex; gap: 10px; margin-bottom: 15px; }
+            .auth-input { flex: 1; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: white; font-size: 14px; outline: none; transition: border 0.3s;}
+            .auth-input:focus { border-color: var(--primary-blue); }
+            .auth-submit { padding: 0 20px; background: var(--primary-blue); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.3s; }
+            .auth-submit:hover { opacity: 0.8; }
+            .auth-submit:active { transform: scale(0.95); }
 
-    <div id="toast" class="toast"></div>
+            .ripple { position: absolute; border-radius: 50%; background: rgba(59, 130, 246, 0.35); transform: scale(0); transform-origin: center; animation: ripple-anim 0.6s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; will-change: transform, opacity; }
+            .aurora-glow { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.25; pointer-events: none; z-index: 0; will-change: transform; transform: translateZ(0); }
+            .glow-1 { width: 320px; height: 320px; background: radial-gradient(circle, #3b82f6, transparent 70%); top: 8%; left: -10%; animation: drift-1 16s ease-in-out infinite; }
+            .glow-2 { width: 280px; height: 280px; background: radial-gradient(circle, #0ea5e9, transparent 70%); bottom: 5%; right: -8%; animation: drift-2 20s ease-in-out infinite; }
+            
+            .footer { margin-top: 40px; margin-bottom: env(safe-area-inset-bottom); font-size: 12px; color: var(--text-secondary); letter-spacing: 1px; opacity: 0.5; z-index: 10; text-align: center; line-height: 1.8;}
+            
+            @keyframes drift-1 { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(40px, 30px, 0) scale(1.15); } }
+            @keyframes drift-2 { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(-30px, -25px, 0) scale(1.1); } }
+            @keyframes status-ping { 0% { transform: scale(1); opacity: 0.8; } 75%, 100% { transform: scale(3.5); opacity: 0; } }
+            @keyframes ripple-anim { to { transform: scale(3); opacity: 0; } }
+            
+            @media (max-width: 600px) { 
+                .container { padding: 25px 20px; width: 82%; border-radius: 18px; } 
+                .nav-grid { grid-template-columns: 1fr; } 
+                h1 { font-size: 38px; }
+                .modal-box { width: 76%; padding: 22px; border-radius: 14px; }
+                .modal-header { margin-bottom: 16px; padding-bottom: 12px; font-size: 18px; }
+                .auth-area { flex-direction: column; gap: 12px; }
+                .auth-input { padding: 14px 15px; font-size: 15px; text-align: center; }
+                .auth-submit { padding: 12px; width: 100%; font-size: 15px; } 
+            }
+            @media (-webkit-min-device-pixel-ratio: 2) {
+                .nav-item { border-width: 0.5px; }
+                .container { border-width: 0.5px; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="aurora-glow glow-1"></div>
+        <div class="aurora-glow glow-2"></div>
+        <div id="toast" class="toast"></div>
 
-    <div class="stealth-trigger-reveal" id="stealth-trigger" title=" "></div>
+        <div class="stealth-trigger-reveal" id="stealth-trigger" title=" "></div>
 
-    <div class="modal-overlay" id="app-modal">
-        <div class="modal-box">
-            <div class="modal-header">
-                <span id="modal-title">认证中枢</span>
-                <span class="close-btn" id="close-modal-btn">×</span>
+        <div class="modal-overlay" id="app-modal">
+            <div class="modal-box">
+                <div class="modal-header">
+                    <span id="modal-title">认证中枢</span>
+                    <span class="close-btn" id="close-modal-btn">×</span>
+                </div>
+                <div class="auth-area" id="auth-area">
+                    <input type="password" id="sys-pwd" class="auth-input" placeholder="请输入阵法口令...">
+                    <button class="auth-submit" id="submit-pwd-btn">破阵</button>
+                </div>
             </div>
-            <div class="auth-area" id="auth-area">
-                <input type="password" id="sys-pwd" class="auth-input" placeholder="请输入阵法口令...">
-                <button class="auth-submit" id="submit-pwd-btn">破阵</button>
+        </div>
+
+        <div class="container">
+            <h1 id="main-title">零落山川</h1>
+            <div class="quote-container" id="quote-wrapper">
+                <div class="sub-quote" id="random-quote">道法推演中...</div>
+            </div>
+            <div class="nav-grid">
+                ${cardsHtml}
             </div>
         </div>
-    </div>
-
-    <div class="container">
-        <h1 id="main-title">零落山川</h1>
-        <div class="quote-container" id="quote-wrapper">
-            <div class="sub-quote" id="random-quote">道法推演中...</div>
+        
+        <div class="footer" id="footer-text">
+            © <span id="current-year"></span> 零落山川 All Rights Reserved.
         </div>
-        <div class="nav-grid">
-            ${cardsHtml}
-        </div>
-    </div>
-    
-    <div class="footer" id="footer-text">
-        © <span id="current-year"></span> 零落山川 All Rights Reserved.
-    </div>
 
-    <script>
-        (() => {
-            // =====================================
-            // 量子代码雨 (Matrix Rain) 引擎
-            // =====================================
-            function initMatrixRain() {
-                const canvas = document.getElementById('matrix-canvas');
-                if (!canvas) return;
-                const ctx = canvas.getContext('2d');
-                
-                let width = canvas.width = window.innerWidth;
-                let height = canvas.height = window.innerHeight;
-                
-                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%"\'#&_(),.;:?!\\|{}<>[]^~'.split('');
-                const fontSize = 14;
-                let columns = width / fontSize;
-                let drops = [];
-                for(let x = 0; x < columns; x++) drops[x] = 1;
-                
-                function draw() {
-                    ctx.fillStyle = 'rgba(5, 5, 5, 0.05)';
-                    ctx.fillRect(0, 0, width, height);
-                    ctx.fillStyle = '#10b981';
-                    ctx.font = fontSize + 'px monospace';
+        <script>
+            (() => {
+                let isUnlocked = false; 
+                let quoteTimer = null; 
+                // 【重点注入】：从后端传入的前端时间变量
+                const intervalSec = ${sysConfig.quoteInterval !== undefined ? sysConfig.quoteInterval : 60};
+
+                async function loadDynamicQuote() {
+                    const quoteEl = document.getElementById('random-quote');
+                    const wrapperEl = document.getElementById('quote-wrapper');
                     
-                    for(let i = 0; i < drops.length; i++) {
-                        const text = chars[Math.floor(Math.random() * chars.length)];
-                        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                        if(drops[i] * fontSize > height && Math.random() > 0.975) drops[i] = 0;
-                        drops[i]++;
+                    if (wrapperEl.classList.contains('loaded')) {
+                        wrapperEl.classList.remove('loaded');
+                        await new Promise(r => setTimeout(r, 800)); 
                     }
-                }
-                
-                let matrixInterval = setInterval(draw, 33);
-                
-                window.addEventListener('resize', () => {
-                    width = canvas.width = window.innerWidth;
-                    height = canvas.height = window.innerHeight;
-                    columns = width / fontSize;
-                    drops = [];
-                    for(let x = 0; x < columns; x++) drops[x] = 1;
-                });
-            }
-
-            // =====================================
-            // 原有核心逻辑
-            // =====================================
-            let isUnlocked = false; 
-            let quoteTimer = null; 
-            const intervalSec = ${sysConfig.quoteInterval !== undefined ? sysConfig.quoteInterval : 60};
-
-            async function loadDynamicQuote() {
-                const quoteEl = document.getElementById('random-quote');
-                const wrapperEl = document.getElementById('quote-wrapper');
-                
-                if (wrapperEl.classList.contains('loaded')) {
-                    wrapperEl.classList.remove('loaded');
-                    await new Promise(r => setTimeout(r, 800)); 
-                }
-                
-                try {
-                    const res = await fetch('https://v1.hitokoto.cn/', { signal: AbortSignal.timeout(3000) });
-                    if (!res.ok) throw new Error('API_ERR');
-                    const data = await res.json();
                     
-                    let sourceText = "";
-                    if (data.from_who) sourceText += data.from_who;
-                    if (data.from) sourceText += (sourceText ? " " : "") + "《" + data.from + "》";
-                    
-                    quoteEl.innerText = "「 " + data.hitokoto + " 」";
-                    
-                    const oldSource = wrapperEl.querySelector('.quote-source');
-                    if (oldSource) oldSource.remove();
-
-                    if (sourceText) {
-                        const sourceDiv = document.createElement('div');
-                        sourceDiv.className = 'quote-source'; 
-                        sourceDiv.innerText = "—— " + sourceText;
-                        wrapperEl.appendChild(sourceDiv);
-                    }
-                } catch (e) {
-                    quoteEl.innerText = "「 灵气枯竭，未能连接到语录之源... 」"; 
-                    const oldSource = wrapperEl.querySelector('.quote-source');
-                    if (oldSource) oldSource.remove();
-                } finally {
-                    wrapperEl.classList.add('loaded');
-                }
-            }
-
-            function showToast(msg, isError = false) {
-                const toast = document.getElementById('toast');
-                toast.innerText = msg;
-                if(isError) toast.classList.add('error');
-                else toast.classList.remove('error');
-                toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 3000);
-            }
-
-            document.addEventListener("DOMContentLoaded", async () => {
-                document.getElementById('current-year').innerText = new Date().getFullYear();
-                
-                initMatrixRain(); // 启动代码雨
-                loadDynamicQuote(); 
-                
-                if (intervalSec > 0) {
-                    const alignToBeijingTime = () => {
-                        const now = new Date();
-                        const utcMs = now.getTime() + (now.getTimezoneOffset() * 60000);
-                        const bjMs = utcMs + (8 * 3600000);
-                        const intervalMs = intervalSec * 1000;
-                        const delay = intervalMs - (bjMs % intervalMs);
-                        
-                        quoteTimer = setTimeout(() => {
-                            loadDynamicQuote();
-                            quoteTimer = setInterval(loadDynamicQuote, intervalMs);
-                        }, delay);
-                    };
-                    alignToBeijingTime();
-                }
-
-                bindRipple(document.querySelectorAll('.nav-item')); 
-
-                document.getElementById('stealth-trigger').addEventListener('click', handleStealthClick);
-                document.getElementById('close-modal-btn').addEventListener('click', closeModal);
-                document.getElementById('submit-pwd-btn').addEventListener('click', verifyPwd);
-                
-                document.getElementById('sys-pwd').addEventListener('keypress', function (e) {
-                    if (e.key === 'Enter') verifyPwd();
-                });
-
-                const savedPasscode = localStorage.getItem('LLSC_PASSCODE');
-                if (savedPasscode) {
                     try {
-                        const res = await fetch('/api/reveal', { method: 'POST', body: JSON.stringify({ pwd: savedPasscode }) });
-                        if (res.ok) {
-                            const data = await res.json();
-                            isUnlocked = true;
-                            renderPrivateCards(data.items);
-                            showToast('✨ 隐秘阵法已自动解除隐匿');
-                        } else {
-                            localStorage.removeItem('LLSC_PASSCODE'); 
+                        const res = await fetch('https://v1.hitokoto.cn/', { signal: AbortSignal.timeout(3000) });
+                        if (!res.ok) throw new Error('API_ERR');
+                        const data = await res.json();
+                        
+                        let sourceText = "";
+                        if (data.from_who) sourceText += data.from_who;
+                        if (data.from) sourceText += (sourceText ? " " : "") + "《" + data.from + "》";
+                        
+                        quoteEl.innerText = "「 " + data.hitokoto + " 」";
+                        
+                        const oldSource = wrapperEl.querySelector('.quote-source');
+                        if (oldSource) oldSource.remove();
+
+                        if (sourceText) {
+                            const sourceDiv = document.createElement('div');
+                            sourceDiv.className = 'quote-source'; 
+                            sourceDiv.innerText = "—— " + sourceText;
+                            wrapperEl.appendChild(sourceDiv);
                         }
-                    } catch(e) {}
-                }
-
-                checkStatus(); 
-            });
-
-            function bindRipple(elements) {
-                elements.forEach(card => {
-                    if(card.dataset.rippleBound) return;
-                    card.dataset.rippleBound = true;
-                    
-                    card.addEventListener('click', function(e) {
-                        const rect = this.getBoundingClientRect();
-                        const ripple = document.createElement('span');
-                        const size = Math.max(rect.width, rect.height);
-                        ripple.className = 'ripple';
-                        ripple.style.width = ripple.style.height = size + 'px';
-                        ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
-                        ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
-                        this.appendChild(ripple);
-                        setTimeout(() => ripple.remove(), 600);
-                    });
-                });
-            }
-
-            async function checkStatus() {
-                const dots = document.querySelectorAll('.status-dot:not(.checked)');
-                if (dots.length === 0) return;
-                
-                const indices = Array.from(dots).map(dot => parseInt(dot.getAttribute('data-idx')));
-                dots.forEach(dot => dot.classList.add('checked')); 
-                
-                try {
-                    const res = await fetch('/api/status', { method: 'POST', body: JSON.stringify({ indices }) });
-                    const statuses = await res.json();
-                    statuses.forEach(status => {
-                        const dot = document.querySelector(\`.status-dot[data-idx="\${status.idx}"]\`);
-                        if (dot) {
-                            if (status.ok) dot.classList.add('online');
-                            else dot.classList.add('offline');
-                        }
-                    });
-                } catch (error) { console.error('探针推演受阻'); }
-            }
-
-            function renderPrivateCards(items) {
-                const grid = document.querySelector('.nav-grid');
-                items.forEach(item => {
-                    if (!document.getElementById('node-' + item.originalIdx)) {
-                        const a = document.createElement('a');
-                        a.href = item.url;
-                        a.className = 'nav-item private-node';
-                        a.target = '_blank';
-                        a.id = 'node-' + item.originalIdx;
-                        a.innerHTML = \`
-                            <span class="icon">\${item.icon}</span>
-                            <div class="details">
-                                <span class="title">\${item.title}</span>
-                                <span class="desc">\${item.desc}</span>
-                            </div>
-                            <div class="status-dot" data-idx="\${item.originalIdx}"></div>
-                        \`;
-                        grid.appendChild(a);
+                    } catch (e) {
+                        quoteEl.innerText = "「 灵气枯竭，未能连接到语录之源... 」"; 
+                        const oldSource = wrapperEl.querySelector('.quote-source');
+                        if (oldSource) oldSource.remove();
+                    } finally {
+                        wrapperEl.classList.add('loaded');
                     }
-                });
-                bindRipple(document.querySelectorAll('.private-node'));
-                checkStatus(); 
-            }
-
-            let stealthClickTimer = null; 
-            function handleStealthClick() {
-                if(stealthClickTimer) return; 
-                stealthClickTimer = setTimeout(() => { stealthClickTimer = null; }, 300);
-
-                if (isUnlocked) lockSystem(); 
-                else openModal();             
-            }
-
-            function openModal() {
-                document.getElementById('auth-area').style.display = 'flex';
-                document.getElementById('sys-pwd').value = '';
-                document.getElementById('app-modal').classList.add('active');
-                setTimeout(() => document.getElementById('sys-pwd').focus(), 100);
-            }
-
-            function closeModal() { document.getElementById('app-modal').classList.remove('active'); }
-
-            async function verifyPwd() {
-                const pwd = document.getElementById('sys-pwd').value;
-                if (!pwd) return;
-
-                try {
-                    const res = await fetch('/api/reveal', { method: 'POST', body: JSON.stringify({ pwd }) });
-                    if (!res.ok) throw new Error('Reveal Failed');
-                    const data = await res.json();
-                    
-                    localStorage.setItem('LLSC_PASSCODE', pwd); 
-                    isUnlocked = true;
-                    
-                    closeModal();
-                    renderPrivateCards(data.items);
-                    showToast('✅ 口令验证成功，隐秘阵法已显现');
-                } catch (e) { 
-                    document.getElementById('sys-pwd').value = '';
-                    showToast('❌ 口令错误，阵法未响应', true);
                 }
-            }
 
-            function lockSystem() {
-                localStorage.removeItem('LLSC_PASSCODE');
-                isUnlocked = false;
-                window.location.reload(); 
-            }
-        })(); 
-    </script>
-</body>
-</html>`;
+                function showToast(msg, isError = false) {
+                    const toast = document.getElementById('toast');
+                    toast.innerText = msg;
+                    if(isError) toast.classList.add('error');
+                    else toast.classList.remove('error');
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 3000);
+                }
+
+                document.addEventListener("DOMContentLoaded", async () => {
+                    document.getElementById('current-year').innerText = new Date().getFullYear();
+                    
+                    loadDynamicQuote(); 
+                    
+                    // 阵法核心：严格对齐东八区 (北京时间 UTC+8) 物理时钟
+                    if (intervalSec > 0) {
+                        const alignToBeijingTime = () => {
+                            const now = new Date();
+                            const utcMs = now.getTime() + (now.getTimezoneOffset() * 60000);
+                            const bjMs = utcMs + (8 * 3600000); // 换算为北京绝对毫秒数
+                            const intervalMs = intervalSec * 1000;
+                            
+                            // 精准计算距离下一个物理周期的毫秒差
+                            const delay = intervalMs - (bjMs % intervalMs);
+                            
+                            quoteTimer = setTimeout(() => {
+                                loadDynamicQuote();
+                                // 初次精准卡点后，切回常规周期循环
+                                quoteTimer = setInterval(loadDynamicQuote, intervalMs);
+                            }, delay);
+                        };
+                        alignToBeijingTime();
+                    }
+
+                    bindRipple(document.querySelectorAll('.nav-item')); 
+
+                    document.getElementById('stealth-trigger').addEventListener('click', handleStealthClick);
+                    document.getElementById('close-modal-btn').addEventListener('click', closeModal);
+                    document.getElementById('submit-pwd-btn').addEventListener('click', verifyPwd);
+                    
+                    document.getElementById('sys-pwd').addEventListener('keypress', function (e) {
+                        if (e.key === 'Enter') verifyPwd();
+                    });
+
+                    const savedPasscode = localStorage.getItem('LLSC_PASSCODE');
+                    if (savedPasscode) {
+                        try {
+                            const res = await fetch('/api/reveal', { method: 'POST', body: JSON.stringify({ pwd: savedPasscode }) });
+                            if (res.ok) {
+                                const data = await res.json();
+                                isUnlocked = true;
+                                renderPrivateCards(data.items);
+                                showToast('✨ 隐秘阵法已自动解除隐匿');
+                            } else {
+                                localStorage.removeItem('LLSC_PASSCODE'); 
+                            }
+                        } catch(e) {}
+                    }
+
+                    checkStatus(); 
+                });
+
+                function bindRipple(elements) {
+                    elements.forEach(card => {
+                        if(card.dataset.rippleBound) return;
+                        card.dataset.rippleBound = true;
+                        
+                        card.addEventListener('click', function(e) {
+                            const rect = this.getBoundingClientRect();
+                            const ripple = document.createElement('span');
+                            const size = Math.max(rect.width, rect.height);
+                            ripple.className = 'ripple';
+                            ripple.style.width = ripple.style.height = size + 'px';
+                            ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+                            ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+                            this.appendChild(ripple);
+                            setTimeout(() => ripple.remove(), 600);
+                        });
+                    });
+                }
+
+                async function checkStatus() {
+                    const dots = document.querySelectorAll('.status-dot:not(.checked)');
+                    if (dots.length === 0) return;
+                    
+                    const indices = Array.from(dots).map(dot => parseInt(dot.getAttribute('data-idx')));
+                    dots.forEach(dot => dot.classList.add('checked')); 
+                    
+                    try {
+                        const res = await fetch('/api/status', { method: 'POST', body: JSON.stringify({ indices }) });
+                        const statuses = await res.json();
+                        statuses.forEach(status => {
+                            const dot = document.querySelector(\`.status-dot[data-idx="\${status.idx}"]\`);
+                            if (dot) {
+                                if (status.ok) dot.classList.add('online');
+                                else dot.classList.add('offline');
+                            }
+                        });
+                    } catch (error) { console.error('探针推演受阻'); }
+                }
+
+                function renderPrivateCards(items) {
+                    const grid = document.querySelector('.nav-grid');
+                    items.forEach(item => {
+                        if (!document.getElementById('node-' + item.originalIdx)) {
+                            const a = document.createElement('a');
+                            a.href = item.url;
+                            a.className = 'nav-item private-node';
+                            a.target = '_blank';
+                            a.id = 'node-' + item.originalIdx;
+                            a.innerHTML = \`
+                                <span class="icon">\${item.icon}</span>
+                                <div class="details">
+                                    <span class="title">\${item.title}</span>
+                                    <span class="desc">\${item.desc}</span>
+                                </div>
+                                <div class="status-dot" data-idx="\${item.originalIdx}"></div>
+                            \`;
+                            grid.appendChild(a);
+                        }
+                    });
+                    bindRipple(document.querySelectorAll('.private-node'));
+                    checkStatus(); 
+                }
+
+                let stealthClickTimer = null; 
+                function handleStealthClick() {
+                    if(stealthClickTimer) return; 
+                    stealthClickTimer = setTimeout(() => { stealthClickTimer = null; }, 300);
+
+                    if (isUnlocked) lockSystem(); 
+                    else openModal();             
+                }
+
+                function openModal() {
+                    document.getElementById('auth-area').style.display = 'flex';
+                    document.getElementById('sys-pwd').value = '';
+                    document.getElementById('app-modal').classList.add('active');
+                    setTimeout(() => document.getElementById('sys-pwd').focus(), 100);
+                }
+
+                function closeModal() { document.getElementById('app-modal').classList.remove('active'); }
+
+                async function verifyPwd() {
+                    const pwd = document.getElementById('sys-pwd').value;
+                    if (!pwd) return;
+
+                    try {
+                        const res = await fetch('/api/reveal', { method: 'POST', body: JSON.stringify({ pwd }) });
+                        if (!res.ok) throw new Error('Reveal Failed');
+                        const data = await res.json();
+                        
+                        localStorage.setItem('LLSC_PASSCODE', pwd); 
+                        isUnlocked = true;
+                        
+                        closeModal();
+                        renderPrivateCards(data.items);
+                        showToast('✅ 口令验证成功，隐秘阵法已显现');
+                    } catch (e) { 
+                        document.getElementById('sys-pwd').value = '';
+                        showToast('❌ 口令错误，阵法未响应', true);
+                    }
+                }
+
+                function lockSystem() {
+                    localStorage.removeItem('LLSC_PASSCODE');
+                    isUnlocked = false;
+                    window.location.reload(); 
+                }
+            })(); 
+        </script>
+    </body>
+    </html>
+    `;
 
     return new Response(html, { headers: SECURE_HEADERS });
   }

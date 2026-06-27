@@ -115,7 +115,7 @@ export default {
             <button type="button" class="btn btn-secondary" onclick="importJson()">📜 融合玉简</button>
           </div>
           <form method="POST" id="adminForm">
-            <!-- 【重点修复：动态后台时间配置表单】 -->
+            <!-- 修复：确保动态后台时间配置表单真正渲染 -->
             <div class="edit-card" style="border-color: #f87171; box-shadow: 0 4px 6px -1px rgba(239,68,68,0.1);">
                 <div class="card-header">
                     <span class="badge" style="background:#fef2f2;color:#ef4444;">🛡️ 核心中枢法阵配置</span>
@@ -661,4 +661,3 @@ export default {
         </script>
     </body>
     </html>
-    

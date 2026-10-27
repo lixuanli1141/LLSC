@@ -1,6 +1,6 @@
 # 零落山川 · 个人导航站 v2
 
-Cloudflare Workers + KV 的个人导航站。干净浅色设计，系统字体，不依赖任何外部字体或 CDN。
+Cloudflare Workers + KV 的个人导航站。浅色活泼设计，系统字体，不依赖任何外部字体或 CDN；插画与动效全部用内联 SVG / CSS 实现，手机优先（单列布局、48px 点击区、16px 输入字号），并尊重 `prefers-reduced-motion`。
 
 ## 结构
 

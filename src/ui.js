@@ -21,7 +21,9 @@ export function renderHome(settings) {
 </head>
 <body>
 <div id="toast" class="toast" role="status"></div>
-<div class="stealth" id="stealth" title=" "></div>
+<button class="stealth" id="stealth" type="button" title="私密导航" aria-label="私密导航">
+  <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 26c0-6 7-11 15-11 5 0 8 1 11 3 2 1 6 2 6 5s-3 4-5 4c-1 2-3 4-6 4-2 3-5 4-8 4-6 0-13-3-13-9Z" fill="var(--sky-soft)"/><path d="M12 24c2-2 5-3 8-3" stroke="var(--sky)" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="16" cy="21" r="1.6" fill="#1c2333"/><path d="M33 20c2-3 6-3 7-1-1 0-2 1-2 2s1 2 2 2c-1 2-5 2-7-3Z" fill="var(--sky)"/><path d="M22 33c1 2 3 3 5 3" stroke="var(--sky)" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+</button>
 <div class="modal" id="modal">
   <div class="dialog">
     <h2>输入口令</h2>
@@ -34,6 +36,26 @@ export function renderHome(settings) {
   </div>
 </div>
 <header>
+  <svg class="hero" viewBox="0 0 560 150" role="img" aria-label="手绘山水与小鲸鱼">
+    <circle class="hero-sun" cx="452" cy="34" r="20" fill="var(--sun)"/>
+    <circle cx="452" cy="34" r="27" fill="none" stroke="var(--sun)" stroke-width="2" stroke-dasharray="4 7" stroke-linecap="round"/>
+    <g class="hero-cloud hero-cloud-a" fill="#ffffff"><ellipse cx="90" cy="38" rx="30" ry="12"/><ellipse cx="112" cy="30" rx="22" ry="11"/><ellipse cx="70" cy="30" rx="18" ry="9"/></g>
+    <g class="hero-cloud hero-cloud-b" fill="#ffffff"><ellipse cx="300" cy="22" rx="24" ry="9"/><ellipse cx="318" cy="16" rx="17" ry="8"/></g>
+    <g class="hero-whale">
+      <path d="M196 62c0-8 10-14 20-14 6 0 10 1 14 4 3 1 8 2 8 6s-4 5-7 5c-1 3-4 5-8 5-3 4-7 5-11 5-8 0-16-4-16-11Z" fill="var(--sky-soft)"/>
+      <path d="M204 60c3-3 7-4 11-4" stroke="var(--sky)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <circle cx="210" cy="57" r="2" fill="#1c2333"/>
+      <path d="M232 58c3-4 8-4 9-1-1 0-3 1-3 3s1 2 3 2c-1 3-6 3-9-4Z" fill="var(--sky)"/>
+      <path d="M222 70c1 3 4 4 7 4" stroke="var(--sky)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    </g>
+    <path d="M0 118 L70 62 L120 104 L180 52 L250 118 Z" fill="var(--hill-1)"/>
+    <path d="M150 118 L230 70 L290 110 L350 60 L430 118 Z" fill="var(--hill-2)"/>
+    <path d="M330 118 L410 76 L470 112 L520 84 L560 118 Z" fill="var(--hill-1)"/>
+    <path d="M0 118 Q140 104 280 118 T560 118 V150 H0 Z" fill="var(--hill-3)"/>
+    <g stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity=".8">
+      <path d="M176 62 l6 8 M184 58 l5 7"/><path d="M346 70 l6 8 M354 66 l5 7"/>
+    </g>
+  </svg>
   <h1>${escapeHtml(SITE_NAME)}</h1>
   <div class="subtitle">${escapeHtml(SITE_SUBTITLE)}</div>
   <div class="quote" id="quote">山川有灵，归处有光。</div>
@@ -66,6 +88,14 @@ export function renderAdmin() {
   textarea{min-height:64px;font-family:monospace;font-size:13px}
   .settings{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:20px;box-shadow:var(--shadow)}
   .settings h2{margin:0 0 14px;font-size:17px}
+  @media (max-width:600px){
+    .edit-card{padding:16px}
+    .card-head{flex-wrap:wrap;gap:10px}
+    .card-head > div{display:flex;gap:8px;flex-wrap:wrap}
+    .card-head button{min-height:44px;padding:10px 12px}
+    .toolbar button{flex:1 1 40%}
+    .checks{flex-direction:column;gap:12px}
+  }
 </style>
 </head>
 <body>

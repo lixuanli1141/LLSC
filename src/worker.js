@@ -1,0 +1,171 @@
+// 零落山川 v2 — Cloudflare Workers + KV 个人导航
+// 路由：
+//   GET  /                  首页
+//   GET  /assets/app.css   样式（同源，无外部依赖）
+//   GET  /assets/app.js    首页客户端脚本
+//   GET  /assets/admin.js  后台客户端脚本
+//   GET  /api/nav          当前可见导航（公开 + 已解锁私密）与语录设置
+//   POST /api/reveal       { pwd } 口令解锁，成功后发 HttpOnly 会话 Cookie
+//   POST /api/lock         清除 reveal 会话
+//   POST /api/status       { indices } 探测链接状态（HEAD，失败回落 GET，4 秒超时，60 秒缓存）
+//   GET  /admin            管理后台（Basic Auth，ADMIN_PWD Secret）
+//   GET  /admin/api/config 后台读取全部配置
+//   POST /admin/api/save   后台保存配置与语录设置
+
+import { DEFAULT_SETTINGS } from "./config.js";
+import { loadItems, loadSettings, saveItems, saveSettings, visibleItems } from "./store.js";
+import {
+  checkAdmin, checkReveal, createRevealSession, hasRevealSession,
+  destroyRevealSession, revealCookie, clearRevealCookie,
+} from "./auth.js";
+import { renderHome, renderAdmin } from "./ui.js";
+import { APP_CSS, HOME_JS, ADMIN_JS } from "./assets.js";
+
+const SECURITY_HEADERS = {
+  "Content-Security-Policy":
+    "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; " +
+    "font-src 'self'; connect-src 'self' https://v1.hitokoto.cn; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+};
+
+function html(body, status = 200, extra = {}) {
+  return new Response(body, { status, headers: { ...SECURITY_HEADERS, "Content-Type": "text/html;charset=UTF-8", ...extra } });
+}
+function json(data, status = 200, extra = {}) {
+  return new Response(JSON.stringify(data), { status, headers: { ...SECURITY_HEADERS, "Content-Type": "application/json;charset=UTF-8", "Cache-Control": "no-store", ...extra } });
+}
+function text(body, status = 200, contentType = "text/plain;charset=UTF-8") {
+  return new Response(body, { status, headers: { ...SECURITY_HEADERS, "Content-Type": contentType } });
+}
+function unauthorizedAdmin(configured) {
+  const body = configured ? "未授权访问，请出示身份凭证。" : "管理员密码未配置，拒绝访问。请在 Cloudflare 后台为该 Worker 设置 ADMIN_PWD Secret。";
+  return new Response(body, {
+    status: 401,
+    headers: { ...SECURITY_HEADERS, "WWW-Authenticate": 'Basic realm="LingLuo ShanChuan Admin"', "Content-Type": "text/plain;charset=UTF-8" },
+  });
+}
+
+// 状态探测缓存：每个 isolate 内 60 秒有效，避免每次刷新都全量探测。
+const statusCache = new Map(); // url -> { ok, at }
+
+async function probe(url) {
+  const cached = statusCache.get(url);
+  if (cached && Date.now() - cached.at < 60_000) return cached.ok;
+  let ok = false;
+  for (const method of ["HEAD", "GET"]) {
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 LLSC-Monitor" },
+        signal: AbortSignal.timeout(4000),
+      });
+      ok = res.ok;
+      break;
+    } catch {
+      if (method === "GET") ok = false;
+    }
+  }
+  statusCache.set(url, { ok, at: Date.now() });
+  return ok;
+}
+
+export default {
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+
+    // ---- 静态资源 ----
+    if (url.pathname === "/assets/app.css" && request.method === "GET") {
+      return text(APP_CSS, 200, "text/css;charset=UTF-8");
+    }
+    if (url.pathname === "/assets/app.js" && request.method === "GET") {
+      return text(HOME_JS, 200, "text/javascript;charset=UTF-8");
+    }
+    if (url.pathname === "/assets/admin.js" && request.method === "GET") {
+      return text(ADMIN_JS, 200, "text/javascript;charset=UTF-8");
+    }
+
+    // ---- 管理后台 ----
+    if (url.pathname === "/admin" && request.method === "GET") {
+      const auth = await checkAdmin(request, env);
+      if (!auth.ok) return unauthorizedAdmin(auth.configured);
+      return html(renderAdmin());
+    }
+    if (url.pathname === "/admin/api/config" && request.method === "GET") {
+      const auth = await checkAdmin(request, env);
+      if (!auth.ok) return unauthorizedAdmin(auth.configured);
+      const [items, settings] = await Promise.all([loadItems(env), loadSettings(env)]);
+      return json({ items, settings });
+    }
+    if (url.pathname === "/admin/api/save" && request.method === "POST") {
+      const auth = await checkAdmin(request, env);
+      if (!auth.ok) return unauthorizedAdmin(auth.configured);
+      let body;
+      try {
+        body = await request.json();
+      } catch {
+        return text("请求体必须是 JSON", 400);
+      }
+      try {
+        const [items, settings] = await Promise.all([saveItems(env, body.items), saveSettings(env, body.settings)]);
+        return json({ ok: true, items: items.length, settings });
+      } catch (e) {
+        return text(`保存失败：${e.message}`, 400);
+      }
+    }
+
+    // ---- 公开 API ----
+    if (url.pathname === "/api/nav" && request.method === "GET") {
+      const [items, settings, unlocked] = await Promise.all([
+        loadItems(env), loadSettings(env), hasRevealSession(request, env),
+      ]);
+      return json({ items: visibleItems(items, unlocked), unlocked, settings });
+    }
+
+    if (url.pathname === "/api/reveal" && request.method === "POST") {
+      let pwd;
+      try {
+        ({ pwd } = await request.json());
+      } catch {
+        return text("请求体必须是 JSON", 400);
+      }
+      const result = await checkReveal(pwd, env);
+      if (!result.configured) return text("私密口令尚未设置，拒绝访问", 503);
+      if (!result.ok) return text("Unauthorized", 401);
+      const token = await createRevealSession(env);
+      return json({ ok: true }, 200, { "Set-Cookie": revealCookie(token, request) });
+    }
+
+    if (url.pathname === "/api/lock" && request.method === "POST") {
+      await destroyRevealSession(request, env);
+      return json({ ok: true }, 200, { "Set-Cookie": clearRevealCookie(request) });
+    }
+
+    if (url.pathname === "/api/status" && request.method === "POST") {
+      let indices;
+      try {
+        ({ indices } = await request.json());
+      } catch {
+        return text("请求体必须是 JSON", 400);
+      }
+      if (!Array.isArray(indices) || indices.length > 50) return text("indices 必须是最多 50 个下标的数组", 400);
+      const items = await loadItems(env);
+      const results = await Promise.all(indices.map(async (idx) => {
+        const item = items[idx];
+        if (!item || item.isHidden) return { idx, ok: false };
+        return { idx, ok: await probe(item.url) };
+      }));
+      return json(results);
+    }
+
+    // ---- 首页 ----
+    if (url.pathname === "/" && request.method === "GET") {
+      const settings = await loadSettings(env);
+      return html(renderHome(settings));
+    }
+
+    return text("Not Found", 404);
+  },
+};

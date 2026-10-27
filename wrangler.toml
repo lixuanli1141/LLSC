@@ -8,3 +8,7 @@ enabled = true
 [[kv_namespaces]]
 binding = "MY_KV"
 id = "c1f01fc52ea2473ea86df6082dc763c0"
+
+# 密码不在这里：ADMIN_PWD（管理后台）与 REVEAL_PWD（私密口令）
+# 都是 Cloudflare Worker Secret，用 `wrangler secret put <名字>` 设置。
+# 两者缺失时对应功能拒绝访问，不使用任何默认值。

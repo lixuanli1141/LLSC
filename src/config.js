@@ -3,7 +3,7 @@
 //（环境变量 ADMIN_PWD / REVEAL_PWD），缺失时拒绝访问，绝不使用默认值。
 
 export const SITE_NAME = "零落山川";
-export const SITE_SUBTITLE = "山川有灵 · 归处有光";
+export const SITE_SUBTITLE = "LLSC // NAVIGATION HUB";
 export const ADMIN_USER = "admin";
 export const SESSION_TTL_SECONDS = 24 * 60 * 60; // reveal 会话 24 小时
 export const MAX_ITEMS = 50;

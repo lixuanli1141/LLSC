@@ -15,11 +15,28 @@ const FAVICON = "data:image/svg+xml," + encodeURIComponent(
 );
 
 const HERO_SCENE = `<svg viewBox="0 0 640 360" role="img" aria-label="山川插画" preserveAspectRatio="xMidYMid slice">
-<rect width="640" height="360" fill="#181818"/>
-<circle cx="512" cy="96" r="40" fill="#0284c7"/>
-<polygon points="0,360 0,240 120,140 220,260 320,180 420,280 520,200 640,300 640,360" fill="#272727"/>
-<polygon points="0,360 0,300 160,210 280,320 400,240 540,330 640,280 640,360" fill="#313131"/>
-<rect x="0" y="312" width="640" height="2" fill="#0284c7"/>
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bae6fd"/><stop offset="1" stop-color="#f0f9ff"/></linearGradient>
+<linearGradient id="river" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7dd3fc"/><stop offset="1" stop-color="#0284c7"/></linearGradient>
+</defs>
+<rect width="640" height="360" fill="url(#sky)"/>
+<circle cx="512" cy="88" r="36" fill="#fbbf24"/>
+<circle cx="512" cy="88" r="52" fill="#fbbf24" opacity=".25"/>
+<g fill="#ffffff" opacity=".9">
+<ellipse cx="140" cy="70" rx="52" ry="16"/><ellipse cx="180" cy="58" rx="40" ry="14"/>
+<ellipse cx="400" cy="48" rx="46" ry="13"/><ellipse cx="430" cy="60" rx="34" ry="11"/>
+</g>
+<g fill="#38bdf8" opacity=".55"><polygon points="0,360 0,210 110,120 200,230 300,150 400,250 500,170 640,260 640,360"/></g>
+<g fill="#0284c7"><polygon points="0,360 0,260 130,160 240,280 340,190 460,300 560,220 640,300 640,360"/></g>
+<g fill="#075985"><polygon points="0,360 0,320 150,240 280,330 420,260 540,340 640,300 640,360"/></g>
+<path d="M0 330 Q 160 310 320 332 T 640 326 V 360 H 0 Z" fill="url(#river)"/>
+<g stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round">
+<path d="M120 100 q 6 -6 12 0 q 6 -6 12 0"/><path d="M300 80 q 6 -6 12 0 q 6 -6 12 0"/>
+</g>
+<g font-family="monospace" font-size="13" fill="#0f172a">
+<rect x="24" y="300" width="86" height="26" rx="13" fill="#ffffff" opacity=".92"/><text x="67" y="318" text-anchor="middle">云盘</text>
+<rect x="122" y="300" width="86" height="26" rx="13" fill="#ffffff" opacity=".92"/><text x="165" y="318" text-anchor="middle">影视</text>
+</g>
 </svg>`;
 
 export function renderHome(settings) {
@@ -42,17 +59,15 @@ export function renderHome(settings) {
 <body>
 <a class="skip" href="#nav">跳到导航</a>
 <div id="toast" class="toast" role="status"></div>
-<button class="stealth" id="stealth" type="button" title="私密导航" aria-label="私密导航">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-</button>
+<button class="stealth" id="stealth" type="button" aria-label="口令"></button>
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
   <div class="dialog">
     <h2 id="modal-title">输入口令</h2>
     <div class="row">
-      <input type="password" id="pwd" placeholder="私密导航口令" autocomplete="current-password">
+      <input type="password" id="pwd" placeholder="口令" autocomplete="current-password">
       <button id="submit-pwd" type="button">解锁</button>
     </div>
-    <p class="hint">解锁后会记住 24 小时，点右下角可再次锁定。</p>
+    <p class="hint">解锁后会记住 24 小时。</p>
     <div class="row"><button class="ghost" id="close-modal" type="button">取消</button></div>
   </div>
 </div>
@@ -60,7 +75,6 @@ export function renderHome(settings) {
   <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="1.5" width="13" height="13" rx="2"/><path d="M1.5 5.5h13M5.5 5.5v9"/></svg></span>LLSC</a>
   <span class="nav-links"><a href="#nav">导航</a><a href="#how">如何使用</a><a href="/admin">管理</a></span>
   <span class="status-pill"><i></i>SYSTEM ONLINE</span>
-  <button class="nav-unlock" id="nav-unlock" type="button">解锁私密</button>
 </nav>
 <header class="hero">
   <div class="hero-copy">
@@ -69,7 +83,6 @@ export function renderHome(settings) {
     <p class="sub">云盘、影视、题库和服务器，都在这里。一处归拢，直达你要去的地方。</p>
     <div class="cta-row">
       <a class="btn-primary" href="#nav">进入导航</a>
-      <button class="btn-ghost" id="hero-unlock" type="button">解锁私密导航</button>
     </div>
     <p class="proof" id="proof">正在探测节点状态</p>
     <p class="quote" id="quote">山川有灵，归处有光。</p>
@@ -88,7 +101,7 @@ export function renderHome(settings) {
       <p class="section-sub">点一张卡片，直达一个地方。状态点会实时告诉你它现在能不能打开。</p>
     </div>
     <div class="grid" id="grid"></div>
-    <div class="lockbar"><button class="ghost" id="lock-btn" type="button" style="display:none">锁定私密导航</button></div>
+    <div class="lockbar"><button class="ghost" id="lock-btn" type="button" style="display:none">锁定</button></div>
   </section>
   <section id="how" class="reveal" aria-label="如何使用">
     <div class="section-head">
@@ -96,9 +109,8 @@ export function renderHome(settings) {
       <h2>三步直达</h2>
     </div>
     <ol class="steps">
-      <li><span class="step-num">01</span><h3>打开页面</h3><p>公开节点都在上面，点卡片就走，不用记地址。</p></li>
-      <li><span class="step-num">02</span><h3>需要时解锁</h3><p>私密节点藏在口令后面，解锁后记住 24 小时。</p></li>
-      <li><span class="step-num">03</span><h3>点卡片直达</h3><p>状态点在线就直接打开，离线先别点，等它回来。</p></li>
+      <li><span class="step-num">01</span><h3>打开页面</h3><p>所有节点都在上面，点卡片就走，不用记地址。</p></li>
+      <li><span class="step-num">02</span><h3>点卡片直达</h3><p>状态点在线就直接打开，离线先别点，等它回来。</p></li>
     </ol>
   </section>
   <section class="tagline" aria-label="一句">
@@ -180,7 +192,7 @@ export function renderAdmin() {
     <label class="field"><span>语录轮换间隔（秒，0 为不自动轮换）</span>
       <input type="number" id="quoteInterval" min="0" max="3600" value="60">
     </label>
-    <p class="hint">管理员密码与私密口令在 Cloudflare 后台以 Secret 管理，不在这里修改，也不会显示在这里。</p>
+    <p class="hint">管理员密码与口令在 Cloudflare 后台以 Secret 管理，不在这里修改，也不会显示在这里。</p>
   </div>
   <div class="toolbar">
     <button id="export" type="button" class="ghost">导出配置</button>

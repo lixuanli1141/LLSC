@@ -121,7 +121,12 @@ export default {
       const [items, settings, unlocked] = await Promise.all([
         loadItems(env), loadSettings(env), hasRevealSession(request, env),
       ]);
-      return json({ items: visibleItems(items, unlocked), unlocked, settings });
+      // 只返回调用者可见项，且剥掉 isPrivate / isHidden 字段：
+      // 未解锁的人从响应里看不出“存在私密项”这件事。
+      const visible = visibleItems(items, unlocked).map(({ title, url, desc, icon, originalIdx }) => (
+        { title, url, desc, icon, originalIdx }
+      ));
+      return json({ items: visible, unlocked, settings });
     }
 
     if (url.pathname === "/api/reveal" && request.method === "POST") {
@@ -132,7 +137,7 @@ export default {
         return text("请求体必须是 JSON", 400);
       }
       const result = await checkReveal(pwd, env);
-      if (!result.configured) return text("私密口令尚未设置，拒绝访问", 503);
+      if (!result.configured) return text("口令尚未设置，拒绝访问", 503);
       if (!result.ok) return text("Unauthorized", 401);
       const token = await createRevealSession(env);
       return json({ ok: true }, 200, { "Set-Cookie": revealCookie(token, request) });
@@ -151,10 +156,13 @@ export default {
         return text("请求体必须是 JSON", 400);
       }
       if (!Array.isArray(indices) || indices.length > 50) return text("indices 必须是最多 50 个下标的数组", 400);
-      const items = await loadItems(env);
+      const [items, unlocked] = await Promise.all([loadItems(env), hasRevealSession(request, env)]);
+      // 只探测调用者可见的项：不可见的下标（私密未解锁、隐藏、不存在）
+      // 一律返回同样的 { idx, ok: false }，不去探测、不区分、不留时延差别。
+      const visibleIdx = new Set(visibleItems(items, unlocked).map((v) => v.originalIdx));
       const results = await Promise.all(indices.map(async (idx) => {
         const item = items[idx];
-        if (!item || item.isHidden) return { idx, ok: false };
+        if (!item || item.isHidden || !visibleIdx.has(idx)) return { idx, ok: false };
         return { idx, ok: await probe(item.url) };
       }));
       return json(results);

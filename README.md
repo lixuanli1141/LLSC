@@ -1,6 +1,8 @@
-# 零落山川 · 个人导航站 v2
+# 零落山川 · 个人导航站 v2.3
 
-Cloudflare Workers + KV 的个人导航站。简洁科技风：冷色调、细线网格、等宽字体点缀，系统字体，不依赖任何外部字体或 CDN；动效全部用内联 SVG / CSS 实现。桌面多列、手机单列，兼顾 1280px 与 390px 视口，并尊重 `prefers-reduced-motion`。
+Cloudflare Workers + KV 的个人导航站。按 elayadesign 的 landing-page-design 与 redesign-existing-projects 两套技能重做：饱满的 hero 区（大标题、副标题、一个主行动、实时状态证明、主视觉）、不对称的 bento 导航分区、三步使用说明、逐词显现的 tagline 区。视觉系统：单一字体、Tailwind 字阶与间距 token、扁平背景、一个点缀色、基础动效曲线加 IntersectionObserver 滚动显现；不引外部字体或 CDN，动效只动 transform 与 opacity，尊重 `prefers-reduced-motion`。桌面多列、手机单列，兼顾 1280px 与 390px 视口。
+
+注：技能要求用 Geist / Manrope 等字体，但本项目不引外部字体与 CDN，所以字体用系统字体栈代替，等宽字体只用于数据与标签；技能的主按钮内边距是 8px / 12px，本项目为保证手机触摸目标，按钮最小高度 48px、内边距 12px / 24px。
 
 ## 结构
 

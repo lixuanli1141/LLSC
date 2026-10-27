@@ -18,7 +18,7 @@ import {
   checkAdmin, checkReveal, createRevealSession, hasRevealSession,
   destroyRevealSession, revealCookie, clearRevealCookie,
 } from "./auth.js";
-import { renderHome, renderAdmin } from "./ui.js";
+import { renderHome, renderAdmin, renderNotFound } from "./ui.js";
 import { APP_CSS, HOME_JS, ADMIN_JS } from "./assets.js";
 
 const SECURITY_HEADERS = {
@@ -166,6 +166,6 @@ export default {
       return html(renderHome(settings));
     }
 
-    return text("Not Found", 404);
+    return html(renderNotFound(), 404);
   },
 };

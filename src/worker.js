@@ -7,7 +7,7 @@
 //   GET  /api/nav          当前可见导航（公开 + 已解锁私密）与语录设置
 //   POST /api/reveal       { pwd } 口令解锁，成功后发 HttpOnly 会话 Cookie
 //   POST /api/lock         清除 reveal 会话
-//   POST /api/status       { indices } 探测链接状态（HEAD，失败回落 GET，4 秒超时，60 秒缓存）
+//   POST /api/status       { indices } 探测链接状态（HEAD 优先，非在线响应回落 GET，4 秒超时，60 秒缓存）
 //   GET  /admin            管理后台（Basic Auth，ADMIN_PWD Secret）
 //   GET  /admin/api/config 后台读取全部配置
 //   POST /admin/api/save   后台保存配置与语录设置
@@ -51,10 +51,23 @@ function unauthorizedAdmin(configured) {
 // 状态探测缓存：每个 isolate 内 60 秒有效，避免每次刷新都全量探测。
 const statusCache = new Map(); // url -> { ok, at }
 
+// 在线判定分两段，导航站的状态灯表示“站点可达、服务在响应”：
+// - HEAD 阶段从严：只有 200-399 算通过；405 / 403 / 404 / 5xx 都不下结论，
+//   必须回落 GET，因为不少站点只禁用或限制 HEAD（pan.llsc.cc 就是 HEAD 405）。
+// - GET 阶段按可达性判定：状态码 < 500 就算在线，200-399 正常，401 / 403 是
+//   站点需要登录但本身通的，404 是服务器在响应（页面可能被移走，状态灯仍
+//   表示可达，所以算在线）。5xx 和网络错误 / 超时算离线。
+function isOnlineStatus(status) {
+  return typeof status === "number" && status < 500;
+}
+
 async function probe(url) {
   const cached = statusCache.get(url);
   if (cached && Date.now() - cached.at < 60_000) return cached.ok;
   let ok = false;
+  // 先试 HEAD：在线就直接用。HEAD 返回 405 / 403 / 404 / 5xx 等非在线响应时
+  // 不能据此判离线（有些站点只禁用 HEAD）——必须继续用 GET 再试一次，
+  // 只有 GET 也确认不在线才判离线。fetch 抛异常同理，继续下一种方法。
   for (const method of ["HEAD", "GET"]) {
     try {
       const res = await fetch(url, {
@@ -62,7 +75,15 @@ async function probe(url) {
         headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 LLSC-Monitor" },
         signal: AbortSignal.timeout(4000),
       });
-      ok = res.ok;
+      const status = res.status;
+      // 拿到响应头就够判定了：立刻取消 body，不要把整站内容下载下来。
+      try { if (res.body) await res.body.cancel(); } catch { /* 取消失败不影响判定 */ }
+      if (method === "HEAD") {
+        if (status >= 200 && status < 400) { ok = true; break; }
+        // HEAD 非 2xx/3xx（含 405 / 403 / 404 / 5xx）：不下结论，落到 GET 重试。
+        continue;
+      }
+      ok = isOnlineStatus(status);
       break;
     } catch {
       if (method === "GET") ok = false;

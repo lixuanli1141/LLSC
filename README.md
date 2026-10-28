@@ -1,8 +1,8 @@
-# 零落山川 · 个人导航站 v2.4
+# 零落山川 · 个人导航站 v2.5
 
-Cloudflare Workers + KV 的个人导航站。按 elayadesign 的 landing-page-design 与 redesign-existing-projects 两套技能重做：饱满的 hero 区（大标题、副标题、一个主行动、实时状态证明、主视觉）、不对称的 bento 导航分区、两步使用说明、逐词显现的 tagline 区。视觉系统：Tailwind 字阶与间距 token、扁平背景、一个点缀色、基础动效曲线加 IntersectionObserver 滚动显现；动效只动 transform 与 opacity，尊重 `prefers-reduced-motion`。桌面多列、手机单列，兼顾 1280px 与 390px 视口。
+Cloudflare Workers + KV 的个人导航站。v2.5 按用户选定的概念图 1「深色科技全屏」重做视觉：同源内联 SVG 深蓝夜色山水（夜空、星点、月光、山峦剪影、河流反光）做 fixed 全屏背景，内容滚动时背景不动；导航栏、hero、导航卡片、语录卡、使用说明、tagline、页脚统一毛玻璃半透明质感（backdrop-filter 模糊 + 半透明深色底 + 细亮边框），浮在背景上；大标题为暖金渐变的马善政毛笔体，语录卡带天蓝发光边框。浅色系统下也保持深色全屏背景，不变白底。此前结构保留：饱满的 hero 区（大标题、副标题、一个主行动、实时状态证明、主视觉）、不对称的 bento 导航分区、两步使用说明、逐词显现的 tagline 区；动效只动 transform 与 opacity，尊重 `prefers-reduced-motion`。桌面多列、手机单列，兼顾 1280px 与 390px 视口。
 
-注：技能要求用 Geist / Manrope 等字体，但本项目不引外部字体与 CDN，所以字体用系统字体栈代替，等宽字体只用于数据与标签；技能的主按钮内边距是 8px / 12px，本项目为保证手机触摸目标，按钮最小高度 48px、内边距 12px / 24px。
+注：不引外部字体、图片与 CDN，背景与主视觉都是同源内联 SVG，字体是子集化内嵌（见下）；为保证手机触摸目标，按钮最小高度 48px、内边距 12px / 24px。
 
 ## 字体
 

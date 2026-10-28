@@ -14,28 +14,30 @@ const FAVICON = "data:image/svg+xml," + encodeURIComponent(
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#0284c7"/><path d="M6 22 L13 10 L18 18 L21 13 L26 22 Z" fill="#fff"/></svg>`
 );
 
-const HERO_SCENE = `<svg viewBox="0 0 640 360" role="img" aria-label="山川插画" preserveAspectRatio="xMidYMid slice">
+const HERO_SCENE = `<svg viewBox="0 0 640 360" role="img" aria-label="山川夜景" preserveAspectRatio="xMidYMid slice">
 <defs>
-<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bae6fd"/><stop offset="1" stop-color="#f0f9ff"/></linearGradient>
-<linearGradient id="river" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7dd3fc"/><stop offset="1" stop-color="#0284c7"/></linearGradient>
+<linearGradient id="nsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#04102b"/><stop offset=".55" stop-color="#0d2f5c"/><stop offset="1" stop-color="#17507f"/></linearGradient>
+<linearGradient id="nriver" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7db9e8"/><stop offset="1" stop-color="#0b2b4a"/></linearGradient>
 </defs>
-<rect width="640" height="360" fill="url(#sky)"/>
-<circle cx="512" cy="88" r="36" fill="#fbbf24"/>
-<circle cx="512" cy="88" r="52" fill="#fbbf24" opacity=".25"/>
-<g fill="#ffffff" opacity=".9">
-<ellipse cx="140" cy="70" rx="52" ry="16"/><ellipse cx="180" cy="58" rx="40" ry="14"/>
-<ellipse cx="400" cy="48" rx="46" ry="13"/><ellipse cx="430" cy="60" rx="34" ry="11"/>
+<rect width="640" height="360" fill="url(#nsky)"/>
+<g fill="#ffffff">
+<circle cx="60" cy="42" r="1.6" opacity=".9"/><circle cx="150" cy="90" r="1.2" opacity=".6"/>
+<circle cx="245" cy="36" r="1.4" opacity=".8"/><circle cx="330" cy="80" r="1" opacity=".5"/>
+<circle cx="420" cy="46" r="1.5" opacity=".9"/><circle cx="505" cy="105" r="1.1" opacity=".5"/>
+<circle cx="585" cy="40" r="1.3" opacity=".7"/><circle cx="120" cy="130" r="1" opacity=".4"/>
+<circle cx="540" cy="150" r="1" opacity=".4"/>
 </g>
-<g fill="#38bdf8" opacity=".55"><polygon points="0,360 0,210 110,120 200,230 300,150 400,250 500,170 640,260 640,360"/></g>
-<g fill="#0284c7"><polygon points="0,360 0,260 130,160 240,280 340,190 460,300 560,220 640,300 640,360"/></g>
-<g fill="#075985"><polygon points="0,360 0,320 150,240 280,330 420,260 540,340 640,300 640,360"/></g>
-<path d="M0 330 Q 160 310 320 332 T 640 326 V 360 H 0 Z" fill="url(#river)"/>
-<g stroke="#0f172a" stroke-width="2" fill="none" stroke-linecap="round">
-<path d="M120 100 q 6 -6 12 0 q 6 -6 12 0"/><path d="M300 80 q 6 -6 12 0 q 6 -6 12 0"/>
-</g>
-<g font-family="monospace" font-size="13" fill="#0f172a">
-<rect x="24" y="300" width="86" height="26" rx="13" fill="#ffffff" opacity=".92"/><text x="67" y="318" text-anchor="middle">云盘</text>
-<rect x="122" y="300" width="86" height="26" rx="13" fill="#ffffff" opacity=".92"/><text x="165" y="318" text-anchor="middle">影视</text>
+<circle cx="528" cy="74" r="26" fill="#f4f9ff" opacity=".92"/>
+<circle cx="528" cy="74" r="44" fill="#cfe9ff" opacity=".18"/>
+<g fill="#9fc6e8" opacity=".5"><polygon points="0,360 0,205 110,120 205,225 305,150 405,245 505,168 640,255 640,360"/></g>
+<g fill="#143d63"><polygon points="0,360 0,255 130,160 245,278 345,192 465,298 565,222 640,298 640,360"/></g>
+<g fill="#081c36"><polygon points="0,360 0,318 150,242 285,330 425,262 545,338 640,300 640,360"/></g>
+<g fill="#ffffff" opacity=".10"><ellipse cx="180" cy="235" rx="150" ry="14"/><ellipse cx="470" cy="265" rx="170" ry="16"/></g>
+<path d="M298 306 C318 322 306 340 320 360 L356 360 C342 338 352 320 330 306 Z" fill="url(#nriver)" opacity=".85"/>
+<g stroke="#bfe3ff" stroke-width="2" opacity=".55" stroke-linecap="round"><path d="M316 322 h26"/><path d="M312 342 h34"/></g>
+<g font-family="monospace" font-size="13" fill="#dbeafe">
+<rect x="24" y="300" width="86" height="26" rx="13" fill="#ffffff" opacity=".12"/><rect x="24" y="300" width="86" height="26" rx="13" fill="none" stroke="#ffffff" stroke-opacity=".35"/><text x="67" y="318" text-anchor="middle">云盘</text>
+<rect x="122" y="300" width="86" height="26" rx="13" fill="#ffffff" opacity=".12"/><rect x="122" y="300" width="86" height="26" rx="13" fill="none" stroke="#ffffff" stroke-opacity=".35"/><text x="165" y="318" text-anchor="middle">影视</text>
 </g>
 </svg>`;
 
@@ -50,7 +52,7 @@ export function renderHome(settings) {
 <meta property="og:title" content="${escapeHtml(SITE_NAME)}">
 <meta property="og:description" content="云盘、影视、题库和服务器，都在一处归拢的个人导航。">
 <meta property="og:type" content="website">
-<meta name="theme-color" content="#fafafa">
+<meta name="theme-color" content="#050b18">
 <title>${escapeHtml(SITE_NAME)} — 个人导航</title>
 <link rel="icon" href="${FAVICON}">
 <link rel="stylesheet" href="/assets/app.css">

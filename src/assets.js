@@ -218,12 +218,13 @@ button.danger{background:var(--danger);}
   .reveal{opacity:1;transform:none;}
   .tagline span{opacity:1;}
 }
-.sky{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;}
+.sky{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.hero,main,footer{position:relative;z-index:1;}
 #stars{position:absolute;inset:0;width:100%;height:100%;display:block;}
 .au{position:absolute;border-radius:50%;will-change:transform;}
-.au.a1{width:80vmax;height:80vmax;left:-25vmax;top:-30vmax;background:radial-gradient(circle,rgba(56,189,248,.20),rgba(56,189,248,0) 65%);animation:drift1 26s ease-in-out infinite alternate;}
-.au.a2{width:70vmax;height:70vmax;right:-20vmax;top:-10vmax;background:radial-gradient(circle,rgba(139,92,246,.18),rgba(139,92,246,0) 65%);animation:drift2 32s ease-in-out infinite alternate;}
-.au.a3{width:60vmax;height:60vmax;left:20vw;bottom:-35vmax;background:radial-gradient(circle,rgba(232,201,138,.10),rgba(232,201,138,0) 65%);animation:drift3 38s ease-in-out infinite alternate;}
+.au.a1{width:80vmax;height:80vmax;left:-25vmax;top:-30vmax;background:radial-gradient(circle,rgba(56,189,248,.32),rgba(56,189,248,0) 65%);animation:drift1 26s ease-in-out infinite alternate;}
+.au.a2{width:70vmax;height:70vmax;right:-20vmax;top:-10vmax;background:radial-gradient(circle,rgba(139,92,246,.28),rgba(139,92,246,0) 65%);animation:drift2 32s ease-in-out infinite alternate;}
+.au.a3{width:60vmax;height:60vmax;left:20vw;bottom:-35vmax;background:radial-gradient(circle,rgba(232,201,138,.16),rgba(232,201,138,0) 65%);animation:drift3 38s ease-in-out infinite alternate;}
 @keyframes drift1{from{transform:translate(0,0) scale(1);}to{transform:translate(8vmax,5vmax) scale(1.15);}}
 @keyframes drift2{from{transform:translate(0,0) scale(1.1);}to{transform:translate(-7vmax,6vmax) scale(1);}}
 @keyframes drift3{from{transform:translate(0,0) scale(1);}to{transform:translate(-5vmax,-4vmax) scale(1.12);}}
@@ -243,14 +244,18 @@ export const HOME_JS = `
       sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const n = Math.max(50, Math.min(110, Math.floor(window.innerWidth * window.innerHeight / 18000)));
       stars = [];
-      for (let i = 0; i < n; i++) stars.push({ x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight, r: 0.4 + Math.random() * 1.1, p: Math.random() * Math.PI * 2, s: 0.5 + Math.random() * 1.1 });
+      for (let i = 0; i < n; i++) stars.push({ x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight, r: 0.8 + Math.random() * 1.4, p: Math.random() * Math.PI * 2, s: 0.5 + Math.random() * 1.1 });
     }
     function drawStars(t) {
       sctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
       for (const st of stars) {
-        const a = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(t / 1000 * st.s + st.p));
-        sctx.globalAlpha = a;
+        const a = 0.5 + 0.5 * (0.5 + 0.5 * Math.sin(t / 1000 * st.s + st.p));
+        sctx.globalAlpha = a * 0.18;
         sctx.fillStyle = '#dbeafe';
+        sctx.beginPath();
+        sctx.arc(st.x, st.y, st.r * 3, 0, Math.PI * 2);
+        sctx.fill();
+        sctx.globalAlpha = a;
         sctx.beginPath();
         sctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
         sctx.fill();

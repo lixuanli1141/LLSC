@@ -32,12 +32,12 @@ export function renderHome(settings) {
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/long-cang@5.3.0/index.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/ma-shan-zheng@5.2.9/index.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@callmebill/lxgw-wenkai-web@1.522.0/lxgwwenkai-regular/result.css">
-<link rel="stylesheet" href="/assets/app.css?v=2.5.22">
+<link rel="stylesheet" href="/assets/app.css?v=2.5.23">
 <script type="application/json" id="llsc-settings">${safeSettingsJson(settings)}</script>
 </head>
 <body>
 <a class="skip" href="#nav">跳到导航</a>
-<div class="sky" aria-hidden="true"><canvas id="stars"></canvas><i class="au a1"></i><i class="au a2"></i><i class="au a3"></i></div>
+<div class="bg" aria-hidden="true"><div class="bg-static"></div><video id="bg-video" muted playsinline loop preload="none" poster="/assets/bg-ink.jpg"></video></div>
 <div id="toast" class="toast" role="status"></div>
 <button class="stealth" id="stealth" type="button" aria-label="口令"></button>
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
@@ -92,7 +92,7 @@ export function renderHome(settings) {
   <span>© ${year} ${escapeHtml(SITE_NAME)}</span>
   <span><a href="/">回首页</a> · <a href="/admin">管理后台</a></span>
 </footer>
-<script src="/assets/app.js?v=2.5.20" defer></script>
+<script src="/assets/app.js?v=2.5.23" defer></script>
 </body>
 </html>`;
 }
@@ -105,7 +105,7 @@ export function renderNotFound() {
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>页面不在这里 · ${escapeHtml(SITE_NAME)}</title>
 <link rel="icon" href="${FAVICON}">
-<link rel="stylesheet" href="/assets/app.css?v=2.5.22">
+<link rel="stylesheet" href="/assets/app.css?v=2.5.23">
 </head>
 <body>
 <main class="notfound">
@@ -126,7 +126,7 @@ export function renderAdmin() {
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>${escapeHtml(SITE_NAME)} · 管理后台</title>
 <link rel="icon" href="${FAVICON}">
-<link rel="stylesheet" href="/assets/app.css?v=2.5.22">
+<link rel="stylesheet" href="/assets/app.css?v=2.5.23">
 <style>
   main{width:min(860px,92vw)} .edit-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:16px;box-shadow:var(--shadow)}
   .card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}

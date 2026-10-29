@@ -224,88 +224,32 @@ button.danger{background:var(--danger);}
   .reveal{opacity:1;transform:none;}
   .tagline span{opacity:1;}
 }
-.sky{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#050f1f;}
+.bg-static{position:absolute;inset:0;background:url(/assets/bg-ink.jpg) center/cover no-repeat;}
+#bg-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:0;transition:opacity 1.2s ease;}
+#bg-video.on{opacity:1;}
+.bg::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(3,8,18,.30),rgba(3,8,18,.45));}
 .hero,main,footer{position:relative;z-index:1;}
-#stars{position:absolute;inset:0;width:100%;height:100%;display:block;}
-.au{position:absolute;border-radius:50%;will-change:transform;}
-.au.a1{width:130vmax;height:36vmax;left:-25vmax;top:-14vmax;background:radial-gradient(ellipse at center,rgba(56,189,248,.30),rgba(56,189,248,0) 70%);animation:drift1 26s ease-in-out infinite alternate;}
-.au.a2{width:120vmax;height:30vmax;right:-25vmax;top:16vmax;background:radial-gradient(ellipse at center,rgba(139,92,246,.24),rgba(139,92,246,0) 70%);animation:drift2 32s ease-in-out infinite alternate;}
-.au.a3{width:110vmax;height:26vmax;left:-15vmax;bottom:-12vmax;background:radial-gradient(ellipse at center,rgba(232,201,138,.14),rgba(232,201,138,0) 70%);animation:drift3 38s ease-in-out infinite alternate;}
-@keyframes drift1{from{transform:translateX(-5vmax) rotate(-16deg);}to{transform:translateX(5vmax) rotate(-12deg);}}
-@keyframes drift2{from{transform:translateX(5vmax) rotate(10deg);}to{transform:translateX(-5vmax) rotate(14deg);}}
-@keyframes drift3{from{transform:translateX(-4vmax) rotate(-8deg);}to{transform:translateX(4vmax) rotate(-5deg);}}
+@media (min-aspect-ratio:1/1){#bg-video{object-position:50% 22%;}.bg-static{background-position:50% 22%;}}
 `;
 
 export const HOME_JS = `
 (() => {
-  const skyCanvas = document.getElementById('stars');
-  if (skyCanvas) {
-    const sctx = skyCanvas.getContext('2d');
+  // 视频背景：静态图先行，视频能播了再淡入。弱网 / 省流 / 减动效下只留静态图。
+  const bgVideo = document.getElementById('bg-video');
+  if (bgVideo) {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let stars = [], shoot = null, nextShoot = Date.now() + 5000, useHalo = true;
-    function buildStars() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      skyCanvas.width = Math.floor(window.innerWidth * dpr);
-      skyCanvas.height = Math.floor(window.innerHeight * dpr);
-      sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const narrow = window.innerWidth < 700;
-      useHalo = !narrow;
-      const n = Math.max(narrow ? 40 : 50, Math.min(narrow ? 60 : 110, Math.floor(window.innerWidth * window.innerHeight / 18000)));
-      stars = [];
-      for (let i = 0; i < n; i++) stars.push({ x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight, r: 0.8 + Math.random() * 1.4, p: Math.random() * Math.PI * 2, s: 0.5 + Math.random() * 1.1 });
-    }
-    function drawStars(t) {
-      sctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-      for (const st of stars) {
-        const a = 0.5 + 0.5 * (0.5 + 0.5 * Math.sin(t / 1000 * st.s + st.p));
-        sctx.fillStyle = '#dbeafe';
-        if (useHalo) {
-          sctx.globalAlpha = a * 0.18;
-          sctx.beginPath();
-          sctx.arc(st.x, st.y, st.r * 3, 0, Math.PI * 2);
-          sctx.fill();
-        }
-        sctx.globalAlpha = a;
-        sctx.beginPath();
-        sctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
-        sctx.fill();
-      }
-      sctx.globalAlpha = 1;
-      if (shoot) {
-        const grad = sctx.createLinearGradient(shoot.x, shoot.y, shoot.x - shoot.vx * 12, shoot.y - shoot.vy * 12);
-        grad.addColorStop(0, 'rgba(255,255,255,.9)');
-        grad.addColorStop(1, 'rgba(255,255,255,0)');
-        sctx.strokeStyle = grad;
-        sctx.lineWidth = 1.5;
-        sctx.beginPath();
-        sctx.moveTo(shoot.x, shoot.y);
-        sctx.lineTo(shoot.x - shoot.vx * 12, shoot.y - shoot.vy * 12);
-        sctx.stroke();
-        shoot.x += shoot.vx;
-        shoot.y += shoot.vy;
-        shoot.life -= 16;
-        if (shoot.life <= 0 || shoot.x > window.innerWidth || shoot.y > window.innerHeight) shoot = null;
-      } else if (!reduced && Date.now() > nextShoot) {
-        const ang = Math.PI * (0.15 + Math.random() * 0.2);
-        const sp = 7 + Math.random() * 4;
-        shoot = { x: window.innerWidth * (0.2 + Math.random() * 0.7), y: window.innerHeight * Math.random() * 0.3, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, life: 900 };
-        nextShoot = Date.now() + 6000 + Math.random() * 6000;
-      }
-    }
-    buildStars();
-    let rsTimer = null;
-    window.addEventListener('resize', () => { clearTimeout(rsTimer); rsTimer = setTimeout(buildStars, 150); });
-    let rafId = null, scrollTimer = null, scrolling = false;
-    function loop(t) { drawStars(t); rafId = requestAnimationFrame(loop); }
-    if (reduced) {
-      drawStars(0);
-    } else {
-      rafId = requestAnimationFrame(loop);
-      window.addEventListener('scroll', () => {
-        if (!scrolling) { scrolling = true; if (rafId) { cancelAnimationFrame(rafId); rafId = null; } }
-        clearTimeout(scrollTimer);
-        scrollTimer = setTimeout(() => { scrolling = false; if (!rafId) rafId = requestAnimationFrame(loop); }, 200);
-      }, { passive: true });
+    const saveData = navigator.connection && navigator.connection.saveData;
+    if (!reduced && !saveData) {
+      bgVideo.src = '/assets/bg-ink.mp4';
+      bgVideo.addEventListener('playing', () => bgVideo.classList.add('on'));
+      const tryPlay = () => { const pr = bgVideo.play(); if (pr && pr.catch) pr.catch(() => {}); };
+      bgVideo.addEventListener('canplay', tryPlay);
+      tryPlay();
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) bgVideo.pause();
+        else tryPlay();
+      });
     }
   }
   const grid = document.getElementById('grid');

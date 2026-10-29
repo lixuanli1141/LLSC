@@ -121,6 +121,33 @@ export default {
       return new Response(data, { headers: { ...SECURITY_HEADERS, "Content-Type": "image/jpeg", "Cache-Control": "public, max-age=31536000, immutable" } });
     }
 
+    // 视频背景：水墨固定镜头版。视频支持 Range（浏览器边下边播、循环无缝），
+    // 海报图是视频加载完成前的静态背景，弱网 / 省流 / 减动效下只显示静态图。
+    if (url.pathname === "/assets/bg-ink.jpg" && request.method === "GET") {
+      const data = await env.MY_KV.get("bg-ink-poster", "arrayBuffer");
+      if (data === null) return new Response("not found", { status: 404 });
+      return new Response(data, { headers: { ...SECURITY_HEADERS, "Content-Type": "image/jpeg", "Cache-Control": "public, max-age=31536000, immutable" } });
+    }
+
+    if (url.pathname === "/assets/bg-ink.mp4" && request.method === "GET") {
+      const data = await env.MY_KV.get("bg-ink-video", "arrayBuffer");
+      if (data === null) return new Response("not found", { status: 404 });
+      const headers = { ...SECURITY_HEADERS, "Content-Type": "video/mp4", "Accept-Ranges": "bytes", "Cache-Control": "public, max-age=31536000, immutable" };
+      const range = request.headers.get("Range");
+      const m = range && /bytes=(\d*)-(\d*)/.exec(range);
+      if (m) {
+        const start = m[1] ? parseInt(m[1], 10) : 0;
+        const end = m[2] ? parseInt(m[2], 10) : data.byteLength - 1;
+        if (start < data.byteLength && end >= start && end < data.byteLength) {
+          return new Response(data.slice(start, end + 1), {
+            status: 206,
+            headers: { ...headers, "Content-Range": `bytes ${start}-${end}/${data.byteLength}`, "Content-Length": String(end - start + 1) },
+          });
+        }
+      }
+      return new Response(data, { headers });
+    }
+
     // ---- 管理后台 ----
     if (url.pathname === "/admin" && request.method === "GET") {
       const auth = await checkAdmin(request, env);

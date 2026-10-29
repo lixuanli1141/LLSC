@@ -77,7 +77,7 @@ h1{font-family:var(--title);font-size:36px;line-height:1.2;margin:0;letter-spaci
   transition:transform .3s var(--ease),border-color .3s var(--ease);}
 .btn-ghost:hover{transform:translateY(-2px);border-color:var(--accent);}
 .btn-ghost:active{transform:scale(.98);}
-.proof{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:#9fb8d8;margin:24px 0 0;}
+.proof{display:none;/* 状态行文字已隐藏（用户要求简洁），圆点状态仍在卡片上正常更新 */font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:#9fb8d8;margin:24px 0 0;}
 .quote{margin:24px 0 0;max-width:680px;color:#f0f7ff;font-family:var(--calligraphy);font-size:24px;line-height:36px;
   font-weight:400;min-height:96px;
   background:rgba(13,34,64,.55);border:1px solid rgba(125,211,252,.45);

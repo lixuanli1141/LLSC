@@ -7,7 +7,7 @@
 //   GET  /api/nav          当前可见导航（公开 + 已解锁私密）与语录设置
 //   POST /api/reveal       { pwd } 口令解锁，成功后发 HttpOnly 会话 Cookie
 //   POST /api/lock         清除 reveal 会话
-//   POST /api/status       { indices } 探测链接状态（HEAD 优先，非在线响应回落 GET，4 秒超时，60 秒缓存）
+//   POST /api/status       { indices } 探测链接状态（HEAD 优先，非在线响应回落 GET，手动跳转判定，8 秒超时，GET 失败重试一次，60 秒缓存）
 //   GET  /admin            管理后台（Basic Auth，ADMIN_PWD Secret）
 //   GET  /admin/api/config 后台读取全部配置
 //   POST /admin/api/save   后台保存配置与语录设置
@@ -64,29 +64,36 @@ function isOnlineStatus(status) {
 async function probe(url) {
   const cached = statusCache.get(url);
   if (cached && Date.now() - cached.at < 60_000) return cached.ok;
+  const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 LLSC-Monitor";
   let ok = false;
-  // 先试 HEAD：在线就直接用。HEAD 返回 405 / 403 / 404 / 5xx 等非在线响应时
-  // 不能据此判离线（有些站点只禁用 HEAD）——必须继续用 GET 再试一次，
-  // 只有 GET 也确认不在线才判离线。fetch 抛异常同理，继续下一种方法。
-  for (const method of ["HEAD", "GET"]) {
-    try {
-      const res = await fetch(url, {
-        method,
-        headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 LLSC-Monitor" },
-        signal: AbortSignal.timeout(4000),
-      });
-      const status = res.status;
-      // 拿到响应头就够判定了：立刻取消 body，不要把整站内容下载下来。
-      try { if (res.body) await res.body.cancel(); } catch { /* 取消失败不影响判定 */ }
-      if (method === "HEAD") {
-        if (status >= 200 && status < 400) { ok = true; break; }
-        // HEAD 非 2xx/3xx（含 405 / 403 / 404 / 5xx）：不下结论，落到 GET 重试。
-        continue;
-      }
-      ok = isOnlineStatus(status);
-      break;
-    } catch {
-      if (method === "GET") ok = false;
+  // 先试 HEAD：200-399 直接在线。HEAD 返回 405 / 403 / 404 / 5xx 等非在线响应时
+  // 不能据此判离线（有些站点只禁用 HEAD）——必须继续用 GET 再试一次。
+  // 跳转用 manual：3xx 本身就说明服务在响应，不用再跟跳转链（跳转链本身
+  // 也可能失败，徒增离线误判）。GET 抛异常（超时 / 网络错）时重试一次。
+  try {
+    const head = await fetch(url, {
+      method: "HEAD", redirect: "manual",
+      headers: { "User-Agent": UA },
+      signal: AbortSignal.timeout(8000),
+    });
+    const hs = head.status;
+    // 拿到响应头就够判定了：立刻取消 body，不要把整站内容下载下来。
+    try { if (head.body) await head.body.cancel(); } catch { /* 取消失败不影响判定 */ }
+    if (hs >= 200 && hs < 400) ok = true;
+  } catch { /* HEAD 异常，落到 GET */ }
+  if (!ok) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const res = await fetch(url, {
+          method: "GET", redirect: "manual",
+          headers: { "User-Agent": UA },
+          signal: AbortSignal.timeout(8000),
+        });
+        const status = res.status;
+        try { if (res.body) await res.body.cancel(); } catch { /* 取消失败不影响判定 */ }
+        ok = isOnlineStatus(status);
+        break; // GET 拿到响应就下结论（无论在线离线），不再重试
+      } catch { /* GET 异常：再试一次；两次都异常则离线 */ }
     }
   }
   statusCache.set(url, { ok, at: Date.now() });

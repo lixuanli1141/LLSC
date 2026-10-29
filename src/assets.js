@@ -210,6 +210,9 @@ button.danger{background:var(--danger);}
   .tagline p{font-size:28px;line-height:1.3;}
   .steps h3{font-size:18px;line-height:26px;}
   .tagline{padding:48px 0;}
+  .au.a1{width:60vmax;height:60vmax;}
+  .au.a2{width:55vmax;height:55vmax;}
+  .au.a3{display:none;}
 }
 @media (prefers-reduced-motion: reduce){
   html{scroll-behavior:auto;}
@@ -236,13 +239,15 @@ export const HOME_JS = `
   if (skyCanvas) {
     const sctx = skyCanvas.getContext('2d');
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let stars = [], shoot = null, nextShoot = Date.now() + 5000;
+    let stars = [], shoot = null, nextShoot = Date.now() + 5000, useHalo = true;
     function buildStars() {
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       skyCanvas.width = Math.floor(window.innerWidth * dpr);
       skyCanvas.height = Math.floor(window.innerHeight * dpr);
       sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const n = Math.max(50, Math.min(110, Math.floor(window.innerWidth * window.innerHeight / 18000)));
+      const narrow = window.innerWidth < 700;
+      useHalo = !narrow;
+      const n = Math.max(narrow ? 40 : 50, Math.min(narrow ? 60 : 110, Math.floor(window.innerWidth * window.innerHeight / 18000)));
       stars = [];
       for (let i = 0; i < n; i++) stars.push({ x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight, r: 0.8 + Math.random() * 1.4, p: Math.random() * Math.PI * 2, s: 0.5 + Math.random() * 1.1 });
     }
@@ -250,11 +255,13 @@ export const HOME_JS = `
       sctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
       for (const st of stars) {
         const a = 0.5 + 0.5 * (0.5 + 0.5 * Math.sin(t / 1000 * st.s + st.p));
-        sctx.globalAlpha = a * 0.18;
         sctx.fillStyle = '#dbeafe';
-        sctx.beginPath();
-        sctx.arc(st.x, st.y, st.r * 3, 0, Math.PI * 2);
-        sctx.fill();
+        if (useHalo) {
+          sctx.globalAlpha = a * 0.18;
+          sctx.beginPath();
+          sctx.arc(st.x, st.y, st.r * 3, 0, Math.PI * 2);
+          sctx.fill();
+        }
         sctx.globalAlpha = a;
         sctx.beginPath();
         sctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
@@ -285,10 +292,17 @@ export const HOME_JS = `
     buildStars();
     let rsTimer = null;
     window.addEventListener('resize', () => { clearTimeout(rsTimer); rsTimer = setTimeout(buildStars, 150); });
+    let rafId = null, scrollTimer = null, scrolling = false;
+    function loop(t) { drawStars(t); rafId = requestAnimationFrame(loop); }
     if (reduced) {
       drawStars(0);
     } else {
-      (function loop(t) { drawStars(t); requestAnimationFrame(loop); })(0);
+      rafId = requestAnimationFrame(loop);
+      window.addEventListener('scroll', () => {
+        if (!scrolling) { scrolling = true; if (rafId) { cancelAnimationFrame(rafId); rafId = null; } }
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(() => { scrolling = false; if (!rafId) rafId = requestAnimationFrame(loop); }, 200);
+      }, { passive: true });
     }
   }
   const grid = document.getElementById('grid');

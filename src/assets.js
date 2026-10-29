@@ -210,8 +210,8 @@ button.danger{background:var(--danger);}
   .tagline p{font-size:28px;line-height:1.3;}
   .steps h3{font-size:18px;line-height:26px;}
   .tagline{padding:48px 0;}
-  .au.a1{width:60vmax;height:60vmax;}
-  .au.a2{width:55vmax;height:55vmax;}
+  .au.a1{width:130vmax;height:26vmax;top:-10vmax;}
+  .au.a2{width:120vmax;height:22vmax;top:22vmax;}
   .au.a3{display:none;}
 }
 @media (prefers-reduced-motion: reduce){
@@ -225,12 +225,12 @@ button.danger{background:var(--danger);}
 .hero,main,footer{position:relative;z-index:1;}
 #stars{position:absolute;inset:0;width:100%;height:100%;display:block;}
 .au{position:absolute;border-radius:50%;will-change:transform;}
-.au.a1{width:80vmax;height:80vmax;left:-25vmax;top:-30vmax;background:radial-gradient(circle,rgba(56,189,248,.32),rgba(56,189,248,0) 65%);animation:drift1 26s ease-in-out infinite alternate;}
-.au.a2{width:70vmax;height:70vmax;right:-20vmax;top:-10vmax;background:radial-gradient(circle,rgba(139,92,246,.28),rgba(139,92,246,0) 65%);animation:drift2 32s ease-in-out infinite alternate;}
-.au.a3{width:60vmax;height:60vmax;left:20vw;bottom:-35vmax;background:radial-gradient(circle,rgba(232,201,138,.16),rgba(232,201,138,0) 65%);animation:drift3 38s ease-in-out infinite alternate;}
-@keyframes drift1{from{transform:translate(0,0) scale(1);}to{transform:translate(8vmax,5vmax) scale(1.15);}}
-@keyframes drift2{from{transform:translate(0,0) scale(1.1);}to{transform:translate(-7vmax,6vmax) scale(1);}}
-@keyframes drift3{from{transform:translate(0,0) scale(1);}to{transform:translate(-5vmax,-4vmax) scale(1.12);}}
+.au.a1{width:130vmax;height:36vmax;left:-25vmax;top:-14vmax;background:radial-gradient(ellipse at center,rgba(56,189,248,.30),rgba(56,189,248,0) 70%);animation:drift1 26s ease-in-out infinite alternate;}
+.au.a2{width:120vmax;height:30vmax;right:-25vmax;top:16vmax;background:radial-gradient(ellipse at center,rgba(139,92,246,.24),rgba(139,92,246,0) 70%);animation:drift2 32s ease-in-out infinite alternate;}
+.au.a3{width:110vmax;height:26vmax;left:-15vmax;bottom:-12vmax;background:radial-gradient(ellipse at center,rgba(232,201,138,.14),rgba(232,201,138,0) 70%);animation:drift3 38s ease-in-out infinite alternate;}
+@keyframes drift1{from{transform:translateX(-5vmax) rotate(-16deg);}to{transform:translateX(5vmax) rotate(-12deg);}}
+@keyframes drift2{from{transform:translateX(5vmax) rotate(10deg);}to{transform:translateX(-5vmax) rotate(14deg);}}
+@keyframes drift3{from{transform:translateX(-4vmax) rotate(-8deg);}to{transform:translateX(4vmax) rotate(-5deg);}}
 `;
 
 export const HOME_JS = `

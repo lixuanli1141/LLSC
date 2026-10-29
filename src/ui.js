@@ -55,12 +55,11 @@ export function renderHome(settings) {
 <header class="hero">
   <div class="hero-copy">
     <h1>零落<br>山川</h1>
-    <p class="sub">云盘、影视、题库和服务器，都在这里。一处归拢，直达你要去的地方。</p>
+    <p class="quote" id="quote">山川有灵，归处有光。</p>
     <div class="cta-row">
       <a class="btn-primary" href="#nav">进入导航</a>
     </div>
     <p class="proof" id="proof">正在探测节点状态</p>
-    <p class="quote" id="quote">山川有灵，归处有光。</p>
   </div>
   <figure class="hero-visual reveal">
     <div class="window-bar"><span></span><span></span><span></span><em>llsc · live</em></div>

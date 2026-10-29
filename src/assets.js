@@ -76,15 +76,15 @@ h1{font-family:var(--calligraphy);font-size:36px;line-height:1.2;margin:0;letter
 .btn-ghost:hover{transform:translateY(-2px);border-color:var(--accent);}
 .btn-ghost:active{transform:scale(.98);}
 .proof{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:#9fb8d8;margin:24px 0 0;}
-.quote{margin:32px 0 0;max-width:680px;color:#f0f7ff;font-size:22px;line-height:32px;
-  font-weight:600;min-height:96px;
+.quote{margin:24px 0 0;max-width:680px;color:#f0f7ff;font-family:var(--calligraphy);font-size:24px;line-height:36px;
+  font-weight:400;min-height:96px;
   background:rgba(13,34,64,.55);border:1px solid rgba(125,211,252,.45);
   border-radius:16px;padding:24px;
   box-shadow:var(--shadow);
   backdrop-filter:blur(14px) saturate(150%);-webkit-backdrop-filter:blur(14px) saturate(150%);
   transition:opacity .5s var(--ease);}
-@media (min-width:1024px){.quote{font-size:24px;line-height:36px;}}
-.quote .src{display:block;text-align:right;font-size:12px;margin-top:8px;color:var(--muted);}
+@media (min-width:1024px){.quote{font-size:30px;line-height:44px;}}
+.quote .src{display:block;text-align:right;font-family:var(--sans);font-size:13px;margin-top:12px;color:#e8c98a;}
 .hero-visual{margin:0;border:1px solid rgba(147,197,253,.35);border-radius:16px;overflow:hidden;
   background:rgba(8,20,40,.45);box-shadow:var(--shadow);
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}

@@ -322,6 +322,19 @@ export const HOME_JS = `
       }
       proofEl.textContent = items.length + ' 个节点 · ' + online + ' 个在线';
     }catch(e){ /* 探测失败时圆点保持灰色，不打扰用户 */ }
+    reportFonts();
+  }
+
+  // 临时诊断（v2.5.11）：三个字体是否真的加载成功，直接写在状态行里，
+  // 用户截图就能看到，确认后删除。
+  async function reportFonts(){
+    try{
+      await document.fonts.ready;
+      const t = document.fonts.check('40px "LLSC Title"');
+      const q = document.fonts.check('24px "LLSC Calligraphy"');
+      const b = document.fonts.check('16px "LLSC WenKai"');
+      proofEl.textContent += ' · 字体 标题' + (t ? '✓' : '✗') + ' 诗词' + (q ? '✓' : '✗') + ' 正文' + (b ? '✓' : '✗');
+    }catch(e){ /* 诊断本身失败不打扰用户 */ }
   }
 
   let quoteIdx = Math.floor(Math.random() * LOCAL_QUOTES.length);

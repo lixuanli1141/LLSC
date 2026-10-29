@@ -88,7 +88,7 @@ h1{font-family:var(--calligraphy);font-size:36px;line-height:1.2;margin:0;letter
 .hero-visual{margin:0;border:1px solid rgba(147,197,253,.35);border-radius:16px;overflow:hidden;
   background:rgba(8,20,40,.45);box-shadow:var(--shadow);
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
-.hero-visual svg{display:block;width:100%;height:auto;}
+.hero-visual img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;}
 .window-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid rgba(147,197,253,.25);background:rgba(10,25,47,.45);}
 .window-bar span{width:12px;height:12px;border-radius:50%;background:rgba(147,197,253,.35);}
 .window-bar em{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--muted);margin-left:8px;}

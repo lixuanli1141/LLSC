@@ -14,32 +14,6 @@ const FAVICON = "data:image/svg+xml," + encodeURIComponent(
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#0284c7"/><path d="M6 22 L13 10 L18 18 L21 13 L26 22 Z" fill="#fff"/></svg>`
 );
 
-const HERO_SCENE = `<svg viewBox="0 0 640 360" role="img" aria-label="山川夜景" preserveAspectRatio="xMidYMid slice">
-<defs>
-<linearGradient id="nsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#04102b"/><stop offset=".55" stop-color="#0d2f5c"/><stop offset="1" stop-color="#17507f"/></linearGradient>
-<linearGradient id="nriver" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7db9e8"/><stop offset="1" stop-color="#0b2b4a"/></linearGradient>
-</defs>
-<rect width="640" height="360" fill="url(#nsky)"/>
-<g fill="#ffffff">
-<circle cx="60" cy="42" r="1.6" opacity=".9"/><circle cx="150" cy="90" r="1.2" opacity=".6"/>
-<circle cx="245" cy="36" r="1.4" opacity=".8"/><circle cx="330" cy="80" r="1" opacity=".5"/>
-<circle cx="420" cy="46" r="1.5" opacity=".9"/><circle cx="505" cy="105" r="1.1" opacity=".5"/>
-<circle cx="585" cy="40" r="1.3" opacity=".7"/><circle cx="120" cy="130" r="1" opacity=".4"/>
-<circle cx="540" cy="150" r="1" opacity=".4"/>
-</g>
-<circle cx="528" cy="74" r="26" fill="#f4f9ff" opacity=".92"/>
-<circle cx="528" cy="74" r="44" fill="#cfe9ff" opacity=".18"/>
-<g fill="#9fc6e8" opacity=".5"><polygon points="0,360 0,205 110,120 205,225 305,150 405,245 505,168 640,255 640,360"/></g>
-<g fill="#143d63"><polygon points="0,360 0,255 130,160 245,278 345,192 465,298 565,222 640,298 640,360"/></g>
-<g fill="#081c36"><polygon points="0,360 0,318 150,242 285,330 425,262 545,338 640,300 640,360"/></g>
-<g fill="#ffffff" opacity=".10"><ellipse cx="180" cy="235" rx="150" ry="14"/><ellipse cx="470" cy="265" rx="170" ry="16"/></g>
-<path d="M298 306 C318 322 306 340 320 360 L356 360 C342 338 352 320 330 306 Z" fill="url(#nriver)" opacity=".85"/>
-<g stroke="#bfe3ff" stroke-width="2" opacity=".55" stroke-linecap="round"><path d="M316 322 h26"/><path d="M312 342 h34"/></g>
-<g font-family="monospace" font-size="13" fill="#dbeafe">
-<rect x="24" y="300" width="86" height="26" rx="13" fill="#ffffff" opacity=".12"/><rect x="24" y="300" width="86" height="26" rx="13" fill="none" stroke="#ffffff" stroke-opacity=".35"/><text x="67" y="318" text-anchor="middle">云盘</text>
-<rect x="122" y="300" width="86" height="26" rx="13" fill="#ffffff" opacity=".12"/><rect x="122" y="300" width="86" height="26" rx="13" fill="none" stroke="#ffffff" stroke-opacity=".35"/><text x="165" y="318" text-anchor="middle">影视</text>
-</g>
-</svg>`;
 
 export function renderHome(settings) {
   const year = new Date().getFullYear();
@@ -90,7 +64,7 @@ export function renderHome(settings) {
   </div>
   <figure class="hero-visual reveal">
     <div class="window-bar"><span></span><span></span><span></span><em>llsc · live</em></div>
-    ${HERO_SCENE}
+    <img src="/assets/hero.jpg" alt="山川夜景" fetchpriority="high">
     <figcaption>山川有灵，归处有光</figcaption>
   </figure>
 </header>

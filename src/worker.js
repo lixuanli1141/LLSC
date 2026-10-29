@@ -107,6 +107,11 @@ export default {
     if (url.pathname === "/assets/admin.js" && request.method === "GET") {
       return text(ADMIN_JS, 200, "text/javascript;charset=UTF-8");
     }
+    if (url.pathname === "/assets/hero.jpg" && request.method === "GET") {
+      const data = await env.MY_KV.get("hero-night-river", "arrayBuffer");
+      if (data === null) return new Response("not found", { status: 404 });
+      return new Response(data, { headers: { ...SECURITY_HEADERS, "Content-Type": "image/jpeg", "Cache-Control": "public, max-age=31536000, immutable" } });
+    }
 
     // ---- 管理后台 ----
     if (url.pathname === "/admin" && request.method === "GET") {

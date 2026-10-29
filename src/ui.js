@@ -32,7 +32,7 @@ export function renderHome(settings) {
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/long-cang@5.3.0/index.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/ma-shan-zheng@5.2.9/index.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@callmebill/lxgw-wenkai-web@1.522.0/lxgwwenkai-regular/result.css">
-<link rel="stylesheet" href="/assets/app.css?v=2.5.13">
+<link rel="stylesheet" href="/assets/app.css?v=2.5.14">
 <script type="application/json" id="llsc-settings">${safeSettingsJson(settings)}</script>
 </head>
 <body>
@@ -50,11 +50,6 @@ export function renderHome(settings) {
     <div class="row"><button class="ghost" id="close-modal" type="button">取消</button></div>
   </div>
 </div>
-<nav class="topnav" aria-label="主导航">
-  <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="1.5" width="13" height="13" rx="2"/><path d="M1.5 5.5h13M5.5 5.5v9"/></svg></span>LLSC</a>
-  <span class="nav-links"><a href="#nav">导航</a><a href="#how">如何使用</a><a href="/admin">管理</a></span>
-  <span class="status-pill"><i></i>SYSTEM ONLINE</span>
-</nav>
 <header class="hero">
   <div class="hero-copy">
     <h1>零落<br>山川</h1>
@@ -96,7 +91,7 @@ export function renderHome(settings) {
   <span>© ${year} ${escapeHtml(SITE_NAME)}</span>
   <span><a href="/">回首页</a> · <a href="/admin">管理后台</a></span>
 </footer>
-<script src="/assets/app.js?v=2.5.13" defer></script>
+<script src="/assets/app.js?v=2.5.14" defer></script>
 </body>
 </html>`;
 }
@@ -109,7 +104,7 @@ export function renderNotFound() {
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>页面不在这里 · ${escapeHtml(SITE_NAME)}</title>
 <link rel="icon" href="${FAVICON}">
-<link rel="stylesheet" href="/assets/app.css?v=2.5.13">
+<link rel="stylesheet" href="/assets/app.css?v=2.5.14">
 </head>
 <body>
 <main class="notfound">
@@ -130,7 +125,7 @@ export function renderAdmin() {
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>${escapeHtml(SITE_NAME)} · 管理后台</title>
 <link rel="icon" href="${FAVICON}">
-<link rel="stylesheet" href="/assets/app.css?v=2.5.13">
+<link rel="stylesheet" href="/assets/app.css?v=2.5.14">
 <style>
   main{width:min(860px,92vw)} .edit-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:16px;box-shadow:var(--shadow)}
   .card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}

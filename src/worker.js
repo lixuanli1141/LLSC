@@ -2,8 +2,6 @@
 // 路由：
 //   GET  /                  首页
 //   GET  /assets/app.css   样式（同源，无外部依赖）
-//   GET  /assets/font-title.woff2  标题字体（龙藏体子集，同源）
-//   GET  /assets/font-body.woff2   正文字体（得意黑子集，同源）
 //   GET  /assets/app.js    首页客户端脚本
 //   GET  /assets/admin.js  后台客户端脚本
 //   GET  /api/nav          当前可见导航（公开 + 已解锁私密）与语录设置
@@ -21,7 +19,7 @@ import {
   destroyRevealSession, revealCookie, clearRevealCookie,
 } from "./auth.js";
 import { renderHome, renderAdmin, renderNotFound } from "./ui.js";
-import { APP_CSS, HOME_JS, ADMIN_JS, FONT_TITLE_WOFF2_B64, FONT_BODY_WOFF2_B64 } from "./assets.js";
+import { APP_CSS, HOME_JS, ADMIN_JS } from "./assets.js";
 
 const SECURITY_HEADERS = {
   "Content-Security-Policy":
@@ -102,15 +100,6 @@ async function probe(url) {
   return ok;
 }
 
-// base64（标准字母表，无换行）解码为字节：字体文件以 base64 存在 assets.js，
-// 请求时再解码成二进制返回，避免把二进制直接写进源码。
-function b64ToBytes(b64) {
-  const bin = atob(b64);
-  const bytes = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-  return bytes;
-}
-
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -125,12 +114,7 @@ export default {
     if (url.pathname === "/assets/admin.js" && request.method === "GET") {
       return text(ADMIN_JS, 200, "text/javascript;charset=UTF-8");
     }
-    if (url.pathname === "/assets/font-title.woff2" && request.method === "GET") {
-      return new Response(b64ToBytes(FONT_TITLE_WOFF2_B64), { headers: { ...SECURITY_HEADERS, "Content-Type": "font/woff2", "Cache-Control": "public, max-age=31536000, immutable" } });
-    }
-    if (url.pathname === "/assets/font-body.woff2" && request.method === "GET") {
-      return new Response(b64ToBytes(FONT_BODY_WOFF2_B64), { headers: { ...SECURITY_HEADERS, "Content-Type": "font/woff2", "Cache-Control": "public, max-age=31536000, immutable" } });
-    }
+
     if (url.pathname === "/assets/hero.jpg" && request.method === "GET") {
       const data = await env.MY_KV.get("hero-night-river", "arrayBuffer");
       if (data === null) return new Response("not found", { status: 404 });

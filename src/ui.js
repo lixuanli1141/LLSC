@@ -29,7 +29,7 @@ export function renderHome(settings) {
 <meta name="theme-color" content="#050b18">
 <title>${escapeHtml(SITE_NAME)} — 个人导航</title>
 <link rel="icon" href="${FAVICON}">
-<link rel="stylesheet" href="/assets/app.css?v=2.5.9">
+<link rel="stylesheet" href="/assets/app.css?v=2.5.10">
 <script type="application/json" id="llsc-settings">${safeSettingsJson(settings)}</script>
 </head>
 <body>
@@ -62,7 +62,7 @@ export function renderHome(settings) {
     <p class="proof" id="proof">正在探测节点状态</p>
   </div>
   <figure class="hero-visual reveal">
-    <div class="window-bar"><span></span><span></span><span></span><em>llsc · live · v2.5.9</em></div>
+    <div class="window-bar"><span></span><span></span><span></span><em>llsc · live · v2.5.10</em></div>
     <img src="/assets/hero.jpg" alt="山川夜景" fetchpriority="high">
     <figcaption>山川有灵，归处有光</figcaption>
   </figure>
@@ -106,7 +106,7 @@ export function renderNotFound() {
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>页面不在这里 · ${escapeHtml(SITE_NAME)}</title>
 <link rel="icon" href="${FAVICON}">
-<link rel="stylesheet" href="/assets/app.css?v=2.5.9">
+<link rel="stylesheet" href="/assets/app.css?v=2.5.10">
 </head>
 <body>
 <main class="notfound">
@@ -127,7 +127,7 @@ export function renderAdmin() {
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>${escapeHtml(SITE_NAME)} · 管理后台</title>
 <link rel="icon" href="${FAVICON}">
-<link rel="stylesheet" href="/assets/app.css?v=2.5.9">
+<link rel="stylesheet" href="/assets/app.css?v=2.5.10">
 <style>
   main{width:min(860px,92vw)} .edit-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:16px;box-shadow:var(--shadow)}
   .card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}

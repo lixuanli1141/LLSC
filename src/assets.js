@@ -363,7 +363,7 @@ export const HOME_JS = `
     let src = '';
     if(settings.quoteSource === 'hitokoto'){
       try{
-        const res = await fetch('https://v1.hitokoto.cn/', { signal: AbortSignal.timeout(3000) });
+        const res = await fetch('/api/quote', { signal: AbortSignal.timeout(10000) });
         if(res.ok){ const d = await res.json(); text = d.hitokoto; src = [d.from_who, d.from].filter(Boolean).join(' · '); }
       }catch(e){ /* 一言失败时用本地语录兜底 */ }
     }

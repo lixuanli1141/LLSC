@@ -5,6 +5,7 @@
 //   GET  /assets/app.js    首页客户端脚本
 //   GET  /assets/admin.js  后台客户端脚本
 //   GET  /api/nav          当前可见导航（公开 + 已解锁私密）与语录设置
+//   GET  /api/quote        一言中转：云端拉取 hitokoto 原样返回，失败时 502，前端回落本地语录
 //   POST /api/reveal       { pwd } 口令解锁，成功后发 HttpOnly 会话 Cookie
 //   POST /api/lock         清除 reveal 会话
 //   POST /api/status       { indices } 探测链接状态（HEAD 优先，非在线响应回落 GET，手动跳转判定，8 秒超时，GET 失败重试一次，60 秒缓存）
@@ -188,6 +189,23 @@ export default {
         { title, url, desc, icon, originalIdx }
       ));
       return json({ items: visible, unlocked, settings });
+    }
+
+    if (url.pathname === "/api/quote" && request.method === "GET") {
+      // 一言中转：浏览器只跟本站同源通信，不再直连 hitokoto，
+      // 避开手机网络下跨域拉取超时导致的本地回落。
+      // 失败时返回 502，前端按原有逻辑回落本地语录。
+      try {
+        const res = await fetch("https://v1.hitokoto.cn/", {
+          signal: AbortSignal.timeout(8000),
+        });
+        if (!res.ok) return json({ error: "hitokoto unavailable" }, 502);
+        const d = await res.json();
+        if (!d || typeof d.hitokoto !== "string") return json({ error: "bad hitokoto response" }, 502);
+        return json(d);
+      } catch {
+        return json({ error: "hitokoto fetch failed" }, 502);
+      }
     }
 
     if (url.pathname === "/api/reveal" && request.method === "POST") {

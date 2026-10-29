@@ -92,7 +92,7 @@ export function renderHome(settings) {
   <span>© ${year} ${escapeHtml(SITE_NAME)}</span>
   <span><a href="/">回首页</a> · <a href="/admin">管理后台</a></span>
 </footer>
-<script src="/assets/app.js?v=2.5.23" defer></script>
+<script src="/assets/app.js?v=2.5.24" defer></script>
 </body>
 </html>`;
 }
@@ -156,7 +156,7 @@ export function renderAdmin() {
     <label class="field"><span>语录来源</span>
       <select id="quoteSource">
         <option value="local">本地语录（默认，不依赖外部服务）</option>
-        <option value="hitokoto">一言（hitokoto，失败时用本地兜底）</option>
+        <option value="hitokoto">一言（hitokoto 中转，失败时用本地兜底）</option>
         <option value="off">关闭语录</option>
       </select>
     </label>

@@ -55,7 +55,7 @@ export function renderHome(settings) {
 <header class="hero">
   <div class="hero-copy">
     <h1>零落<br>山川</h1>
-    <p class="quote" id="quote">山川有灵，归处有光。</p>
+    <p class="quote" id="quote"><span class="quote-layer" id="quote-layer-a">山川有灵，归处有光。</span><span class="quote-layer off" id="quote-layer-b"></span></p>
     <div class="cta-row">
       <a class="btn-primary" href="#nav">进入导航</a>
     </div>

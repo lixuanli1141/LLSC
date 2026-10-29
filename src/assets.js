@@ -79,12 +79,14 @@ h1{font-family:var(--calligraphy);font-size:36px;line-height:1.2;margin:0;letter
 .quote{margin:24px 0 0;max-width:680px;color:#f0f7ff;font-family:var(--calligraphy);font-size:24px;line-height:36px;
   font-weight:400;min-height:96px;
   background:rgba(13,34,64,.55);border:1px solid rgba(125,211,252,.45);
-  border-radius:16px;padding:24px;
+  border-radius:16px;padding:24px;position:relative;overflow:hidden;
   box-shadow:var(--shadow);
   backdrop-filter:blur(14px) saturate(150%);-webkit-backdrop-filter:blur(14px) saturate(150%);
-  transition:opacity .5s var(--ease);}
+  transition:height .6s var(--ease);}
 @media (min-width:1024px){.quote{font-size:30px;line-height:44px;}}
 .quote .src{display:block;text-align:right;font-family:var(--sans);font-size:13px;margin-top:12px;color:#e8c98a;}
+.quote-layer{display:block;transition:opacity .6s var(--ease),transform .6s var(--ease);}
+.quote-layer.off{position:absolute;left:24px;right:24px;top:24px;opacity:0;transform:translateY(12px);pointer-events:none;}
 .hero-visual{margin:0;border:1px solid rgba(147,197,253,.35);border-radius:16px;overflow:hidden;
   background:rgba(8,20,40,.45);box-shadow:var(--shadow);
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
@@ -220,6 +222,9 @@ export const HOME_JS = `
 (() => {
   const grid = document.getElementById('grid');
   const quoteEl = document.getElementById('quote');
+  const quoteLayers = [document.getElementById('quote-layer-a'), document.getElementById('quote-layer-b')];
+  let quoteCurrent = 0;
+  let quoteAnimating = false;
   const proofEl = document.getElementById('proof');
   const toastEl = document.getElementById('toast');
   const lockBtn = document.getElementById('lock-btn');
@@ -320,8 +325,8 @@ export const HOME_JS = `
   let quoteIdx = Math.floor(Math.random() * LOCAL_QUOTES.length);
   async function loadQuote(){
     if(settings.quoteSource === 'off' || settings.quoteInterval === 0){ quoteEl.style.display = 'none'; return; }
-    quoteEl.style.opacity = 0;
-    await new Promise(r => setTimeout(r, 400));
+    if(quoteAnimating) return;
+    // 先拿到新句子再动动画：旧句一直可见，不会出现空白期
     let text = LOCAL_QUOTES[quoteIdx % LOCAL_QUOTES.length]; quoteIdx++;
     let src = '';
     if(settings.quoteSource === 'hitokoto'){
@@ -330,9 +335,25 @@ export const HOME_JS = `
         if(res.ok){ const d = await res.json(); text = d.hitokoto; src = [d.from_who, d.from].filter(Boolean).join(' · '); }
       }catch(e){ /* 一言失败时用本地语录兜底 */ }
     }
-    quoteEl.textContent = '「 ' + text + ' 」';
-    if(src){ const s = el('span','src','—— ' + src); quoteEl.appendChild(s); }
-    quoteEl.style.opacity = 1;
+    const cur = quoteLayers[quoteCurrent];
+    const next = quoteLayers[1 - quoteCurrent];
+    next.textContent = '「 ' + text + ' 」';
+    if(src){ next.appendChild(el('span','src','—— ' + src)); }
+    // 双层交叉淡化 + 高度平滑伸缩：卡片本身不动，只换里面的字
+    quoteAnimating = true;
+    const h0 = quoteEl.offsetHeight;
+    quoteEl.style.height = h0 + 'px';
+    void quoteEl.offsetHeight;
+    const h1 = next.offsetHeight + 48;
+    quoteEl.style.height = h1 + 'px';
+    cur.classList.add('off');
+    next.classList.remove('off');
+    setTimeout(() => {
+      cur.textContent = '';
+      quoteEl.style.height = '';
+      quoteCurrent = 1 - quoteCurrent;
+      quoteAnimating = false;
+    }, 650);
   }
 
   function openModal(){ modal.classList.add('open'); pwdInput.value=''; setTimeout(()=>pwdInput.focus(), 50); }

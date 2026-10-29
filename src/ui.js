@@ -76,7 +76,7 @@ export function renderHome(settings) {
   </section>
   <section id="how" class="reveal" aria-label="如何使用">
     <div class="section-head">
-      <h2>三步直达</h2>
+      <h2>两步直达</h2>
     </div>
     <ol class="steps">
       <li><span class="step-num">01</span><h3>打开页面</h3><p>所有节点都在上面，点卡片就走，不用记地址。</p></li>

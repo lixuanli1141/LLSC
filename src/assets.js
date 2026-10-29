@@ -202,7 +202,7 @@ button.danger{background:var(--danger);}
   .stealth{width:80px;height:80px;}
   .dialog{padding:24px;}
   .lockbar button{width:100%;}
-  h1{font-size:30px;line-height:1.2;}
+  h1{font-size:52px;line-height:1.2;}
   .sub{font-size:16px;line-height:24px;}
   .quote{font-size:18px;line-height:28px;padding:20px;min-height:80px;}
   .section-head h2{font-size:24px;line-height:32px;}

@@ -64,7 +64,7 @@ h1{font-family:var(--calligraphy);font-size:36px;line-height:1.2;margin:0;letter
   margin:24px 0 0;text-wrap:pretty;}
 .cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px;}
 .btn-primary{display:inline-flex;align-items:center;justify-content:center;min-height:48px;
-  padding:12px 24px;border-radius:8px;background:linear-gradient(135deg,#0ea5e9,#0369a1);color:#fff;
+  padding:12px 24px;border-radius:8px;background:linear-gradient(135deg,#0369a1,#075985);color:#fff;
   font-size:16px;font-weight:600;text-decoration:none;border:1px solid rgba(125,211,252,.5);cursor:pointer;
   box-shadow:0 6px 24px rgba(2,132,199,.45);
   transition:transform .3s var(--ease),opacity .3s var(--ease),box-shadow .3s var(--ease);}
@@ -182,7 +182,7 @@ footer a:hover{color:var(--ink);}
 input,select,textarea{width:100%;min-height:48px;padding:12px;border:1px solid rgba(147,197,253,.35);border-radius:8px;
   background:rgba(148,197,255,.07);color:var(--ink);font:inherit;font-size:16px;}
 select option{background:#0a1a30;color:var(--ink);}
-button{min-height:48px;padding:12px 24px;border:0;border-radius:8px;background:linear-gradient(135deg,#0ea5e9,#0369a1);color:#fff;
+button{min-height:48px;padding:12px 24px;border:0;border-radius:8px;background:linear-gradient(135deg,#0369a1,#075985);color:#fff;
   font:inherit;font-size:16px;font-weight:600;cursor:pointer;
   transition:transform .3s var(--ease),background-color .3s var(--ease),border-color .3s var(--ease);}
 button:active{transform:scale(.98);}

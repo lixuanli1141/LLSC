@@ -80,7 +80,6 @@ export function renderHome(settings) {
 </nav>
 <header class="hero">
   <div class="hero-copy">
-    <p class="eyebrow">个人导航 · 一处归拢</p>
     <h1>零落<br>山川</h1>
     <p class="sub">云盘、影视、题库和服务器，都在这里。一处归拢，直达你要去的地方。</p>
     <div class="cta-row">
@@ -98,7 +97,6 @@ export function renderHome(settings) {
 <main id="main">
   <section id="nav" class="reveal" aria-label="导航">
     <div class="section-head">
-      <p class="eyebrow">导航</p>
       <h2>所有入口，一处归拢</h2>
       <p class="section-sub">点一张卡片，直达一个地方。状态点会实时告诉你它现在能不能打开。</p>
     </div>
@@ -107,7 +105,6 @@ export function renderHome(settings) {
   </section>
   <section id="how" class="reveal" aria-label="如何使用">
     <div class="section-head">
-      <p class="eyebrow">如何使用</p>
       <h2>三步直达</h2>
     </div>
     <ol class="steps">

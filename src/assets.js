@@ -218,10 +218,74 @@ button.danger{background:var(--danger);}
   .reveal{opacity:1;transform:none;}
   .tagline span{opacity:1;}
 }
+.sky{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;}
+#stars{position:absolute;inset:0;width:100%;height:100%;display:block;}
+.au{position:absolute;border-radius:50%;will-change:transform;}
+.au.a1{width:80vmax;height:80vmax;left:-25vmax;top:-30vmax;background:radial-gradient(circle,rgba(56,189,248,.20),rgba(56,189,248,0) 65%);animation:drift1 26s ease-in-out infinite alternate;}
+.au.a2{width:70vmax;height:70vmax;right:-20vmax;top:-10vmax;background:radial-gradient(circle,rgba(139,92,246,.18),rgba(139,92,246,0) 65%);animation:drift2 32s ease-in-out infinite alternate;}
+.au.a3{width:60vmax;height:60vmax;left:20vw;bottom:-35vmax;background:radial-gradient(circle,rgba(232,201,138,.10),rgba(232,201,138,0) 65%);animation:drift3 38s ease-in-out infinite alternate;}
+@keyframes drift1{from{transform:translate(0,0) scale(1);}to{transform:translate(8vmax,5vmax) scale(1.15);}}
+@keyframes drift2{from{transform:translate(0,0) scale(1.1);}to{transform:translate(-7vmax,6vmax) scale(1);}}
+@keyframes drift3{from{transform:translate(0,0) scale(1);}to{transform:translate(-5vmax,-4vmax) scale(1.12);}}
 `;
 
 export const HOME_JS = `
 (() => {
+  const skyCanvas = document.getElementById('stars');
+  if (skyCanvas) {
+    const sctx = skyCanvas.getContext('2d');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let stars = [], shoot = null, nextShoot = Date.now() + 5000;
+    function buildStars() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      skyCanvas.width = Math.floor(window.innerWidth * dpr);
+      skyCanvas.height = Math.floor(window.innerHeight * dpr);
+      sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const n = Math.max(50, Math.min(110, Math.floor(window.innerWidth * window.innerHeight / 18000)));
+      stars = [];
+      for (let i = 0; i < n; i++) stars.push({ x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight, r: 0.4 + Math.random() * 1.1, p: Math.random() * Math.PI * 2, s: 0.5 + Math.random() * 1.1 });
+    }
+    function drawStars(t) {
+      sctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      for (const st of stars) {
+        const a = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(t / 1000 * st.s + st.p));
+        sctx.globalAlpha = a;
+        sctx.fillStyle = '#dbeafe';
+        sctx.beginPath();
+        sctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
+        sctx.fill();
+      }
+      sctx.globalAlpha = 1;
+      if (shoot) {
+        const grad = sctx.createLinearGradient(shoot.x, shoot.y, shoot.x - shoot.vx * 12, shoot.y - shoot.vy * 12);
+        grad.addColorStop(0, 'rgba(255,255,255,.9)');
+        grad.addColorStop(1, 'rgba(255,255,255,0)');
+        sctx.strokeStyle = grad;
+        sctx.lineWidth = 1.5;
+        sctx.beginPath();
+        sctx.moveTo(shoot.x, shoot.y);
+        sctx.lineTo(shoot.x - shoot.vx * 12, shoot.y - shoot.vy * 12);
+        sctx.stroke();
+        shoot.x += shoot.vx;
+        shoot.y += shoot.vy;
+        shoot.life -= 16;
+        if (shoot.life <= 0 || shoot.x > window.innerWidth || shoot.y > window.innerHeight) shoot = null;
+      } else if (!reduced && Date.now() > nextShoot) {
+        const ang = Math.PI * (0.15 + Math.random() * 0.2);
+        const sp = 7 + Math.random() * 4;
+        shoot = { x: window.innerWidth * (0.2 + Math.random() * 0.7), y: window.innerHeight * Math.random() * 0.3, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, life: 900 };
+        nextShoot = Date.now() + 6000 + Math.random() * 6000;
+      }
+    }
+    buildStars();
+    let rsTimer = null;
+    window.addEventListener('resize', () => { clearTimeout(rsTimer); rsTimer = setTimeout(buildStars, 150); });
+    if (reduced) {
+      drawStars(0);
+    } else {
+      (function loop(t) { drawStars(t); requestAnimationFrame(loop); })(0);
+    }
+  }
   const grid = document.getElementById('grid');
   const quoteEl = document.getElementById('quote');
   const quoteLayers = [document.getElementById('quote-layer-a'), document.getElementById('quote-layer-b')];

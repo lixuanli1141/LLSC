@@ -18,7 +18,7 @@ export const APP_CSS = `
   --ease:cubic-bezier(0.22,1,0.36,1);
   --sans:"LLSC WenKai","LXGW WenKai","Songti SC","Noto Serif SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",serif;
   --calligraphy:"LLSC Calligraphy","Ma Shan Zheng","Zhi Mang Xing",cursive,serif;
-  --title:"LLSC Title","LLSC Calligraphy","Songti SC",serif;
+  --title:"LLSC Title","Long Cang","LLSC Calligraphy","Songti SC",serif;
   --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
 }
 *{box-sizing:border-box}
@@ -330,9 +330,9 @@ export const HOME_JS = `
   async function reportFonts(){
     try{
       await document.fonts.ready;
-      const t = document.fonts.check('40px "LLSC Title"');
-      const q = document.fonts.check('24px "LLSC Calligraphy"');
-      const b = document.fonts.check('16px "LLSC WenKai"');
+      const t = document.fonts.check('40px "LLSC Title"') || document.fonts.check('40px "Long Cang"');
+      const q = document.fonts.check('24px "LLSC Calligraphy"') || document.fonts.check('24px "Ma Shan Zheng"');
+      const b = document.fonts.check('16px "LLSC WenKai"') || document.fonts.check('16px "LXGW WenKai"');
       proofEl.textContent += ' · 字体 标题' + (t ? '✓' : '✗') + ' 诗词' + (q ? '✓' : '✗') + ' 正文' + (b ? '✓' : '✗');
     }catch(e){ /* 诊断本身失败不打扰用户 */ }
   }

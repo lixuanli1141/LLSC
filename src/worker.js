@@ -23,8 +23,8 @@ import { APP_CSS, HOME_JS, ADMIN_JS } from "./assets.js";
 
 const SECURITY_HEADERS = {
   "Content-Security-Policy":
-    "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; " +
-    "font-src 'self'; connect-src 'self' https://v1.hitokoto.cn; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+    "default-src 'self'; script-src 'self'; style-src 'self' https://cdn.jsdelivr.net; img-src 'self' data:; " +
+    "font-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self' https://v1.hitokoto.cn; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "DENY",
   "Referrer-Policy": "strict-origin-when-cross-origin",

@@ -100,7 +100,7 @@ h1{font-family:var(--title);font-size:36px;line-height:1.12;margin:0;letter-spac
 .window-bar em{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--muted);margin-left:8px;}
 .hero-visual figcaption{padding:16px;font-family:var(--mono);font-size:12px;color:var(--muted);}
 .hero-media{position:relative;}
-.hero-play{position:absolute;left:16px;bottom:16px;width:72px;height:72px;border:0;background:transparent;box-shadow:none;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:opacity .3s var(--ease),transform .3s var(--ease);animation:playIn .5s var(--ease) .9s backwards;z-index:2;}
+.hero-play{position:absolute;left:8px;bottom:8px;width:72px;height:72px;border:0;background:transparent;box-shadow:none;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:opacity .3s var(--ease),transform .3s var(--ease);animation:playIn .5s var(--ease) .9s backwards;z-index:2;}
 .hero-play svg{margin-left:5px;}
 .hero-play:hover{transform:scale(1.12);}
 .hero-play:active{transform:scale(.94);}

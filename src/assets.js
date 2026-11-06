@@ -23,7 +23,7 @@ export const APP_CSS = `
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;background:#050b18}
-html,body{overflow-x:hidden}
+html,body{overflow-x:hidden;overflow-x:clip} /* v2.5.29：clip 不建滚动容器，07 强吸附才能生效；旧浏览器回退 hidden */
 body{margin:0;min-height:100vh;background:#050b18;color:var(--ink);
   font-family:var(--sans);display:flex;flex-direction:column;align-items:center;}
 body::before{content:"";position:fixed;inset:0;z-index:-2;
@@ -252,9 +252,9 @@ button.danger{background:var(--danger);}
 .lock-btn.open .shackle{transform:rotate(-38deg);}
 /* 02 共享元素：点卡片时卡片先飞向中心再开新页（链接在新标签页打开，动画不挡路） */
 .card.fly{transition:transform .32s var(--ease),opacity .32s var(--ease);transform:scale(1.06) translateY(-8px);opacity:.35;z-index:5;}
-/* 07 吸附滚动：只给首屏和结尾句用 proximity 轻吸附；导航区内容超一屏，不吸 */
-html{scroll-snap-type:y proximity;}
-.hero,.tagline{scroll-snap-align:start;}
+/* 07 吸附滚动：v2.5.29 改强吸附 mandatory；每块大内容都是吸附点，滚一下停一块 */
+html{scroll-snap-type:y mandatory;}
+.hero,#nav,#how,.tagline,footer{scroll-snap-align:start;}
 /* 08 横向滚动：手机上导航卡横着滑，带吸附 */
 @media (max-width:700px){
   .grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;gap:12px;padding-bottom:8px;scrollbar-width:none;}

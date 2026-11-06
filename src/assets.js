@@ -252,9 +252,9 @@ button.danger{background:var(--danger);}
 .lock-btn.open .shackle{transform:rotate(-38deg);}
 /* 02 共享元素：点卡片时卡片先飞向中心再开新页（链接在新标签页打开，动画不挡路） */
 .card.fly{transition:transform .32s var(--ease),opacity .32s var(--ease);transform:scale(1.06) translateY(-8px);opacity:.35;z-index:5;}
-/* 07 吸附滚动：v2.5.29 改强吸附 mandatory；每块大内容都是吸附点，滚一下停一块 */
-html{scroll-snap-type:y mandatory;}
-.hero,#nav,#how,.tagline,footer{scroll-snap-align:start;scroll-snap-stop:always;}
+/* 07 吸附滚动：v2.5.29 改强吸附 mandatory；每块大内容都是吸附点，滚一下停一块。只限首页：后台/404 页只有一个 footer 吸附点会被吸住下不来（v2.5.40 修） */
+html:has(>body.home){scroll-snap-type:y mandatory;}
+.home .hero,.home #nav,.home #how,.home .tagline,.home footer{scroll-snap-align:start;scroll-snap-stop:always;}
 /* 08 横向滚动：手机上导航卡横着滑，带吸附 */
 @media (max-width:700px){
   .grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;gap:12px;padding-bottom:8px;scrollbar-width:none;}
@@ -291,7 +291,7 @@ html{scroll-snap-type:y mandatory;}
   .hero-visual img{animation:none;clip-path:none;}
   .card.fly{transform:none;opacity:1;}
   .icon.draw svg :is(path,rect,circle,line,polyline,polygon,ellipse){stroke-dashoffset:0;transition:none;}
-  html{scroll-snap-type:none;}
+  html:has(>body.home){scroll-snap-type:none;}
   .modal.open .dialog{animation:none;}
 }
 `;

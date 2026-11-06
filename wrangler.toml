@@ -1,0 +1,14 @@
+name = "llsc"
+main = "worker.js"
+compatibility_date = "2026-06-26"
+
+[observability]
+enabled = true
+
+[[kv_namespaces]]
+binding = "MY_KV"
+id = "87a68fbf506e47ed85bee0cc1ff472cf"
+
+# 密码不在这里：ADMIN_PWD（管理后台）与 REVEAL_PWD（私密口令）
+# 都是 Cloudflare Worker Secret，用 `wrangler secret put <名字>` 设置。
+# 两者缺失时对应功能拒绝访问，不使用任何默认值。

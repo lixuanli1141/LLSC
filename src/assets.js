@@ -94,7 +94,7 @@ h1{font-family:var(--title);font-size:36px;line-height:1.12;margin:0;letter-spac
 .hero-visual{margin:0;border:1px solid rgba(56,189,248,.55);border-radius:16px;overflow:hidden;
   background:linear-gradient(135deg,rgba(56,189,248,.30),rgba(2,132,199,.22));box-shadow:0 8px 32px rgba(2,132,199,.30),inset 0 1px 0 rgba(255,255,255,.18);
   backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);}
-.hero-visual img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;}
+.hero-visual img,.hero-visual video{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;}
 .window-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid rgba(56,189,248,.45);background:rgba(2,132,199,.25);backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);}
 .window-bar span{width:12px;height:12px;border-radius:50%;background:rgba(147,197,253,.35);}
 .window-bar em{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--muted);margin-left:8px;}
@@ -241,7 +241,7 @@ button.danger{background:var(--danger);}
 .hline:nth-child(2) .hline-in{animation-delay:.28s;}
 @keyframes lineUp{to{transform:translateY(0);}}
 /* 03 遮罩揭示：首图从左往右展开 */
-.hero-visual img{clip-path:inset(0 100% 0 0);animation:maskIn .8s var(--ease) .3s forwards;}
+.hero-visual img,.hero-visual video{clip-path:inset(0 100% 0 0);animation:maskIn .8s var(--ease) .3s forwards;}
 @keyframes maskIn{to{clip-path:inset(0 0 0 0);}}
 /* 05 描边动画：卡片图标描边画出（JS 给路径设 pathLength=1 后触发） */
 .icon.draw svg :is(path,rect,circle,line,polyline,polygon,ellipse){stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .8s var(--ease);}
@@ -285,10 +285,10 @@ html:has(>body.home){scroll-snap-type:y mandatory;}
 /* 背景动效开关（视频最后三条：超 5 秒的自动播放要能暂停） */
 /* 09 滚动帧动画用的层（JS 用 rAF 改 transform，只动 transform） */
 .bg{will-change:transform;}
-.hero-visual img{will-change:transform;}
+.hero-visual img,.hero-visual video{will-change:transform;}
 @media (prefers-reduced-motion: reduce){
   .hline-in{animation:none;transform:none;}
-  .hero-visual img{animation:none;clip-path:none;}
+  .hero-visual img,.hero-visual video{animation:none;clip-path:none;}
   .card.fly{transform:none;opacity:1;}
   .icon.draw svg :is(path,rect,circle,line,polyline,polygon,ellipse){stroke-dashoffset:0;transition:none;}
   html:has(>body.home){scroll-snap-type:none;}
@@ -357,7 +357,7 @@ export const HOME_JS = `
 
   // 09 滚动帧动画：背景跟着滚动速度走、首图随滚动缩放，只动 transform
   const bgEl = document.querySelector('.bg');
-  const heroImg = document.querySelector('.hero-visual img');
+  const heroImg = document.querySelector('.hero-visual video');
   const heroEl = document.querySelector('.hero');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!reducedMotion && bgEl) {

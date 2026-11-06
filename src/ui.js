@@ -32,7 +32,7 @@ export function renderHome(settings) {
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/long-cang@5.3.0/index.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/ma-shan-zheng@5.2.9/index.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@callmebill/lxgw-wenkai-web@1.522.0/lxgwwenkai-regular/result.css">
-<link rel="stylesheet" href="/assets/app.css?v=2.5.29">
+<link rel="stylesheet" href="/assets/app.css?v=2.5.30">
 <script type="application/json" id="llsc-settings">${safeSettingsJson(settings)}</script>
 </head>
 <body>
@@ -55,7 +55,7 @@ export function renderHome(settings) {
 </div>
 <header class="hero">
   <div class="hero-copy">
-    <h1><span class="hline"><span class="hline-in">零落</span></span><br><span class="hline"><span class="hline-in">山川</span></span></h1>
+    <h1><span class="hline"><span class="hline-in">零落</span></span><span class="hline"><span class="hline-in">山川</span></span></h1>
     <p class="quote" id="quote"><span class="quote-layer" id="quote-layer-a">山川有灵，归处有光。</span><span class="quote-layer off" id="quote-layer-b"></span></p>
     <div class="cta-row">
       <a class="btn-primary" href="#nav">进入导航</a>
@@ -95,7 +95,7 @@ export function renderHome(settings) {
   <span><a href="/">回首页</a> · <a href="/admin">管理后台</a></span>
 </footer>
 <button class="bg-toggle" id="bg-toggle" type="button" aria-pressed="true">背景动效：开</button>
-<script src="/assets/app.js?v=2.5.29" defer></script>
+<script src="/assets/app.js?v=2.5.30" defer></script>
 </body>
 </html>`;
 }
@@ -108,7 +108,7 @@ export function renderNotFound() {
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>页面不在这里 · ${escapeHtml(SITE_NAME)}</title>
 <link rel="icon" href="${FAVICON}">
-<link rel="stylesheet" href="/assets/app.css?v=2.5.29">
+<link rel="stylesheet" href="/assets/app.css?v=2.5.30">
 </head>
 <body>
 <main class="notfound">
@@ -129,7 +129,7 @@ export function renderAdmin() {
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>${escapeHtml(SITE_NAME)} · 管理后台</title>
 <link rel="icon" href="${FAVICON}">
-<link rel="stylesheet" href="/assets/app.css?v=2.5.29">
+<link rel="stylesheet" href="/assets/app.css?v=2.5.30">
 <style>
   main{width:min(860px,92vw)} .edit-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:16px;box-shadow:var(--shadow)}
   .card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}

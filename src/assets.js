@@ -56,7 +56,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 @media (min-width:1024px){.hero{grid-template-columns:1.05fr .95fr;}}
 .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;color:#7dd3fc;
   text-transform:uppercase;margin:0 0 16px;}
-h1{font-family:var(--title);font-size:36px;line-height:1.2;margin:0;letter-spacing:.04em;font-weight:400;
+h1{font-family:var(--title);font-size:36px;line-height:1.12;margin:0;letter-spacing:.04em;font-weight:400;
   text-wrap:balance;
   color:#e8c98a;}
 @media (min-width:1024px){h1{font-size:60px;}}
@@ -205,7 +205,7 @@ button.danger{background:var(--danger);}
   .stealth{width:80px;height:80px;}
   .dialog{padding:24px;}
   .lockbar button{width:100%;}
-  h1{font-size:42px;line-height:1.2;}
+  h1{font-size:42px;line-height:1.12;}
   .sub{font-size:16px;line-height:24px;}
   .quote{font-size:18px;line-height:28px;padding:20px;min-height:80px;}
   .section-head h2{font-size:24px;line-height:32px;}
@@ -238,7 +238,7 @@ button.danger{background:var(--danger);}
 /* 04 逐行升起：标题两行从遮罩下方依次升起 */
 .hline{display:block;overflow:hidden;padding-bottom:.08em;margin-bottom:-.08em;}
 .hline-in{display:block;transform:translateY(110%);animation:lineUp .7s var(--ease) .1s forwards;}
-.hline:nth-child(3) .hline-in{animation-delay:.28s;}
+.hline:nth-child(2) .hline-in{animation-delay:.28s;}
 @keyframes lineUp{to{transform:translateY(0);}}
 /* 03 遮罩揭示：首图从左往右展开 */
 .hero-visual img{clip-path:inset(0 100% 0 0);animation:maskIn .8s var(--ease) .3s forwards;}
@@ -254,7 +254,7 @@ button.danger{background:var(--danger);}
 .card.fly{transition:transform .32s var(--ease),opacity .32s var(--ease);transform:scale(1.06) translateY(-8px);opacity:.35;z-index:5;}
 /* 07 吸附滚动：v2.5.29 改强吸附 mandatory；每块大内容都是吸附点，滚一下停一块 */
 html{scroll-snap-type:y mandatory;}
-.hero,#nav,#how,.tagline,footer{scroll-snap-align:start;}
+.hero,#nav,#how,.tagline,footer{scroll-snap-align:start;scroll-snap-stop:always;}
 /* 08 横向滚动：手机上导航卡横着滑，带吸附 */
 @media (max-width:700px){
   .grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;gap:12px;padding-bottom:8px;scrollbar-width:none;}

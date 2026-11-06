@@ -22,63 +22,68 @@ async function gh(path: string, init?: RequestInit): Promise<Response> {
   });
 }
 
-export interface PostFile {
+function ghError(res: Response, text: string, action: string): Error {
+  return new Error(`GitHub ${action} failed ${res.status}: ${text.slice(0, 300)}`);
+}
+
+export interface DirEntry {
   name: string;
   sha: string;
   path: string;
 }
 
-export async function listPostFiles(): Promise<PostFile[]> {
-  const res = await gh(`/repos/${OWNER}/${REPO}/contents/posts?ref=main`);
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`GitHub list failed ${res.status}: ${text.slice(0, 200)}`);
-  }
+/** 列出仓库里某个目录下的 .md 文件 */
+export async function listMdFiles(dir: string): Promise<DirEntry[]> {
+  const res = await gh(`/repos/${OWNER}/${REPO}/contents/${dir}?ref=main`);
+  if (!res.ok) throw ghError(res, await res.text(), 'list');
   const data = (await res.json()) as Array<{ name: string; sha: string; path: string; type: string }>;
   return data
     .filter((f) => f.type === 'file' && f.name.endsWith('.md'))
     .map((f) => ({ name: f.name, sha: f.sha, path: f.path }));
 }
 
-export async function getPostFile(slug: string): Promise<{ content: string; sha: string }> {
-  const res = await gh(`/repos/${OWNER}/${REPO}/contents/posts/${slug}.md?ref=main`);
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`GitHub get failed ${res.status}: ${text.slice(0, 200)}`);
-  }
-  const data = (await res.json()) as { content: string; sha: string; encoding: string };
+/** 读仓库里任意文本文件，返回内容和 sha */
+export async function getTextFile(path: string): Promise<{ content: string; sha: string }> {
+  const res = await gh(`/repos/${OWNER}/${REPO}/contents/${path}?ref=main`);
+  if (!res.ok) throw ghError(res, await res.text(), 'get');
+  const data = (await res.json()) as { content: string; sha: string };
   const content = Buffer.from(data.content.replace(/\n/g, ''), 'base64').toString('utf8');
   return { content, sha: data.sha };
 }
 
-export async function savePostFile(
-  slug: string,
-  content: string,
-  sha: string | null,
-  message: string,
-): Promise<void> {
+/** 新建或更新仓库里的文本文件（sha 为 null 时新建） */
+export async function saveTextFile(path: string, content: string, sha: string | null, message: string): Promise<void> {
   const body: Record<string, unknown> = {
     message,
     content: Buffer.from(content, 'utf8').toString('base64'),
   };
   if (sha) body.sha = sha;
-  const res = await gh(`/repos/${OWNER}/${REPO}/contents/posts/${slug}.md`, {
+  const res = await gh(`/repos/${OWNER}/${REPO}/contents/${path}`, {
     method: 'PUT',
     body: JSON.stringify(body),
   });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`GitHub save failed ${res.status}: ${text.slice(0, 300)}`);
-  }
+  if (!res.ok) throw ghError(res, await res.text(), 'save');
 }
 
-export async function deletePostFile(slug: string, sha: string): Promise<void> {
-  const res = await gh(`/repos/${OWNER}/${REPO}/contents/posts/${slug}.md`, {
+/** 删除仓库里的文件 */
+export async function deleteTextFile(path: string, sha: string, message: string): Promise<void> {
+  const res = await gh(`/repos/${OWNER}/${REPO}/contents/${path}`, {
     method: 'DELETE',
-    body: JSON.stringify({ message: `删除文章 ${slug}`, sha }),
+    body: JSON.stringify({ message, sha }),
   });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`GitHub delete failed ${res.status}: ${text.slice(0, 300)}`);
-  }
+  if (!res.ok) throw ghError(res, await res.text(), 'delete');
+}
+
+// ---- 兼容旧的 posts 路由 ----
+export async function listPostFiles(): Promise<DirEntry[]> {
+  return listMdFiles('posts');
+}
+export async function getPostFile(slug: string): Promise<{ content: string; sha: string }> {
+  return getTextFile(`posts/${slug}.md`);
+}
+export async function savePostFile(slug: string, content: string, sha: string | null, message: string): Promise<void> {
+  return saveTextFile(`posts/${slug}.md`, content, sha, message);
+}
+export async function deletePostFile(slug: string, sha: string): Promise<void> {
+  return deleteTextFile(`posts/${slug}.md`, sha, `删除文章 ${slug}`);
 }

@@ -283,8 +283,6 @@ html{scroll-snap-type:y mandatory;}
 .modal.open .dialog{animation:dialogIn .35s var(--ease);transform-origin:100% 100%;}
 @keyframes dialogIn{from{opacity:0;transform:translateY(16px) scale(.92);}to{opacity:1;transform:none;}}
 /* 背景动效开关（视频最后三条：超 5 秒的自动播放要能暂停） */
-.bg-toggle{position:fixed;left:16px;bottom:16px;z-index:60;min-height:36px;padding:8px 14px;border-radius:999px;font-size:12px;background:rgba(10,25,47,.55);color:var(--muted);border:1px solid rgba(147,197,253,.35);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
-.bg-toggle[hidden]{display:none;}
 /* 09 滚动帧动画用的层（JS 用 rAF 改 transform，只动 transform） */
 .bg{will-change:transform;}
 .hero-visual img{will-change:transform;}
@@ -318,17 +316,8 @@ export const HOME_JS = `
       });
     }
   }
-  // 背景动效开关：超 5 秒的自动播放要能暂停（视频最后三条，WCAG 2.2.2）
-  const bgToggle = document.getElementById('bg-toggle');
-  if (bgToggle) {
-    if (!bgVideo || !bgVideo.src) bgToggle.hidden = true;
-    else bgToggle.addEventListener('click', () => {
-      bgPaused = !bgPaused;
-      if (bgPaused) { bgVideo.pause(); bgToggle.textContent = '背景动效：关'; }
-      else { bgToggle.textContent = '背景动效：开'; const pr = bgVideo.play(); if (pr && pr.catch) pr.catch(() => {}); }
-      bgToggle.setAttribute('aria-pressed', String(!bgPaused));
-    });
-  }
+  // （背景动效开关按钮已去掉：视频默认播放，减动效 / 省流下仍只留静态图）
+
   const grid = document.getElementById('grid');
   const quoteEl = document.getElementById('quote');
   const quoteLayers = [document.getElementById('quote-layer-a'), document.getElementById('quote-layer-b')];

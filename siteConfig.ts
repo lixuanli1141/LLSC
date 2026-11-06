@@ -5,7 +5,7 @@ export const siteConfig = {
   title: "零落山川",
   faviconUrl: "/avatar.svg",
   authorName: "零落山川",
-  bio: "测试简介123",
+  bio: "山川有灵，归处有光。",
 
   navTitle: "LLSC",
 

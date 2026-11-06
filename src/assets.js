@@ -224,7 +224,7 @@ button.danger{background:var(--danger);}
   .reveal{opacity:1;transform:none;}
   .tagline span{opacity:1;}
 }
-.bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#050f1f;}
+.bg{position:fixed;inset:-18% 0;z-index:0;overflow:hidden;pointer-events:none;background:#050f1f;} /* 上下各留 18% 余量：滚动视差把它往上推时，底部也不会露出机身底色 */
 .bg-static{position:absolute;inset:0;background:url(/assets/bg-ink.jpg) center/cover no-repeat;}
 #bg-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:0;transition:opacity 1.2s ease;}
 #bg-video.on{opacity:1;}

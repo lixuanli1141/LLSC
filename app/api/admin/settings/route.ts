@@ -36,6 +36,17 @@ function readDanmaku(content: string): string[] {
   }
 }
 
+function readIdList(content: string, key: string): string[] {
+  const m = new RegExp(`${key}:\\s*(\\[[^\\]]*\\])`, 'm').exec(content);
+  if (!m) return [];
+  try {
+    const v = JSON.parse(m[1]) as unknown;
+    return Array.isArray(v) ? v.map(String) : [];
+  } catch {
+    return [];
+  }
+}
+
 function replaceString(content: string, key: string, value: string): string {
   const re = new RegExp(`(^\\s*${key}:\\s*)("(?:[^"\\\\]|\\\\.)*")`, 'm');
   if (!re.test(content)) throw new Error(`在 siteConfig.ts 里找不到 ${key}`);
@@ -50,7 +61,7 @@ export async function GET(req: NextRequest) {
     const { content } = await getTextFile(PATH);
     const social: Record<string, string> = {};
     for (const k of SOCIAL_FIELDS) social[k] = readString(content, k);
-    const settings: Record<string, unknown> = { social, danmaku: readDanmaku(content) };
+    const settings: Record<string, unknown> = { social, danmaku: readDanmaku(content), cloudMusicIds: readIdList(content, 'cloudMusicIds') };
     for (const k of STRING_FIELDS) settings[k] = readString(content, k);
     return NextResponse.json({ ok: true, settings });
   } catch (e) {
@@ -84,6 +95,11 @@ export async function POST(req: NextRequest) {
       const arr = (body.danmaku as unknown[]).map(String).filter(Boolean);
       if (!/danmakuList:\s*\[[^\]]*\]/m.test(next)) throw new Error('在 siteConfig.ts 里找不到 danmakuList');
       next = next.replace(/danmakuList:\s*\[[^\]]*\]/m, `danmakuList: ${JSON.stringify(arr)}`);
+    }
+    if (Array.isArray(body.cloudMusicIds)) {
+      const arr = (body.cloudMusicIds as unknown[]).map(String).filter(Boolean);
+      if (!/cloudMusicIds:\s*\[[^\]]*\]/m.test(next)) throw new Error('在 siteConfig.ts 里找不到 cloudMusicIds');
+      next = next.replace(/cloudMusicIds:\s*\[[^\]]*\]/m, `cloudMusicIds: ${JSON.stringify(arr)}`);
     }
     if (next === content) return NextResponse.json({ ok: true, changed: false });
     await saveTextFile(PATH, next, sha, '更新网站设置');

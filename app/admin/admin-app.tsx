@@ -1,22 +1,25 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-type CollectionKey = 'posts' | 'chatters' | 'moments';
+type CollectionKey = 'posts' | 'chatters' | 'moments' | 'drafts';
 type ListKey = 'friends' | 'projects' | 'albums';
-type TabKey = CollectionKey | ListKey | 'settings';
+type TabKey = 'dashboard' | CollectionKey | ListKey | 'settings' | 'gallery';
 
 const TABS: Array<{ key: TabKey; label: string }> = [
+  { key: 'dashboard', label: '仪表盘' },
   { key: 'posts', label: '文章' },
+  { key: 'drafts', label: '草稿' },
   { key: 'chatters', label: '碎碎念' },
   { key: 'moments', label: '动态' },
   { key: 'friends', label: '友链' },
   { key: 'projects', label: '项目' },
   { key: 'albums', label: '相册' },
+  { key: 'gallery', label: '画廊' },
   { key: 'settings', label: '设置' },
 ];
 
-const COLLECTION_LABEL: Record<CollectionKey, string> = { posts: '文章', chatters: '碎碎念', moments: '动态' };
+const COLLECTION_LABEL: Record<CollectionKey, string> = { posts: '文章', chatters: '碎碎念', moments: '动态', drafts: '草稿' };
 const LIST_LABEL: Record<ListKey, string> = { friends: '友链', projects: '项目', albums: '相册' };
 
 function nowShanghai(): string {
@@ -63,7 +66,7 @@ function emptyForm(collection: CollectionKey): Record<string, unknown> & { sha: 
     date: collection === 'moments' ? new Date().toISOString() : nowShanghai(),
     content: '',
   };
-  if (collection === 'posts') Object.assign(base, { description: '', cover: '/cover.svg', tags: [] });
+  if (collection === 'posts' || collection === 'drafts') Object.assign(base, { description: '', cover: '/cover.svg', tags: [] });
   if (collection === 'chatters') Object.assign(base, { description: '', cover: '', mood: '', tags: [] });
   if (collection === 'moments') Object.assign(base, { id: '', location: '', images: [] });
   return base;
@@ -77,7 +80,28 @@ function MarkdownTab({ collection }: { collection: CollectionKey }) {
   const [editing, setEditing] = useState(false);
   const [status, setStatus] = useState('');
   const [busy, setBusy] = useState(false);
+  const contentRef = useRef<HTMLTextAreaElement | null>(null);
   const set = (k: string, v: unknown) => setForm((f) => ({ ...f, [k]: v }));
+
+  /** 在光标处插入 Markdown 格式 */
+  function insertMd(before: string, after: string, placeholder: string) {
+    const ta = contentRef.current;
+    const cur = String(form.content ?? '');
+    if (!ta) {
+      set('content', cur + before + placeholder + after);
+      return;
+    }
+    const start = ta.selectionStart ?? cur.length;
+    const end = ta.selectionEnd ?? cur.length;
+    const selected = cur.slice(start, end) || placeholder;
+    const next = cur.slice(0, start) + before + selected + after + cur.slice(end);
+    set('content', next);
+    const pos = start + before.length + selected.length + after.length;
+    setTimeout(() => {
+      ta.focus();
+      ta.setSelectionRange(pos, pos);
+    }, 0);
+  }
 
   const load = useCallback(async () => {
     const data = await api(`/api/admin/items?collection=${collection}`);
@@ -140,6 +164,38 @@ function MarkdownTab({ collection }: { collection: CollectionKey }) {
       await load();
     } catch (e) {
       setStatus(e instanceof Error ? e.message : '保存失败');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /** 草稿一键发布成文章：写到 posts，再删掉草稿 */
+  async function publishDraft() {
+    if (collection !== 'drafts' || !form.sha) return;
+    const slug = String(form.slug || '').trim();
+    if (!slug || !/^[a-z0-9][a-z0-9-]*$/.test(slug)) {
+      setStatus('链接名不对，发布不了');
+      return;
+    }
+    if (!window.confirm(`把草稿「${form.title}」发布成文章吗？`)) return;
+    setBusy(true);
+    setStatus('发布中…');
+    try {
+      const body: Record<string, unknown> = { collection: 'posts', slug, ...form, sha: null };
+      body.tags = extra.tags;
+      await api('/api/admin/items', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      await api(`/api/admin/items?collection=drafts&slug=${encodeURIComponent(slug)}&sha=${encodeURIComponent(String(form.sha))}`, {
+        method: 'DELETE',
+      });
+      setStatus('已发布成文章，博客约 1 分钟后自动更新。');
+      setEditing(false);
+      await load();
+    } catch (e) {
+      setStatus(e instanceof Error ? e.message : '发布失败');
     } finally {
       setBusy(false);
     }
@@ -224,17 +280,44 @@ function MarkdownTab({ collection }: { collection: CollectionKey }) {
           )}
           <div>
             <label className={labelCls}>正文（支持 Markdown）</label>
+            <div className="mb-2 flex flex-wrap gap-1.5">
+              {[
+                { t: '加粗', b: '**', a: '**', p: '粗体' },
+                { t: '斜体', b: '*', a: '*', p: '斜体' },
+                { t: '标题', b: '## ', a: '', p: '小标题' },
+                { t: '列表', b: '- ', a: '', p: '列表项' },
+                { t: '引用', b: '> ', a: '', p: '引用' },
+                { t: '链接', b: '[', a: '](https://)', p: '链接文字' },
+                { t: '图片', b: '![', a: '](/images/xxx.jpg)', p: '图片说明' },
+                { t: '代码', b: '`', a: '`', p: '代码' },
+              ].map((x) => (
+                <button
+                  key={x.t}
+                  type="button"
+                  className="rounded-md border border-white/15 px-2 py-1 text-xs text-white/70 hover:bg-white/10"
+                  onClick={() => insertMd(x.b, x.a, x.p)}
+                >
+                  {x.t}
+                </button>
+              ))}
+            </div>
             <textarea
+              ref={contentRef}
               className={`${inputCls} min-h-72 font-mono leading-relaxed`}
               value={String(form.content ?? '')}
               onChange={(e) => set('content', e.target.value)}
               placeholder="在这里写正文…"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button className={btnPrimary} onClick={save} disabled={busy}>
               {busy ? '保存中…' : form.sha ? '保存修改' : collection === 'moments' ? '发布动态' : '发布'}
             </button>
+            {collection === 'drafts' && form.sha && (
+              <button className={btnPrimary} onClick={publishDraft} disabled={busy}>
+                发布成文章
+              </button>
+            )}
             <button
               className={btnGhost}
               onClick={() => {
@@ -430,6 +513,7 @@ function ListTab({ listKey }: { listKey: ListKey }) {
 function SettingsTab() {
   const [form, setForm] = useState<Record<string, unknown> | null>(null);
   const [danmakuText, setDanmakuText] = useState('');
+  const [musicText, setMusicText] = useState('');
   const [status, setStatus] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -438,6 +522,7 @@ function SettingsTab() {
       .then((d) => {
         setForm(d.settings);
         setDanmakuText(((d.settings.danmaku as string[]) || []).join('\n'));
+        setMusicText(((d.settings.cloudMusicIds as string[]) || []).join('\n'));
       })
       .catch((e) => setStatus(e.message));
   }, []);
@@ -449,6 +534,7 @@ function SettingsTab() {
     try {
       const body: Record<string, unknown> = { ...form };
       body.danmaku = danmakuText.split('\n').map((s) => s.trim()).filter(Boolean);
+      body.cloudMusicIds = musicText.split('\n').map((s) => s.trim()).filter(Boolean);
       const data = await api('/api/admin/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -489,6 +575,10 @@ function SettingsTab() {
           <textarea className={`${inputCls} min-h-32`} value={danmakuText} onChange={(e) => setDanmakuText(e.target.value)} />
         </div>
         <div>
+          <label className={labelCls}>音乐歌单（网易云音乐 ID，一行一个）</label>
+          <textarea className={`${inputCls} min-h-24 font-mono`} value={musicText} onChange={(e) => setMusicText(e.target.value)} placeholder={'12345678\n87654321'} />
+        </div>
+        <div>
           <p className="mb-2 text-sm font-medium text-white">社交账号</p>
           <div className="space-y-3">
             {(['github', 'gitee', 'google', 'email', 'qq', 'wechat'] as const).map((k) => (
@@ -507,13 +597,197 @@ function SettingsTab() {
   );
 }
 
+/* ---------------- 画廊栏目 ---------------- */
+
+interface GalleryImage {
+  name: string;
+  sha: string;
+  url: string;
+}
+
+function GalleryTab() {
+  const [images, setImages] = useState<GalleryImage[]>([]);
+  const [status, setStatus] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [copied, setCopied] = useState('');
+
+  const load = useCallback(async () => {
+    const data = await api('/api/admin/images');
+    setImages(data.images || []);
+    setLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    load().catch((e) => setStatus(e.message));
+  }, [load]);
+
+  async function upload(file: File) {
+    if (!/\.(png|jpe?g|gif|webp|svg|avif)$/i.test(file.name)) {
+      setStatus('只能传图片文件');
+      return;
+    }
+    if (file.size > 9 * 1024 * 1024) {
+      setStatus('图片太大了，控制在 9MB 以内');
+      return;
+    }
+    setBusy(true);
+    setStatus('上传中…');
+    try {
+      const data = await new Promise<string>((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(String(r.result).split(',')[1] || '');
+        r.onerror = () => reject(new Error('读取图片失败'));
+        r.readAsDataURL(file);
+      });
+      const name = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]+/g, '_')}`;
+      await api('/api/admin/images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, data }),
+      });
+      setStatus(`已上传 ${name}，博客约 1 分钟后能用。`);
+      await load();
+    } catch (e) {
+      setStatus(e instanceof Error ? e.message : '上传失败');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function copyUrl(img: GalleryImage) {
+    const full = `https://llsc.cc${img.url}`;
+    try {
+      await navigator.clipboard.writeText(full);
+      setCopied(img.name);
+      setTimeout(() => setCopied(''), 2000);
+    } catch {
+      setStatus(full);
+    }
+  }
+
+  async function removeImage(img: GalleryImage) {
+    if (!window.confirm(`确定删除图片 ${img.name} 吗？`)) return;
+    setBusy(true);
+    try {
+      await api(`/api/admin/images?name=${encodeURIComponent(img.name)}&sha=${encodeURIComponent(img.sha)}`, { method: 'DELETE' });
+      setStatus('已删除。');
+      await load();
+    } catch (e) {
+      setStatus(e instanceof Error ? e.message : '删除失败');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!loaded) return <p className="mt-5 text-sm text-white/50">加载中…</p>;
+
+  return (
+    <>
+      {status && <p className="mt-3 rounded-lg bg-white/5 px-3 py-2 text-sm text-white/80 break-all">{status}</p>}
+      <label className={`${btnPrimary} mt-5 inline-block cursor-pointer`}>
+        {busy ? '上传中…' : '上传图片'}
+        <input
+          type="file"
+          accept="image/*"
+          className="hidden"
+          disabled={busy}
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) upload(f);
+            e.target.value = '';
+          }}
+        />
+      </label>
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        {images.length === 0 && <p className="col-span-2 text-sm text-white/50">还没有图片，传一张吧。</p>}
+        {images.map((img) => (
+          <div key={img.name} className="overflow-hidden rounded-xl border border-white/10 bg-white/5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={`https://llsc.cc${img.url}`} alt={img.name} className="h-32 w-full object-cover" />
+            <div className="p-2">
+              <p className="truncate text-xs text-white/70">{img.name}</p>
+              <div className="mt-2 flex gap-2">
+                <button className={btnGhost} onClick={() => copyUrl(img)}>
+                  {copied === img.name ? '已复制' : '复制链接'}
+                </button>
+                <button className={btnGhost} onClick={() => removeImage(img)} disabled={busy}>
+                  删除
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <p className="mt-4 text-xs text-white/40">图片存在仓库的 public/images 里，链接格式是 https://llsc.cc/images/文件名，写文章、做相册都能用。</p>
+    </>
+  );
+}
+
+/* ---------------- 仪表盘栏目 ---------------- */
+
+function DashboardTab({ go }: { go: (t: TabKey) => void }) {
+  const [counts, setCounts] = useState<Record<string, number> | null>(null);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const out: Record<string, number> = {};
+        for (const c of ['posts', 'chatters', 'moments', 'drafts'] as const) {
+          const d = await api(`/api/admin/items?collection=${c}`);
+          out[c] = (d.items || []).length;
+        }
+        for (const t of ['friends', 'projects', 'albums'] as const) {
+          const d = await api(`/api/admin/lists?type=${t}`);
+          out[t] = (d.items || []).length;
+        }
+        const imgs = await api('/api/admin/images');
+        out.images = (imgs.images || []).length;
+        setCounts(out);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : '加载失败');
+      }
+    })();
+  }, []);
+
+  if (error) return <p className="mt-5 text-sm text-red-400">{error}</p>;
+  if (!counts) return <p className="mt-5 text-sm text-white/50">加载中…</p>;
+
+  const cards: Array<{ key: TabKey; label: string; n: number }> = [
+    { key: 'posts', label: '文章', n: counts.posts || 0 },
+    { key: 'drafts', label: '草稿', n: counts.drafts || 0 },
+    { key: 'chatters', label: '碎碎念', n: counts.chatters || 0 },
+    { key: 'moments', label: '动态', n: counts.moments || 0 },
+    { key: 'friends', label: '友链', n: counts.friends || 0 },
+    { key: 'projects', label: '项目', n: counts.projects || 0 },
+    { key: 'albums', label: '相册', n: counts.albums || 0 },
+    { key: 'gallery', label: '图片', n: counts.images || 0 },
+  ];
+
+  return (
+    <div className="mt-5 grid grid-cols-2 gap-3">
+      {cards.map((c) => (
+        <button
+          key={c.key}
+          onClick={() => go(c.key)}
+          className="rounded-2xl border border-white/10 bg-white/5 p-4 text-left hover:bg-white/10"
+        >
+          <p className="text-3xl font-bold text-white">{c.n}</p>
+          <p className="mt-1 text-sm text-white/60">{c.label}</p>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 /* ---------------- 主界面 ---------------- */
 
 export default function AdminApp() {
   const [phase, setPhase] = useState<'checking' | 'not-configured' | 'login' | 'main'>('checking');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
-  const [tab, setTab] = useState<TabKey>('posts');
+  const [tab, setTab] = useState<TabKey>('dashboard');
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -619,12 +893,15 @@ export default function AdminApp() {
           </button>
         ))}
       </div>
+      {tab === 'dashboard' && <DashboardTab go={setTab} />}
       {tab === 'posts' && <MarkdownTab collection="posts" />}
+      {tab === 'drafts' && <MarkdownTab collection="drafts" />}
       {tab === 'chatters' && <MarkdownTab collection="chatters" />}
       {tab === 'moments' && <MarkdownTab collection="moments" />}
       {tab === 'friends' && <ListTab listKey="friends" />}
       {tab === 'projects' && <ListTab listKey="projects" />}
       {tab === 'albums' && <ListTab listKey="albums" />}
+      {tab === 'gallery' && <GalleryTab />}
       {tab === 'settings' && <SettingsTab />}
       <p className="mt-6 text-xs text-white/40">保存或删除后，Vercel 会自动重新部署，博客约 1 分钟后更新。</p>
     </main>

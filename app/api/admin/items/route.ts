@@ -7,7 +7,7 @@ import { COLLECTIONS, SLUG_RE, buildMarkdown, fieldsFromData, newMomentId, type 
 
 function collectionOf(req: NextRequest): CollectionKey | null {
   const c = req.nextUrl.searchParams.get('collection');
-  if (c === 'posts' || c === 'chatters' || c === 'moments') return c;
+  if (c === 'posts' || c === 'chatters' || c === 'moments' || c === 'drafts') return c;
   return null;
 }
 
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: '请求格式不对' }, { status: 400 });
   }
   const collection = body.collection;
-  if (collection !== 'posts' && collection !== 'chatters' && collection !== 'moments') {
+  if (collection !== 'posts' && collection !== 'chatters' && collection !== 'moments' && collection !== 'drafts') {
     return NextResponse.json({ ok: false, error: '栏目不对' }, { status: 400 });
   }
   const def = COLLECTIONS[collection];
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
   if (!SLUG_RE.test(slug)) {
     return NextResponse.json({ ok: false, error: '链接名只能用小写字母、数字和 -，开头要是字母或数字' }, { status: 400 });
   }
-  if ((collection === 'posts' || collection === 'chatters') && !String(body.title || '').trim()) {
+  if ((collection === 'posts' || collection === 'chatters' || collection === 'drafts') && !String(body.title || '').trim()) {
     return NextResponse.json({ ok: false, error: '标题不能为空' }, { status: 400 });
   }
   const fields: Record<string, unknown> = { ...body };

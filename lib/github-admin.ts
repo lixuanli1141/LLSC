@@ -74,6 +74,28 @@ export async function deleteTextFile(path: string, sha: string, message: string)
   if (!res.ok) throw ghError(res, await res.text(), 'delete');
 }
 
+/** 列出 public/images/ 下的图片文件 */
+export async function listImages(): Promise<DirEntry[]> {
+  const res = await gh(`/repos/${OWNER}/${REPO}/contents/public/images?ref=main`);
+  if (res.status === 404) return [];
+  if (!res.ok) throw ghError(res, await res.text(), 'list');
+  const data = (await res.json()) as Array<{ name: string; sha: string; path: string; type: string; size: number }>;
+  return data
+    .filter((f) => f.type === 'file' && /\.(png|jpe?g|gif|webp|svg|avif)$/i.test(f.name))
+    .map((f) => ({ name: f.name, sha: f.sha, path: f.path }));
+}
+
+/** 上传二进制文件（data 为不带 data: 前缀的 base64） */
+export async function saveBinaryFile(path: string, base64: string, sha: string | null, message: string): Promise<void> {
+  const body: Record<string, unknown> = { message, content: base64 };
+  if (sha) body.sha = sha;
+  const res = await gh(`/repos/${OWNER}/${REPO}/contents/${path}`, {
+    method: 'PUT',
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw ghError(res, await res.text(), 'upload');
+}
+
 // ---- 兼容旧的 posts 路由 ----
 export async function listPostFiles(): Promise<DirEntry[]> {
   return listMdFiles('posts');

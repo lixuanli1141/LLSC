@@ -1,6 +1,6 @@
 /** 后台管理的 Markdown 栏目定义：目录 + frontmatter 字段 */
 
-export type CollectionKey = 'posts' | 'chatters' | 'moments';
+export type CollectionKey = 'posts' | 'chatters' | 'moments' | 'drafts';
 
 export interface CollectionDef {
   key: CollectionKey;
@@ -14,6 +14,7 @@ export const COLLECTIONS: Record<CollectionKey, CollectionDef> = {
   posts: { key: 'posts', dir: 'posts', label: '文章', slugHint: '比如 hello-llsc' },
   chatters: { key: 'chatters', dir: 'chatters', label: '碎碎念', slugHint: '比如 2026-11-06-随想' },
   moments: { key: 'moments', dir: 'moments', label: '动态', slugHint: '自动生成 moment-时间戳' },
+  drafts: { key: 'drafts', dir: 'drafts', label: '草稿', slugHint: '比如 hello-llsc' },
 };
 
 export const SLUG_RE = /^[a-z0-9][a-z0-9-]*$/;
@@ -31,7 +32,7 @@ export function buildMarkdown(
   content: string,
 ): string {
   const lines: string[] = ['---'];
-  if (collection === 'posts') {
+  if (collection === 'posts' || collection === 'drafts') {
     lines.push(`title: ${q(String(fields.title || ''))}`);
     lines.push(`date: ${q(String(fields.date || ''))}`);
     lines.push(`description: ${q(String(fields.description || ''))}`);
@@ -70,7 +71,7 @@ export function fieldsFromData(collection: CollectionKey, data: Record<string, u
     const v = (data as Record<string, unknown>)[k];
     return Array.isArray(v) ? v.map(String) : [];
   };
-  if (collection === 'posts') {
+  if (collection === 'posts' || collection === 'drafts') {
     return { title: str('title'), date: str('date'), description: str('description'), cover: str('cover') || '/cover.svg', tags: arr('tags') };
   }
   if (collection === 'chatters') {

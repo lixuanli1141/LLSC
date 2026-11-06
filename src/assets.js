@@ -394,7 +394,7 @@ export const HOME_JS = `
 
   function render(){
     grid.textContent = '';
-    if(!items.length){ grid.appendChild(el('p','empty','暂无可用的导航项，去管理后台添加一个吧。')); return; }
+    if(!items.length){ grid.appendChild(el('p','empty','这儿还空着，去后台加一个。')); return; }
     items.forEach((item, i) => {
       const a = el('a','card');
       a.href = item.url; a.target = '_blank'; a.rel = 'noopener';

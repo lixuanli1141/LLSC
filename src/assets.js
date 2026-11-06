@@ -231,11 +231,77 @@ button.danger{background:var(--danger);}
 .bg::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(3,8,18,.30),rgba(3,8,18,.45));}
 .hero,main,footer{position:relative;z-index:1;}
 @media (min-aspect-ratio:1/1){#bg-video{object-position:50% 22%;}.bg-static{background-position:50% 22%;}}
+
+/* ---- v2.5.28：12 种动效（按视频清单逐一落地） ---- */
+/* 01 页面转场：View Transitions（解锁换场时旧页淡出、新页淡入） */
+::view-transition-old(root),::view-transition-new(root){animation-duration:.45s;animation-timing-function:var(--ease);}
+/* 04 逐行升起：标题两行从遮罩下方依次升起 */
+.hline{display:block;overflow:hidden;padding-bottom:.08em;margin-bottom:-.08em;}
+.hline-in{display:block;transform:translateY(110%);animation:lineUp .7s var(--ease) .1s forwards;}
+.hline:nth-child(3) .hline-in{animation-delay:.28s;}
+@keyframes lineUp{to{transform:translateY(0);}}
+/* 03 遮罩揭示：首图从左往右展开 */
+.hero-visual img{clip-path:inset(0 100% 0 0);animation:maskIn .8s var(--ease) .3s forwards;}
+@keyframes maskIn{to{clip-path:inset(0 0 0 0);}}
+/* 05 描边动画：卡片图标描边画出（JS 给路径设 pathLength=1 后触发） */
+.icon.draw svg :is(path,rect,circle,line,polyline,polygon,ellipse){stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .8s var(--ease);}
+.icon.draw.drawn svg :is(path,rect,circle,line,polyline,polygon,ellipse){stroke-dashoffset:0;}
+/* 06 图标变形：锁扣开合（解锁后锁扣转开） */
+.lock-btn svg{width:18px;height:18px;vertical-align:-3px;margin-right:8px;}
+.lock-btn .shackle{transition:transform .45s var(--ease);transform-origin:16px 11px;}
+.lock-btn.open .shackle{transform:rotate(-38deg);}
+/* 02 共享元素：点卡片时卡片先飞向中心再开新页（链接在新标签页打开，动画不挡路） */
+.card.fly{transition:transform .32s var(--ease),opacity .32s var(--ease);transform:scale(1.06) translateY(-8px);opacity:.35;z-index:5;}
+/* 07 吸附滚动：只给首屏和结尾句用 proximity 轻吸附；导航区内容超一屏，不吸 */
+html{scroll-snap-type:y proximity;}
+.hero,.tagline{scroll-snap-align:start;}
+/* 08 横向滚动：手机上导航卡横着滑，带吸附 */
+@media (max-width:700px){
+  .grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;gap:12px;padding-bottom:8px;scrollbar-width:none;}
+  .grid::-webkit-scrollbar{display:none;}
+  .grid .card{flex:0 0 78vw;scroll-snap-align:center;}
+  .grid .skeleton{flex:0 0 78vw;}
+}
+/* 11 按下回弹：所有按钮 / 卡片按下去缩到 .95，松手带回弹 */
+.btn-primary,.btn-ghost,button,.card{transition-timing-function:cubic-bezier(.34,1.56,.64,1);}
+.btn-primary:active,.btn-ghost:active,button:active{transform:scale(.95);}
+.card:active{transform:scale(.95);}
+/* 12 抖动提示：口令错了对话框左右晃两下 + 文字说明错在哪 */
+@keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
+.dialog.shake{animation:shake .45s var(--ease);}
+.dialog input.err{border-color:var(--danger);}
+.err{color:#fca5a5;font-size:14px;line-height:20px;margin:12px 0 0;}
+.err[hidden]{display:none;}
+/* 10 Lottie：解锁成功的对勾动画容器（真实 Lottie 文件 + 播放器，加载失败时用 CSS 对勾兜底） */
+.lottie-box{width:96px;height:96px;margin:8px auto 4px;}
+.lottie-box[hidden]{display:none;}
+.lottie-fallback{width:96px;height:96px;}
+.lottie-fallback circle{stroke:#38bdf8;stroke-width:5;fill:none;stroke-dasharray:283;stroke-dashoffset:283;animation:drawStroke .6s var(--ease) forwards;}
+.lottie-fallback path{stroke:#34d399;stroke-width:6;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:53;stroke-dashoffset:53;animation:drawStroke .4s var(--ease) .45s forwards;}
+@keyframes drawStroke{to{stroke-dashoffset:0;}}
+/* 弹窗从右下角（口令按钮位置）弹出 */
+.modal.open .dialog{animation:dialogIn .35s var(--ease);transform-origin:100% 100%;}
+@keyframes dialogIn{from{opacity:0;transform:translateY(16px) scale(.92);}to{opacity:1;transform:none;}}
+/* 背景动效开关（视频最后三条：超 5 秒的自动播放要能暂停） */
+.bg-toggle{position:fixed;left:16px;bottom:16px;z-index:60;min-height:36px;padding:8px 14px;border-radius:999px;font-size:12px;background:rgba(10,25,47,.55);color:var(--muted);border:1px solid rgba(147,197,253,.35);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
+.bg-toggle[hidden]{display:none;}
+/* 09 滚动帧动画用的层（JS 用 rAF 改 transform，只动 transform） */
+.bg{will-change:transform;}
+.hero-visual img{will-change:transform;}
+@media (prefers-reduced-motion: reduce){
+  .hline-in{animation:none;transform:none;}
+  .hero-visual img{animation:none;clip-path:none;}
+  .card.fly{transform:none;opacity:1;}
+  .icon.draw svg :is(path,rect,circle,line,polyline,polygon,ellipse){stroke-dashoffset:0;transition:none;}
+  html{scroll-snap-type:none;}
+  .modal.open .dialog{animation:none;}
+}
 `;
 
 export const HOME_JS = `
 (() => {
   // 视频背景：静态图先行，视频能播了再淡入。弱网 / 省流 / 减动效下只留静态图。
+  let bgPaused = false; // 背景动效开关（用户手动暂停后，visibilitychange 也不自动续播）
   const bgVideo = document.getElementById('bg-video');
   if (bgVideo) {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -243,7 +309,7 @@ export const HOME_JS = `
     if (!reduced && !saveData) {
       bgVideo.src = '/assets/bg-ink.mp4';
       bgVideo.addEventListener('playing', () => bgVideo.classList.add('on'));
-      const tryPlay = () => { const pr = bgVideo.play(); if (pr && pr.catch) pr.catch(() => {}); };
+      const tryPlay = () => { if (bgPaused) return; const pr = bgVideo.play(); if (pr && pr.catch) pr.catch(() => {}); };
       bgVideo.addEventListener('canplay', tryPlay);
       tryPlay();
       document.addEventListener('visibilitychange', () => {
@@ -251,6 +317,17 @@ export const HOME_JS = `
         else tryPlay();
       });
     }
+  }
+  // 背景动效开关：超 5 秒的自动播放要能暂停（视频最后三条，WCAG 2.2.2）
+  const bgToggle = document.getElementById('bg-toggle');
+  if (bgToggle) {
+    if (!bgVideo || !bgVideo.src) bgToggle.hidden = true;
+    else bgToggle.addEventListener('click', () => {
+      bgPaused = !bgPaused;
+      if (bgPaused) { bgVideo.pause(); bgToggle.textContent = '背景动效：关'; }
+      else { bgToggle.textContent = '背景动效：开'; const pr = bgVideo.play(); if (pr && pr.catch) pr.catch(() => {}); }
+      bgToggle.setAttribute('aria-pressed', String(!bgPaused));
+    });
   }
   const grid = document.getElementById('grid');
   const quoteEl = document.getElementById('quote');
@@ -289,6 +366,26 @@ export const HOME_JS = `
   }, { threshold: 0.15 });
   document.querySelectorAll('.reveal').forEach((n) => revealObserver.observe(n));
 
+  // 09 滚动帧动画：背景跟着滚动速度走、首图随滚动缩放，只动 transform
+  const bgEl = document.querySelector('.bg');
+  const heroImg = document.querySelector('.hero-visual img');
+  const heroEl = document.querySelector('.hero');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reducedMotion && bgEl) {
+    let ticking = false;
+    const scrub = () => {
+      ticking = false;
+      const y = window.scrollY || 0;
+      bgEl.style.transform = 'translate3d(0,' + (y * -0.12) + 'px,0) scale(1.12)';
+      if (heroImg && heroEl) {
+        const p = Math.min(Math.max(y / Math.max(heroEl.offsetHeight, 1), 0), 1);
+        heroImg.style.transform = 'scale(' + (1.1 - 0.1 * p) + ')';
+      }
+    };
+    window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(scrub); } }, { passive: true });
+    scrub();
+  }
+
   // Tagline 逐字显现：每字一个 IntersectionObserver 触发点。
   const taglineEl = document.getElementById('tagline');
   if (taglineEl) {
@@ -320,6 +417,16 @@ export const HOME_JS = `
       meta.appendChild(el('span','host', host)); body.appendChild(meta);
       const dot = el('span','dot'); dot.dataset.idx = item.originalIdx;
       a.append(icon, body, dot); grid.appendChild(a);
+      // 入场动画跑完就去掉 fill 效果，不然之后的 .fly 位移动画会被动画终态盖住
+      a.addEventListener('animationend', () => { a.style.animation = 'none'; }, { once: true });
+      // 05 描边动画：图标路径描边画出，逐张错峰
+      setTimeout(() => {
+        icon.querySelectorAll('path,rect,circle,line,polyline,polygon,ellipse').forEach(s => s.setAttribute('pathLength', '1'));
+        icon.classList.add('draw');
+        requestAnimationFrame(() => requestAnimationFrame(() => icon.classList.add('drawn')));
+      }, 120 + i * 90);
+      // 02 共享元素：点卡片时卡片先飞向中心（链接在新标签页打开，不挡路）
+      a.addEventListener('click', () => a.classList.add('fly'));
     });
     checkStatus();
   }
@@ -331,6 +438,7 @@ export const HOME_JS = `
     const data = await res.json();
     items = data.items || []; unlocked = !!data.unlocked;
     lockBtn.style.display = unlocked ? '' : 'none';
+    lockBtn.classList.toggle('open', unlocked); // 06 图标变形：解锁后锁扣转开
     proofEl.textContent = items.length + ' 个节点 · 正在探测状态';
     render();
   }
@@ -388,7 +496,50 @@ export const HOME_JS = `
     }, 650);
   }
 
-  function openModal(){ modal.classList.add('open'); pwdInput.value=''; setTimeout(()=>pwdInput.focus(), 50); }
+  // 10 Lottie：解锁成功的对勾动画（真实 Lottie JSON + lottie-web 播放器；加载失败用 CSS 对勾兜底）
+  const lottieBox = document.getElementById('lottie-box');
+  const pwdErr = document.getElementById('pwd-err');
+  const LOTTIE_CHECK = {"v":"5.7.4","fr":60,"ip":0,"op":55,"w":96,"h":96,"nm":"llsc-check","ddd":0,"assets":[],"layers":[
+    {"ddd":0,"ind":1,"ty":4,"nm":"circle","sr":1,"ks":{"o":{"a":0,"k":100},"r":{"a":0,"k":0},"p":{"a":0,"k":[48,48,0]},"a":{"a":0,"k":[0,0,0]},"s":{"a":0,"k":[100,100,100]}},"ao":0,"shapes":[{"ty":"gr","it":[{"ty":"el","s":{"a":0,"k":[76,76]},"p":{"a":0,"k":[0,0]}},{"ty":"st","c":{"a":0,"k":[0.22,0.74,0.97,1]},"o":{"a":0,"k":100},"w":{"a":0,"k":5},"lc":2,"lj":2},{"ty":"tm","s":{"a":0,"k":0},"e":{"a":1,"k":[{"i":{"x":[0.22],"y":[1]},"o":{"x":[0.36],"y":[0]},"t":0,"s":[0]},{"t":28,"s":[100]}]},"o":{"a":0,"k":0},"m":1},{"ty":"tr","p":{"a":0,"k":[0,0]},"a":{"a":0,"k":[0,0]},"s":{"a":0,"k":[100,100]},"r":{"a":0,"k":0},"o":{"a":0,"k":100},"sk":{"a":0,"k":0},"sa":{"a":0,"k":0}}]}],"ip":0,"op":55,"st":0},
+    {"ddd":0,"ind":2,"ty":4,"nm":"check","sr":1,"ks":{"o":{"a":0,"k":100},"r":{"a":0,"k":0},"p":{"a":0,"k":[48,48,0]},"a":{"a":0,"k":[0,0,0]},"s":{"a":0,"k":[100,100,100]}},"ao":0,"shapes":[{"ty":"gr","it":[{"ty":"sh","ks":{"a":0,"k":{"i":[[0,0],[0,0],[0,0]],"o":[[0,0],[0,0],[0,0]],"v":[[-17,1],[-5,13],[19,-13]],"c":false}}},{"ty":"st","c":{"a":0,"k":[0.2,0.83,0.6,1]},"o":{"a":0,"k":100},"w":{"a":0,"k":6},"lc":2,"lj":2},{"ty":"tm","s":{"a":0,"k":0},"e":{"a":1,"k":[{"i":{"x":[0.22],"y":[1]},"o":{"x":[0.36],"y":[0]},"t":18,"s":[0]},{"t":42,"s":[100]}]},"o":{"a":0,"k":0},"m":1},{"ty":"tr","p":{"a":0,"k":[0,0]},"a":{"a":0,"k":[0,0]},"s":{"a":0,"k":[100,100]},"r":{"a":0,"k":0},"o":{"a":0,"k":100},"sk":{"a":0,"k":0},"sa":{"a":0,"k":0}}]}],"ip":0,"op":55,"st":0}
+  ]};
+  const LOTTIE_FALLBACK = '<svg class="lottie-fallback" viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="45"/><path d="M31 49 L43 61 L67 35"/></svg>';
+  let lottieLibPromise = null;
+  function loadLottieLib(){
+    if (lottieLibPromise) return lottieLibPromise;
+    lottieLibPromise = new Promise((resolve) => {
+      if (window.lottie) return resolve(window.lottie);
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/lottie-web@5.12.2/build/player/lottie.min.js';
+      s.onload = () => resolve(window.lottie || null);
+      s.onerror = () => resolve(null);
+      document.head.appendChild(s);
+    });
+    return lottieLibPromise;
+  }
+  async function playUnlockLottie(){
+    // 成功时把表单收起来，只留对勾
+    document.getElementById('pwd-row').style.display = 'none';
+    document.getElementById('modal-title').style.display = 'none';
+    document.querySelector('.dialog .hint').style.display = 'none';
+    pwdErr.hidden = true;
+    lottieBox.hidden = false;
+    const lib = await loadLottieLib();
+    if (lib) {
+      lottieBox.textContent = '';
+      lib.loadAnimation({ container: lottieBox, renderer: 'svg', loop: false, autoplay: true, animationData: LOTTIE_CHECK });
+    } else {
+      lottieBox.innerHTML = LOTTIE_FALLBACK;
+    }
+    await new Promise(r => setTimeout(r, 950));
+    // 恢复弹窗原状，等下次打开
+    lottieBox.hidden = true; lottieBox.textContent = '';
+    document.getElementById('pwd-row').style.display = '';
+    document.getElementById('modal-title').style.display = '';
+    document.querySelector('.dialog .hint').style.display = '';
+  }
+
+  function openModal(){ modal.classList.add('open'); pwdInput.value=''; pwdErr.hidden = true; pwdInput.classList.remove('err'); setTimeout(()=>pwdInput.focus(), 50); }
   function closeModal(){ modal.classList.remove('open'); }
   async function verify(){
     const pwd = pwdInput.value; if(!pwd) return;
@@ -396,8 +547,20 @@ export const HOME_JS = `
       const res = await fetch('/api/reveal', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ pwd }) });
       if(res.status === 503){ toast('口令尚未设置'); return; }
       if(!res.ok) throw new Error('bad pwd');
-      closeModal(); toast('已解锁'); await loadNav();
-    }catch(e){ pwdInput.value=''; toast('口令不对，再试一次'); }
+      // 10 Lottie：解锁成功先播一个对勾动画，再换场
+      await playUnlockLottie();
+      closeModal(); toast('已解锁');
+      // 01 页面转场：解锁后导航换场用 View Transitions 淡入淡出
+      if (document.startViewTransition) document.startViewTransition(() => loadNav());
+      else await loadNav();
+    }catch(e){
+      pwdInput.value='';
+      // 12 抖动提示：对话框晃两下 + 文字说明错在哪
+      pwdErr.hidden = false; pwdInput.classList.add('err');
+      const dialog = modal.querySelector('.dialog');
+      dialog.classList.remove('shake'); void dialog.offsetWidth; dialog.classList.add('shake');
+      toast('口令不对，再试一次');
+    }
   }
   async function lock(){
     await fetch('/api/lock', { method:'POST' });

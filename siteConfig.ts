@@ -33,7 +33,7 @@ export const siteConfig = {
 
   // 5. 首页照片墙预览图
   photoWallImage: "/cover.svg",
-  cloudMusicIds: ["186016"],
+  cloudMusicIds: [],
   social: {
     github: "lixuanli1141",
     gitee: "",

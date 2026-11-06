@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 type CollectionKey = 'posts' | 'chatters' | 'moments' | 'drafts';
 type ListKey = 'friends' | 'projects' | 'albums';
-type TabKey = 'dashboard' | CollectionKey | ListKey | 'settings' | 'gallery';
+type TabKey = 'dashboard' | CollectionKey | ListKey | 'settings' | 'gallery' | 'music';
 
 const TABS: Array<{ key: TabKey; label: string }> = [
   { key: 'dashboard', label: '仪表盘' },
@@ -16,6 +16,7 @@ const TABS: Array<{ key: TabKey; label: string }> = [
   { key: 'projects', label: '项目' },
   { key: 'albums', label: '相册' },
   { key: 'gallery', label: '画廊' },
+  { key: 'music', label: '音乐' },
   { key: 'settings', label: '设置' },
 ];
 
@@ -513,7 +514,6 @@ function ListTab({ listKey }: { listKey: ListKey }) {
 function SettingsTab() {
   const [form, setForm] = useState<Record<string, unknown> | null>(null);
   const [danmakuText, setDanmakuText] = useState('');
-  const [musicText, setMusicText] = useState('');
   const [status, setStatus] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -522,7 +522,6 @@ function SettingsTab() {
       .then((d) => {
         setForm(d.settings);
         setDanmakuText(((d.settings.danmaku as string[]) || []).join('\n'));
-        setMusicText(((d.settings.cloudMusicIds as string[]) || []).join('\n'));
       })
       .catch((e) => setStatus(e.message));
   }, []);
@@ -534,7 +533,6 @@ function SettingsTab() {
     try {
       const body: Record<string, unknown> = { ...form };
       body.danmaku = danmakuText.split('\n').map((s) => s.trim()).filter(Boolean);
-      body.cloudMusicIds = musicText.split('\n').map((s) => s.trim()).filter(Boolean);
       const data = await api('/api/admin/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -573,10 +571,6 @@ function SettingsTab() {
         <div>
           <label className={labelCls}>弹幕（一行一条）</label>
           <textarea className={`${inputCls} min-h-32`} value={danmakuText} onChange={(e) => setDanmakuText(e.target.value)} />
-        </div>
-        <div>
-          <label className={labelCls}>音乐歌单（网易云音乐 ID，一行一个）</label>
-          <textarea className={`${inputCls} min-h-24 font-mono`} value={musicText} onChange={(e) => setMusicText(e.target.value)} placeholder={'12345678\n87654321'} />
         </div>
         <div>
           <p className="mb-2 text-sm font-medium text-white">社交账号</p>
@@ -781,6 +775,204 @@ function DashboardTab({ go }: { go: (t: TabKey) => void }) {
   );
 }
 
+/* ---------------- 音乐栏目 ---------------- */
+
+interface SongDetail {
+  id: string;
+  name?: string;
+  artist?: string;
+  cover?: string;
+  url?: string;
+  error?: string;
+}
+
+function parseSongId(input: string): string {
+  const s = input.trim();
+  const m = s.match(/[?&]id=(\d+)/) || s.match(/\/song\/(\d+)/) || s.match(/^(\d+)$/);
+  return m ? m[1] : '';
+}
+
+function MusicTab() {
+  const [ids, setIds] = useState<string[]>([]);
+  const [details, setDetails] = useState<Record<string, SongDetail>>({});
+  const [addInput, setAddInput] = useState('');
+  const [status, setStatus] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [dirty, setDirty] = useState(false);
+  const [playingId, setPlayingId] = useState('');
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const fetchDetails = useCallback(async (list: string[]) => {
+    if (list.length === 0) return;
+    try {
+      const res = await fetch(`/api/music?ids=${list.join(',')}`);
+      const data: SongDetail[] = await res.json();
+      const map: Record<string, SongDetail> = {};
+      for (const s of data) map[s.id] = s;
+      setDetails((prev) => ({ ...prev, ...map }));
+    } catch {
+      /* 查不到歌名不影响管理歌单 */
+    }
+  }, []);
+
+  useEffect(() => {
+    api('/api/admin/settings')
+      .then((d) => {
+        const list = ((d.settings.cloudMusicIds as string[]) || []).map(String);
+        setIds(list);
+        setLoaded(true);
+        fetchDetails(list);
+      })
+      .catch((e) => setStatus(e.message));
+  }, [fetchDetails]);
+
+  function change(next: string[]) {
+    setIds(next);
+    setDirty(true);
+  }
+
+  async function addSong() {
+    const id = parseSongId(addInput);
+    if (!id) {
+      setStatus('没认出这是哪首歌：粘贴网易云歌曲链接，或者直接填数字 ID');
+      return;
+    }
+    if (ids.includes(id)) {
+      setStatus('这首歌已经在歌单里了');
+      return;
+    }
+    setBusy(true);
+    setStatus('正在查这首歌…');
+    try {
+      const res = await fetch(`/api/music?ids=${id}`);
+      const data: SongDetail[] = await res.json();
+      const song = data[0];
+      if (!song || song.error || !song.name) {
+        setStatus('没找到这首歌，可能是 ID 不对，或者是 VIP 歌');
+        return;
+      }
+      setDetails((prev) => ({ ...prev, [id]: song }));
+      change([...ids, id]);
+      setAddInput('');
+      setStatus(`已加入：${song.name} - ${song.artist || ''}`);
+    } catch {
+      setStatus('查歌失败，网易云那边可能没连上，稍后再试');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function move(i: number, dir: -1 | 1) {
+    const j = i + dir;
+    if (j < 0 || j >= ids.length) return;
+    const next = [...ids];
+    [next[i], next[j]] = [next[j], next[i]];
+    change(next);
+  }
+
+  function togglePlay(id: string) {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (playingId === id) {
+      audio.pause();
+      setPlayingId('');
+      return;
+    }
+    audio.src = `https://music.163.com/song/media/outer/url?id=${id}.mp3`;
+    audio.play().catch(() => setStatus('这首歌试听不了，可能是 VIP 歌'));
+    setPlayingId(id);
+  }
+
+  async function save() {
+    setBusy(true);
+    setStatus('保存中…');
+    try {
+      const data = await api('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cloudMusicIds: ids }),
+      });
+      setDirty(false);
+      setStatus(data.changed ? '已保存，音乐页约 1 分钟后更新。' : '没有改动。');
+    } catch (e) {
+      setStatus(e instanceof Error ? e.message : '保存失败');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!loaded) return <p className="mt-5 text-sm text-white/50">加载中…</p>;
+
+  return (
+    <>
+      <audio ref={audioRef} onEnded={() => setPlayingId('')} />
+      {status && <p className="mt-3 rounded-lg bg-white/5 px-3 py-2 text-sm text-white/80">{status}</p>}
+      <div className="mt-4 flex gap-2">
+        <input
+          className={inputCls}
+          value={addInput}
+          onChange={(e) => setAddInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') addSong();
+          }}
+          placeholder="粘贴网易云歌曲链接，或直接填数字 ID"
+        />
+        <button className={btnPrimary} onClick={addSong} disabled={busy || !addInput.trim()}>
+          加歌
+        </button>
+      </div>
+      <div className="mt-4 space-y-2">
+        {ids.length === 0 && <p className="text-sm text-white/50">歌单还是空的，上面粘贴一首喜欢的歌加进来吧。</p>}
+        {ids.map((id, i) => {
+          const s = details[id];
+          return (
+            <div key={id} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+              {s?.cover ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={s.cover} alt="" className="h-11 w-11 shrink-0 rounded-lg object-cover" />
+              ) : (
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-white/10 text-lg">🎵</div>
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-white">{s?.name || `歌曲 ${id}`}</p>
+                <p className="truncate text-xs text-white/50">{s?.artist || '正在查歌名…'}</p>
+              </div>
+              <button className={btnGhost} onClick={() => togglePlay(id)} disabled={!s?.name}>
+                {playingId === id ? '⏸' : '▶'}
+              </button>
+              <button className={btnGhost} onClick={() => move(i, -1)} disabled={i === 0}>
+                ↑
+              </button>
+              <button className={btnGhost} onClick={() => move(i, 1)} disabled={i === ids.length - 1}>
+                ↓
+              </button>
+              <button
+                className={btnGhost}
+                onClick={() => {
+                  if (playingId === id) {
+                    audioRef.current?.pause();
+                    setPlayingId('');
+                  }
+                  change(ids.filter((x) => x !== id));
+                }}
+              >
+                删除
+              </button>
+            </div>
+          );
+        })}
+      </div>
+      {dirty && (
+        <button className={`${btnPrimary} mt-4`} onClick={save} disabled={busy}>
+          {busy ? '保存中…' : `保存歌单（${ids.length} 首）`}
+        </button>
+      )}
+      <p className="mt-4 text-xs text-white/40">歌单存在博客设置里，保存后音乐页就能播。加歌时要先在网易云找到那首歌，复制它的链接或 ID 过来；VIP 歌可能播不了。</p>
+    </>
+  );
+}
+
 /* ---------------- 主界面 ---------------- */
 
 export default function AdminApp() {
@@ -902,6 +1094,7 @@ export default function AdminApp() {
       {tab === 'projects' && <ListTab listKey="projects" />}
       {tab === 'albums' && <ListTab listKey="albums" />}
       {tab === 'gallery' && <GalleryTab />}
+      {tab === 'music' && <MusicTab />}
       {tab === 'settings' && <SettingsTab />}
       <p className="mt-6 text-xs text-white/40">保存或删除后，Vercel 会自动重新部署，博客约 1 分钟后更新。</p>
     </main>

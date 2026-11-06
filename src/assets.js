@@ -201,7 +201,10 @@ button.danger{background:var(--danger);}
 .lockbar{display:flex;justify-content:center;margin-top:16px;}
 @media (max-width:600px){
   .nav-links{display:none;}
-  .hero{padding-top:48px;}
+  .hero{padding-top:24px;padding-bottom:16px;}
+  .hero-visual img{max-height:170px;object-fit:cover;}
+  .hero-visual figcaption{display:none;}
+  .scroll-hint{margin-top:16px;}
   .stealth{width:80px;height:80px;}
   .dialog{padding:24px;}
   .lockbar button{width:100%;}
@@ -217,6 +220,12 @@ button.danger{background:var(--danger);}
   .au.a2{width:120vmax;height:22vmax;top:22vmax;}
   .au.a3{display:none;}
 }
+/* 矮屏手机：首屏再压一压，保证标题+诗词+按钮+图能塞进一屏 */
+@media (max-height:700px){
+  .hero-visual img{max-height:110px;}
+  .scroll-hint{display:none;}
+  .quote{min-height:64px;}
+}
 @media (prefers-reduced-motion: reduce){
   html{scroll-behavior:auto;scroll-snap-type:none;}
   .scroll-hint span{animation:none;}
@@ -231,12 +240,13 @@ button.danger{background:var(--danger);}
 #bg-video.on{opacity:1;}
 .bg::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(3,8,18,.30),rgba(3,8,18,.45));}
 .hero,main,footer{position:relative;z-index:1;}
-/* 整屏翻页（v2.5.25）：滑一下换一屏。proximity 而非 mandatory，
-   内容超过一屏时仍可自由滚动，不会被卡住；减动效下关闭吸附。 */
-html{scroll-snap-type:y proximity;}
+/* 整屏翻页（v2.5.27）：一滑翻整页，不能停中间。mandatory + snap-stop:always，
+   每页恰好一屏高（内容已按一屏排布，超出的会被裁掉，所以各页内容必须塞得进一屏）；
+   减动效下关闭吸附。 */
+html{scroll-snap-type:y mandatory;}
 body.home main{display:contents;}
-body.home .hero{scroll-snap-align:start;min-height:100vh;min-height:100dvh;min-height:100svh;align-content:center;}
-body.home #nav,body.home #how{scroll-snap-align:start;scroll-snap-stop:normal;min-height:100vh;min-height:100dvh;min-height:100svh;display:flex;flex-direction:column;justify-content:center;width:min(1200px,92vw);margin:0 auto;}
+body.home .hero{scroll-snap-align:start;scroll-snap-stop:always;height:100vh;height:100dvh;height:100svh;align-content:center;overflow:hidden;}
+body.home #nav,body.home #how{scroll-snap-align:start;scroll-snap-stop:always;height:100vh;height:100dvh;height:100svh;display:flex;flex-direction:column;justify-content:center;width:min(1200px,92vw);margin:0 auto;overflow:hidden;}
 body.home .tagline{width:min(1200px,92vw);margin:0 auto;}
 .scroll-hint{margin:32px 0 0;font-family:var(--mono);font-size:12px;letter-spacing:.16em;color:#9fb8d8;}
 .scroll-hint span{display:inline-block;margin-left:4px;animation:hintBob 1.6s ease-in-out infinite;}
@@ -444,6 +454,33 @@ export const HOME_JS = `
   let pagerTick = false;
   window.addEventListener('scroll', () => { if (!pagerTick) { pagerTick = true; requestAnimationFrame(() => { updatePager(); pagerTick = false; }); } }, { passive: true });
   updatePager();
+
+  // 强制翻页：滚轮 / 方向键一次只翻一页，翻页动画期间忽略新的翻页；
+  // 已经到头/到尾时不拦截，让原生滚动去看页脚等吸附区之外的内容。
+  let pageLock = false;
+  function currentPage(){
+    let cur = 0;
+    pages.forEach((p, i) => { if (p.offsetTop <= window.scrollY + 10) cur = i; });
+    return cur;
+  }
+  function goPage(dir){
+    const next = currentPage() + dir;
+    if (next < 0 || next >= pages.length || pageLock) return false;
+    pageLock = true;
+    pages[next].scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => { pageLock = false; }, 800);
+    return true;
+  }
+  window.addEventListener('keydown', (e) => {
+    if (modal.classList.contains('open')) return;
+    if (e.key === 'ArrowDown' || e.key === 'PageDown') { if (goPage(1)) e.preventDefault(); }
+    if (e.key === 'ArrowUp' || e.key === 'PageUp') { if (goPage(-1)) e.preventDefault(); }
+  });
+  window.addEventListener('wheel', (e) => {
+    if (modal.classList.contains('open')) return;
+    if (Math.abs(e.deltaY) < 24) return;
+    if (goPage(e.deltaY > 0 ? 1 : -1)) e.preventDefault();
+  }, { passive: false });
 
   loadNav();
   loadQuote();

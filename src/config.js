@@ -26,7 +26,7 @@ export const DEFAULT_CONFIG = [
   { url: "https://ops.lxlhub.qzz.io", title: "服务器探针", desc: "VPS 资源监控状态", isPrivate: false, isHidden: false, icon: SERVER_ICON },
 ];
 
-export const DEFAULT_SETTINGS = { quoteInterval: 60, quoteSource: "local" }; // quoteSource: local | hitokoto | off
+export const DEFAULT_SETTINGS = { quoteInterval: 60, quoteSource: "local", camouflage: false }; // quoteSource: local | hitokoto | off; camouflage: true 时未解锁只剩标题和诗词
 
 export const LOCAL_QUOTES = [
   "山重水复疑无路，柳暗花明又一村。",
@@ -102,6 +102,7 @@ export function validateSettings(input) {
   const interval = parseInt(input.quoteInterval, 10);
   out.quoteInterval = Number.isFinite(interval) ? Math.min(Math.max(interval, 0), 3600) : DEFAULT_SETTINGS.quoteInterval;
   out.quoteSource = ["local", "hitokoto", "off"].includes(input.quoteSource) ? input.quoteSource : "local";
+  out.camouflage = input.camouflage === true;
   return out;
 }
 

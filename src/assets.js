@@ -244,6 +244,9 @@ body.home .tagline{width:min(1200px,92vw);margin:0 auto;}
 .pager{position:fixed;right:16px;top:50%;transform:translateY(-50%);z-index:60;display:flex;flex-direction:column;gap:12px;}
 .pager button{width:8px;height:8px;min-height:0;padding:0;border-radius:50%;background:rgba(255,255,255,.35);border:0;cursor:pointer;box-shadow:none;}
 .pager button.active{background:#e8c98a;transform:scale(1.4);}
+/* 伪装模式（v2.5.26）：未解锁时只剩标题和诗词，导航、两步直达、
+   标语、页脚、翻页圆点、进入导航按钮和下滑提示全部隐藏。 */
+body.camouflaged #nav,body.camouflaged #how,body.camouflaged .tagline,body.camouflaged footer,body.camouflaged .pager,body.camouflaged .scroll-hint,body.camouflaged .cta-row{display:none;}
 @media (min-aspect-ratio:1/1){#bg-video{object-position:50% 22%;}.bg-static{background-position:50% 22%;}}
 `;
 
@@ -344,6 +347,8 @@ export const HOME_JS = `
     if(!res.ok){ grid.textContent = ''; grid.appendChild(el('p','empty','导航加载失败，请刷新重试。')); return; }
     const data = await res.json();
     items = data.items || []; unlocked = !!data.unlocked;
+    // 伪装模式未解锁：只剩标题和诗词，其余区块全部隐藏；解锁后恢复。
+    document.body.classList.toggle('camouflaged', !!data.camouflaged);
     lockBtn.style.display = unlocked ? '' : 'none';
     proofEl.textContent = items.length + ' 个节点 · 正在探测状态';
     render();
@@ -494,12 +499,14 @@ export const ADMIN_JS = `
     items = data.items || []; settings = data.settings || {};
     document.getElementById('quoteInterval').value = settings.quoteInterval ?? 60;
     document.getElementById('quoteSource').value = settings.quoteSource || 'local';
+    document.getElementById('camouflage').checked = settings.camouflage === true;
     render();
   }
 
   async function save(){
     settings.quoteInterval = parseInt(document.getElementById('quoteInterval').value, 10) || 0;
     settings.quoteSource = document.getElementById('quoteSource').value;
+    settings.camouflage = document.getElementById('camouflage').checked;
     const res = await fetch('/admin/api/save', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ items, settings }) });
     if(res.ok) toast('已保存'); else { const t = await res.text(); toast('保存失败：' + t); }
   }

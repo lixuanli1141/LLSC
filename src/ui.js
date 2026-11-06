@@ -32,7 +32,7 @@ export function renderHome(settings) {
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/long-cang@5.3.0/index.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/ma-shan-zheng@5.2.9/index.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@callmebill/lxgw-wenkai-web@1.522.0/lxgwwenkai-regular/result.css">
-<link rel="stylesheet" href="/assets/app.css?v=2.5.25">
+<link rel="stylesheet" href="/assets/app.css?v=2.5.26">
 <script type="application/json" id="llsc-settings">${safeSettingsJson(settings)}</script>
 </head>
 <body class="home">
@@ -98,7 +98,7 @@ export function renderHome(settings) {
   <span>© ${year} ${escapeHtml(SITE_NAME)}</span>
   <span><a href="/">回首页</a> · <a href="/admin">管理后台</a></span>
 </footer>
-<script src="/assets/app.js?v=2.5.25" defer></script>
+<script src="/assets/app.js?v=2.5.26" defer></script>
 </body>
 </html>`;
 }
@@ -111,7 +111,7 @@ export function renderNotFound() {
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>页面不在这里 · ${escapeHtml(SITE_NAME)}</title>
 <link rel="icon" href="${FAVICON}">
-<link rel="stylesheet" href="/assets/app.css?v=2.5.25">
+<link rel="stylesheet" href="/assets/app.css?v=2.5.26">
 </head>
 <body>
 <main class="notfound">
@@ -132,7 +132,7 @@ export function renderAdmin() {
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>${escapeHtml(SITE_NAME)} · 管理后台</title>
 <link rel="icon" href="${FAVICON}">
-<link rel="stylesheet" href="/assets/app.css?v=2.5.25">
+<link rel="stylesheet" href="/assets/app.css?v=2.5.26">
 <style>
   main{width:min(860px,92vw)} .edit-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:16px;box-shadow:var(--shadow)}
   .card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
@@ -168,6 +168,9 @@ export function renderAdmin() {
     </label>
     <label class="field"><span>语录轮换间隔（秒，0 为不自动轮换）</span>
       <input type="number" id="quoteInterval" min="0" max="3600" value="60">
+    </label>
+    <label class="field"><span>伪装模式</span>
+      <label style="display:flex;gap:8px;align-items:center;font-size:14px"><input type="checkbox" id="camouflage" style="width:auto;min-height:0"> 隐藏全部导航：未解锁时首页只剩标题和诗词，输口令后才显示导航</label>
     </label>
     <p class="hint">管理员密码与口令在 Cloudflare 后台以 Secret 管理，不在这里修改，也不会显示在这里。</p>
   </div>

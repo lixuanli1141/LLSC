@@ -183,12 +183,15 @@ export default {
       const [items, settings, unlocked] = await Promise.all([
         loadItems(env), loadSettings(env), hasRevealSession(request, env),
       ]);
+      // 伪装模式：未解锁时连公开项也不返回，首页只剩标题和诗词。
+      // 解锁后恢复正常可见项。camouflaged 字段供前端决定是否隐藏相关区块。
+      const camouflaged = settings.camouflage === true && !unlocked;
       // 只返回调用者可见项，且剥掉 isPrivate / isHidden 字段：
       // 未解锁的人从响应里看不出“存在私密项”这件事。
-      const visible = visibleItems(items, unlocked).map(({ title, url, desc, icon, originalIdx }) => (
+      const visible = camouflaged ? [] : visibleItems(items, unlocked).map(({ title, url, desc, icon, originalIdx }) => (
         { title, url, desc, icon, originalIdx }
       ));
-      return json({ items: visible, unlocked, settings });
+      return json({ items: visible, unlocked, settings, camouflaged });
     }
 
     if (url.pathname === "/api/quote" && request.method === "GET") {
@@ -235,10 +238,12 @@ export default {
         return text("请求体必须是 JSON", 400);
       }
       if (!Array.isArray(indices) || indices.length > 50) return text("indices 必须是最多 50 个下标的数组", 400);
-      const [items, unlocked] = await Promise.all([loadItems(env), hasRevealSession(request, env)]);
+      const [items, settings, unlocked] = await Promise.all([loadItems(env), loadSettings(env), hasRevealSession(request, env)]);
       // 只探测调用者可见的项：不可见的下标（私密未解锁、隐藏、不存在）
       // 一律返回同样的 { idx, ok: false }，不去探测、不区分、不留时延差别。
-      const visibleIdx = new Set(visibleItems(items, unlocked).map((v) => v.originalIdx));
+      // 伪装模式未解锁时全部下标都按不可见处理。
+      const camouflaged = settings.camouflage === true && !unlocked;
+      const visibleIdx = camouflaged ? new Set() : new Set(visibleItems(items, unlocked).map((v) => v.originalIdx));
       const results = await Promise.all(indices.map(async (idx) => {
         const item = items[idx];
         if (!item || item.isHidden || !visibleIdx.has(idx)) return { idx, ok: false };

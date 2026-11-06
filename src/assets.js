@@ -218,7 +218,8 @@ button.danger{background:var(--danger);}
   .au.a3{display:none;}
 }
 @media (prefers-reduced-motion: reduce){
-  html{scroll-behavior:auto;}
+  html{scroll-behavior:auto;scroll-snap-type:none;}
+  .scroll-hint span{animation:none;}
   *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;}
   .card{animation:none;}
   .reveal{opacity:1;transform:none;}
@@ -230,6 +231,19 @@ button.danger{background:var(--danger);}
 #bg-video.on{opacity:1;}
 .bg::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(3,8,18,.30),rgba(3,8,18,.45));}
 .hero,main,footer{position:relative;z-index:1;}
+/* 整屏翻页（v2.5.25）：滑一下换一屏。proximity 而非 mandatory，
+   内容超过一屏时仍可自由滚动，不会被卡住；减动效下关闭吸附。 */
+html{scroll-snap-type:y proximity;}
+body.home main{display:contents;}
+body.home .hero{scroll-snap-align:start;min-height:100vh;min-height:100dvh;min-height:100svh;align-content:center;}
+body.home #nav,body.home #how{scroll-snap-align:start;scroll-snap-stop:normal;min-height:100vh;min-height:100dvh;min-height:100svh;display:flex;flex-direction:column;justify-content:center;width:min(1200px,92vw);margin:0 auto;}
+body.home .tagline{width:min(1200px,92vw);margin:0 auto;}
+.scroll-hint{margin:32px 0 0;font-family:var(--mono);font-size:12px;letter-spacing:.16em;color:#9fb8d8;}
+.scroll-hint span{display:inline-block;margin-left:4px;animation:hintBob 1.6s ease-in-out infinite;}
+@keyframes hintBob{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+.pager{position:fixed;right:16px;top:50%;transform:translateY(-50%);z-index:60;display:flex;flex-direction:column;gap:12px;}
+.pager button{width:8px;height:8px;min-height:0;padding:0;border-radius:50%;background:rgba(255,255,255,.35);border:0;cursor:pointer;box-shadow:none;}
+.pager button.active{background:#e8c98a;transform:scale(1.4);}
 @media (min-aspect-ratio:1/1){#bg-video{object-position:50% 22%;}.bg-static{background-position:50% 22%;}}
 `;
 
@@ -410,6 +424,21 @@ export const HOME_JS = `
   pwdInput.addEventListener('keydown', e => { if(e.key === 'Enter') verify(); });
   modal.addEventListener('click', e => { if(e.target === modal) closeModal(); });
   lockBtn.addEventListener('click', lock);
+
+  // 整屏翻页圆点：根据滚动位置点亮当前屏，点圆点跳到对应屏。
+  const pages = [document.querySelector('.hero'), document.getElementById('nav'), document.getElementById('how')].filter(Boolean);
+  const pagerBtns = [...document.querySelectorAll('.pager button')];
+  function updatePager(){
+    if(!pages.length) return;
+    let cur = 0;
+    const mid = window.scrollY + window.innerHeight / 2;
+    pages.forEach((p, i) => { if (p.offsetTop <= mid) cur = i; });
+    pagerBtns.forEach((b, i) => b.classList.toggle('active', i === cur));
+  }
+  pagerBtns.forEach((b, i) => b.addEventListener('click', () => pages[i] && pages[i].scrollIntoView({ behavior: 'smooth' })));
+  let pagerTick = false;
+  window.addEventListener('scroll', () => { if (!pagerTick) { pagerTick = true; requestAnimationFrame(() => { updatePager(); pagerTick = false; }); } }, { passive: true });
+  updatePager();
 
   loadNav();
   loadQuote();

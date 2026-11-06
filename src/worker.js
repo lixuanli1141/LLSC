@@ -142,6 +142,13 @@ export default {
       return new Response(data, { headers });
     }
 
+    // 首图视频封面：用户视频里截的一帧（日落，KV key hero-video-poster）。
+    if (url.pathname === "/assets/hero-poster.jpg" && request.method === "GET") {
+      const data = await env.MY_KV.get("hero-video-poster", "arrayBuffer");
+      if (data === null) return new Response("not found", { status: 404 });
+      return new Response(data, { headers: { ...SECURITY_HEADERS, "Content-Type": "image/jpeg", "Cache-Control": "public, max-age=31536000, immutable" } });
+    }
+
     // 视频背景：水墨固定镜头版。视频支持 Range（浏览器边下边播、循环无缝），
     // 海报图是视频加载完成前的静态背景，弱网 / 省流 / 减动效下只显示静态图。
     if (url.pathname === "/assets/bg-ink.jpg" && request.method === "GET") {

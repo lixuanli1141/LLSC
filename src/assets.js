@@ -99,6 +99,16 @@ h1{font-family:var(--title);font-size:36px;line-height:1.12;margin:0;letter-spac
 .window-bar span{width:12px;height:12px;border-radius:50%;background:rgba(147,197,253,.35);}
 .window-bar em{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--muted);margin-left:8px;}
 .hero-visual figcaption{padding:16px;font-family:var(--mono);font-size:12px;color:var(--muted);}
+.hero-media{position:relative;}
+.hero-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;border-radius:50%;border:1px solid rgba(56,189,248,.65);background:linear-gradient(135deg,rgba(56,189,248,.45),rgba(2,132,199,.35));backdrop-filter:blur(8px) saturate(160%);-webkit-backdrop-filter:blur(8px) saturate(160%);box-shadow:0 8px 32px rgba(2,132,199,.45),inset 0 1px 0 rgba(255,255,255,.25);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:opacity .3s var(--ease),transform .3s var(--ease);animation:playIn .5s var(--ease) .9s backwards;z-index:2;}
+.hero-play svg{margin-left:3px;}
+.hero-play:hover{transform:translate(-50%,-50%) scale(1.08);}
+.hero-play:active{transform:translate(-50%,-50%) scale(.96);}
+.hero-play::after{content:"";position:absolute;inset:-7px;border-radius:50%;border:1px solid rgba(56,189,248,.55);animation:pulseRing 2.2s ease-out infinite;}
+.hero-visual.is-playing .hero-play{opacity:0;pointer-events:none;transform:translate(-50%,-50%) scale(.85);}
+.hero-visual.is-playing .hero-play::after{animation:none;opacity:0;}
+@keyframes playIn{from{opacity:0;transform:translate(-50%,-50%) scale(.8);}to{opacity:1;transform:translate(-50%,-50%) scale(1);}}
+@keyframes pulseRing{0%{transform:scale(.92);opacity:.9;}70%{transform:scale(1.28);opacity:0;}100%{transform:scale(1.28);opacity:0;}}
 main{width:min(1200px,92vw);margin:0 auto;}
 section{padding:48px 0;}
 .section-head{margin-bottom:32px;}
@@ -289,6 +299,7 @@ html:has(>body.home){scroll-snap-type:y mandatory;}
 @media (prefers-reduced-motion: reduce){
   .hline-in{animation:none;transform:none;}
   .hero-visual img,.hero-visual video{animation:none;clip-path:none;}
+  .hero-play,.hero-play::after{animation:none;}
   .card.fly{transform:none;opacity:1;}
   .icon.draw svg :is(path,rect,circle,line,polyline,polygon,ellipse){stroke-dashoffset:0;transition:none;}
   html:has(>body.home){scroll-snap-type:none;}
@@ -373,6 +384,19 @@ export const HOME_JS = `
     };
     window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(scrub); } }, { passive: true });
     scrub();
+  }
+
+  // 首图视频播放器：无原生控件（不显示进度条），点播放键或点画面播/停；
+  // 播完自动停，回封面（load() 恢复 poster）。
+  const heroFigure = document.querySelector('.hero-visual');
+  const heroVideo = document.querySelector('.hero-visual video');
+  const heroPlayBtn = document.querySelector('.hero-play');
+  if (heroFigure && heroVideo && heroPlayBtn) {
+    heroPlayBtn.addEventListener('click', () => { heroVideo.play(); });
+    heroVideo.addEventListener('click', () => { if (heroVideo.paused) heroVideo.play(); else heroVideo.pause(); });
+    heroVideo.addEventListener('play', () => { heroFigure.classList.add('is-playing'); });
+    heroVideo.addEventListener('pause', () => { heroFigure.classList.remove('is-playing'); });
+    heroVideo.addEventListener('ended', () => { heroFigure.classList.remove('is-playing'); heroVideo.load(); });
   }
 
   // Tagline 逐字显现：每字一个 IntersectionObserver 触发点。

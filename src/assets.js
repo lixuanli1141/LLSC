@@ -161,7 +161,7 @@ section{padding:48px 0;}
 .reveal{opacity:0;transform:translateY(32px);
   transition:opacity .7s var(--ease),transform .7s var(--ease);}
 .reveal.in{opacity:1;transform:translateY(0);}
-footer{width:min(1200px,92vw);margin:0 auto;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+footer{width:min(1200px,92vw);margin:0 auto;display:flex;justify-content:center;gap:16px;flex-wrap:wrap;
   color:#8fa9c7;font-family:var(--mono);font-size:12px;letter-spacing:.08em;padding:32px 0 48px;}
 footer a{text-decoration:none;}
 footer a:hover{color:var(--ink);}

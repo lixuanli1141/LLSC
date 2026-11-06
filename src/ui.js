@@ -32,7 +32,7 @@ export function renderHome(settings) {
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/long-cang@5.3.0/index.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/ma-shan-zheng@5.2.9/index.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@callmebill/lxgw-wenkai-web@1.522.0/lxgwwenkai-regular/result.css">
-<link rel="stylesheet" href="/assets/app.css?v=2.5.42">
+<link rel="stylesheet" href="/assets/app.css?v=2.5.43">
 <script type="application/json" id="llsc-settings">${safeSettingsJson(settings)}</script>
 </head>
 <body class="home">
@@ -64,7 +64,7 @@ export function renderHome(settings) {
   </div>
   <figure class="hero-visual reveal">
     <div class="window-bar"><span></span><span></span><span></span></div>
-    <video src="/assets/hero.mp4" poster="/assets/hero.jpg" autoplay muted loop playsinline></video>
+    <video src="/assets/hero.mp4" poster="/assets/hero.jpg" controls loop playsinline></video>
     <figcaption>山川有灵，归处有光</figcaption>
   </figure>
 </header>
@@ -93,7 +93,7 @@ export function renderHome(settings) {
 <footer>
   <span>© ${year} ${escapeHtml(SITE_NAME)}</span>
 </footer>
-<script src="/assets/app.js?v=2.5.42" defer></script>
+<script src="/assets/app.js?v=2.5.43" defer></script>
 </body>
 </html>`;
 }
@@ -106,7 +106,7 @@ export function renderNotFound() {
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>页面不在这里 · ${escapeHtml(SITE_NAME)}</title>
 <link rel="icon" href="${FAVICON}">
-<link rel="stylesheet" href="/assets/app.css?v=2.5.42">
+<link rel="stylesheet" href="/assets/app.css?v=2.5.43">
 </head>
 <body>
 <main class="notfound">
@@ -127,7 +127,7 @@ export function renderAdmin() {
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>${escapeHtml(SITE_NAME)} · 管理后台</title>
 <link rel="icon" href="${FAVICON}">
-<link rel="stylesheet" href="/assets/app.css?v=2.5.42">
+<link rel="stylesheet" href="/assets/app.css?v=2.5.43">
 <style>
   main{width:min(860px,92vw)} .edit-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:16px;box-shadow:var(--shadow)}
   .card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}

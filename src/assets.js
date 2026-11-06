@@ -201,10 +201,7 @@ button.danger{background:var(--danger);}
 .lockbar{display:flex;justify-content:center;margin-top:16px;}
 @media (max-width:600px){
   .nav-links{display:none;}
-  .hero{padding-top:24px;padding-bottom:16px;}
-  .hero-visual img{max-height:170px;object-fit:cover;}
-  .hero-visual figcaption{display:none;}
-  .scroll-hint{margin-top:16px;}
+  .hero{padding-top:48px;}
   .stealth{width:80px;height:80px;}
   .dialog{padding:24px;}
   .lockbar button{width:100%;}
@@ -220,15 +217,8 @@ button.danger{background:var(--danger);}
   .au.a2{width:120vmax;height:22vmax;top:22vmax;}
   .au.a3{display:none;}
 }
-/* 矮屏手机：首屏再压一压，保证标题+诗词+按钮+图能塞进一屏 */
-@media (max-height:700px){
-  .hero-visual img{max-height:110px;}
-  .scroll-hint{display:none;}
-  .quote{min-height:64px;}
-}
 @media (prefers-reduced-motion: reduce){
-  html{scroll-behavior:auto;scroll-snap-type:none;}
-  .scroll-hint span{animation:none;}
+  html{scroll-behavior:auto;}
   *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;}
   .card{animation:none;}
   .reveal{opacity:1;transform:none;}
@@ -240,23 +230,6 @@ button.danger{background:var(--danger);}
 #bg-video.on{opacity:1;}
 .bg::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(3,8,18,.30),rgba(3,8,18,.45));}
 .hero,main,footer{position:relative;z-index:1;}
-/* 整屏翻页（v2.5.27）：一滑翻整页，不能停中间。mandatory + snap-stop:always，
-   每页恰好一屏高（内容已按一屏排布，超出的会被裁掉，所以各页内容必须塞得进一屏）；
-   减动效下关闭吸附。 */
-html{scroll-snap-type:y mandatory;}
-body.home main{display:contents;}
-body.home .hero{scroll-snap-align:start;scroll-snap-stop:always;height:100vh;height:100dvh;height:100svh;align-content:center;overflow:hidden;}
-body.home #nav,body.home #how{scroll-snap-align:start;scroll-snap-stop:always;height:100vh;height:100dvh;height:100svh;display:flex;flex-direction:column;justify-content:center;width:min(1200px,92vw);margin:0 auto;overflow:hidden;}
-body.home .tagline{width:min(1200px,92vw);margin:0 auto;}
-.scroll-hint{margin:32px 0 0;font-family:var(--mono);font-size:12px;letter-spacing:.16em;color:#9fb8d8;}
-.scroll-hint span{display:inline-block;margin-left:4px;animation:hintBob 1.6s ease-in-out infinite;}
-@keyframes hintBob{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
-.pager{position:fixed;right:16px;top:50%;transform:translateY(-50%);z-index:60;display:flex;flex-direction:column;gap:12px;}
-.pager button{width:8px;height:8px;min-height:0;padding:0;border-radius:50%;background:rgba(255,255,255,.35);border:0;cursor:pointer;box-shadow:none;}
-.pager button.active{background:#e8c98a;transform:scale(1.4);}
-/* 伪装模式（v2.5.26）：未解锁时只剩标题和诗词，导航、两步直达、
-   标语、页脚、翻页圆点、进入导航按钮和下滑提示全部隐藏。 */
-body.camouflaged #nav,body.camouflaged #how,body.camouflaged .tagline,body.camouflaged footer,body.camouflaged .pager,body.camouflaged .scroll-hint,body.camouflaged .cta-row{display:none;}
 @media (min-aspect-ratio:1/1){#bg-video{object-position:50% 22%;}.bg-static{background-position:50% 22%;}}
 `;
 
@@ -357,8 +330,6 @@ export const HOME_JS = `
     if(!res.ok){ grid.textContent = ''; grid.appendChild(el('p','empty','导航加载失败，请刷新重试。')); return; }
     const data = await res.json();
     items = data.items || []; unlocked = !!data.unlocked;
-    // 伪装模式未解锁：只剩标题和诗词，其余区块全部隐藏；解锁后恢复。
-    document.body.classList.toggle('camouflaged', !!data.camouflaged);
     lockBtn.style.display = unlocked ? '' : 'none';
     proofEl.textContent = items.length + ' 个节点 · 正在探测状态';
     render();
@@ -440,48 +411,6 @@ export const HOME_JS = `
   modal.addEventListener('click', e => { if(e.target === modal) closeModal(); });
   lockBtn.addEventListener('click', lock);
 
-  // 整屏翻页圆点：根据滚动位置点亮当前屏，点圆点跳到对应屏。
-  const pages = [document.querySelector('.hero'), document.getElementById('nav'), document.getElementById('how')].filter(Boolean);
-  const pagerBtns = [...document.querySelectorAll('.pager button')];
-  function updatePager(){
-    if(!pages.length) return;
-    let cur = 0;
-    const mid = window.scrollY + window.innerHeight / 2;
-    pages.forEach((p, i) => { if (p.offsetTop <= mid) cur = i; });
-    pagerBtns.forEach((b, i) => b.classList.toggle('active', i === cur));
-  }
-  pagerBtns.forEach((b, i) => b.addEventListener('click', () => pages[i] && pages[i].scrollIntoView({ behavior: 'smooth' })));
-  let pagerTick = false;
-  window.addEventListener('scroll', () => { if (!pagerTick) { pagerTick = true; requestAnimationFrame(() => { updatePager(); pagerTick = false; }); } }, { passive: true });
-  updatePager();
-
-  // 强制翻页：滚轮 / 方向键一次只翻一页，翻页动画期间忽略新的翻页；
-  // 已经到头/到尾时不拦截，让原生滚动去看页脚等吸附区之外的内容。
-  let pageLock = false;
-  function currentPage(){
-    let cur = 0;
-    pages.forEach((p, i) => { if (p.offsetTop <= window.scrollY + 10) cur = i; });
-    return cur;
-  }
-  function goPage(dir){
-    const next = currentPage() + dir;
-    if (next < 0 || next >= pages.length || pageLock) return false;
-    pageLock = true;
-    pages[next].scrollIntoView({ behavior: 'smooth' });
-    setTimeout(() => { pageLock = false; }, 800);
-    return true;
-  }
-  window.addEventListener('keydown', (e) => {
-    if (modal.classList.contains('open')) return;
-    if (e.key === 'ArrowDown' || e.key === 'PageDown') { if (goPage(1)) e.preventDefault(); }
-    if (e.key === 'ArrowUp' || e.key === 'PageUp') { if (goPage(-1)) e.preventDefault(); }
-  });
-  window.addEventListener('wheel', (e) => {
-    if (modal.classList.contains('open')) return;
-    if (Math.abs(e.deltaY) < 24) return;
-    if (goPage(e.deltaY > 0 ? 1 : -1)) e.preventDefault();
-  }, { passive: false });
-
   loadNav();
   loadQuote();
   const interval = (settings.quoteInterval || 0) * 1000;
@@ -536,14 +465,12 @@ export const ADMIN_JS = `
     items = data.items || []; settings = data.settings || {};
     document.getElementById('quoteInterval').value = settings.quoteInterval ?? 60;
     document.getElementById('quoteSource').value = settings.quoteSource || 'local';
-    document.getElementById('camouflage').checked = settings.camouflage === true;
     render();
   }
 
   async function save(){
     settings.quoteInterval = parseInt(document.getElementById('quoteInterval').value, 10) || 0;
     settings.quoteSource = document.getElementById('quoteSource').value;
-    settings.camouflage = document.getElementById('camouflage').checked;
     const res = await fetch('/admin/api/save', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ items, settings }) });
     if(res.ok) toast('已保存'); else { const t = await res.text(); toast('保存失败：' + t); }
   }

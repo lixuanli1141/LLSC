@@ -201,7 +201,7 @@ button.danger{background:var(--danger);}
 .lockbar{display:flex;justify-content:center;margin-top:16px;}
 @media (max-width:600px){
   .nav-links{display:none;}
-  .hero{padding-top:48px;}
+  .hero{padding-top:16px;}
   .stealth{width:80px;height:80px;}
   .dialog{padding:24px;}
   .lockbar button{width:100%;}

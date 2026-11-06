@@ -22,9 +22,9 @@ export function renderHome(settings) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="description" content="${escapeHtml(SITE_NAME)} — 云盘、影视、题库和服务器，都在一处归拢的个人导航。">
+<meta name="description" content="${escapeHtml(SITE_NAME)} — 云盘、影视、服务器，东西都在这儿。">
 <meta property="og:title" content="${escapeHtml(SITE_NAME)}">
-<meta property="og:description" content="云盘、影视、题库和服务器，都在一处归拢的个人导航。">
+<meta property="og:description" content="云盘、影视、服务器，东西都在这儿。">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#050b18">
 <title>${escapeHtml(SITE_NAME)} — 个人导航</title>
@@ -32,7 +32,7 @@ export function renderHome(settings) {
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/long-cang@5.3.0/index.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/ma-shan-zheng@5.2.9/index.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@callmebill/lxgw-wenkai-web@1.522.0/lxgwwenkai-regular/result.css">
-<link rel="stylesheet" href="/assets/app.css?v=2.5.37">
+<link rel="stylesheet" href="/assets/app.css?v=2.5.39">
 <script type="application/json" id="llsc-settings">${safeSettingsJson(settings)}</script>
 </head>
 <body>
@@ -71,29 +71,29 @@ export function renderHome(settings) {
 <main id="main">
   <section id="nav" class="reveal" aria-label="导航">
     <div class="section-head">
-      <h2>所有入口，一处归拢</h2>
-      <p class="section-sub">点一张卡片，直达一个地方。状态点会实时告诉你它现在能不能打开。</p>
+      <h2>东西都在这儿</h2>
+      <p class="section-sub">点卡片就打开。绿点是在线，暗了就是挂了。</p>
     </div>
     <div class="grid" id="grid"></div>
     <div class="lockbar"><button class="ghost lock-btn" id="lock-btn" type="button" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path class="shackle" d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>锁定</span></button></div>
   </section>
   <section id="how" class="reveal" aria-label="如何使用">
     <div class="section-head">
-      <h2>两步直达</h2>
+      <h2>怎么用</h2>
     </div>
     <ol class="steps">
-      <li><span class="step-num">01</span><h3>打开页面</h3><p>所有节点都在上面，点卡片就走，不用记地址。</p></li>
-      <li><span class="step-num">02</span><h3>点卡片直达</h3><p>状态点在线就直接打开，离线先别点，等它回来。</p></li>
+      <li><span class="step-num">01</span><h3>打开页面</h3><p>东西都在上面，点一下就走，不用记地址。</p></li>
+      <li><span class="step-num">02</span><h3>点卡片</h3><p>绿了直接点，灰了先别点，等它回来。</p></li>
     </ol>
   </section>
   <section class="tagline" aria-label="一句">
-    <p id="tagline">把散落各处的入口，收进一处干净的地方。</p>
+    <p id="tagline">东西散得到处都是，收在这儿了。</p>
   </section>
 </main>
 <footer>
   <span>© ${year} ${escapeHtml(SITE_NAME)}</span>
 </footer>
-<script src="/assets/app.js?v=2.5.37" defer></script>
+<script src="/assets/app.js?v=2.5.39" defer></script>
 </body>
 </html>`;
 }
@@ -106,7 +106,7 @@ export function renderNotFound() {
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>页面不在这里 · ${escapeHtml(SITE_NAME)}</title>
 <link rel="icon" href="${FAVICON}">
-<link rel="stylesheet" href="/assets/app.css?v=2.5.37">
+<link rel="stylesheet" href="/assets/app.css?v=2.5.39">
 </head>
 <body>
 <main class="notfound">
@@ -127,7 +127,7 @@ export function renderAdmin() {
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>${escapeHtml(SITE_NAME)} · 管理后台</title>
 <link rel="icon" href="${FAVICON}">
-<link rel="stylesheet" href="/assets/app.css?v=2.5.37">
+<link rel="stylesheet" href="/assets/app.css?v=2.5.39">
 <style>
   main{width:min(860px,92vw)} .edit-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:16px;box-shadow:var(--shadow)}
   .card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
